@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AI with Hammad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #05090e;
+    --bg-2: #0b131b;
+    --ink: #e8f1f2;
+    --muted: #8ba5ae;
+    --cyan: #22d3ee;
+    --teal: #2dd4bf;
+    --line: rgba(45, 212, 191, 0.14);
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-strong: rgba(255, 255, 255, 0.05);
+    --font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
+    --font-body: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.65;
+    padding-inline: max(16px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: rgba(34, 211, 238, 0.25); }
+
+  .page {
+    max-width: 1060px;
+    margin-inline: auto;
+    padding-block: 0 5rem;
+  }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 12px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-block: 12px 0;
+    padding: 0.7rem 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(7, 12, 17, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .brand-mark {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--cyan);
+    border: 1px solid rgba(34, 211, 238, 0.35);
+    background: rgba(34, 211, 238, 0.08);
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.18);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.4rem;
+    font-size: 0.85rem;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a:hover { color: var(--cyan); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    padding-block: clamp(4.5rem, 10vw, 7.5rem) clamp(3rem, 7vw, 4.5rem);
+    text-align: center;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 10% 20% auto;
+    height: 260px;
+    margin-inline: auto;
+    max-width: 560px;
+    background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.09), transparent 70%);
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    background: var(--glass);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.3rem, 6vw, 3.9rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 1.4rem auto 1.1rem;
+    max-width: 17ch;
+  }
+
+  .hero h1 .accent {
+    color: var(--cyan);
+    text-shadow: 0 0 26px rgba(34, 211, 238, 0.35);
+  }
+
+  .hero p {
+    max-width: 52ch;
+    margin: 0 auto 2.2rem;
+    color: var(--muted);
+    font-size: 1.06rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 0.9rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+    border-radius: 12px;
+    padding: 0.85rem 1.6rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
+  }
+
+  .btn-primary {
+    color: #04201f;
+    background: linear-gradient(135deg, var(--cyan), var(--teal));
+    box-shadow: 0 0 24px rgba(34, 211, 238, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 36px rgba(34, 211, 238, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .btn-ghost {
+    color: var(--ink);
+    border: 1px solid var(--line);
+    background: var(--glass);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .btn-ghost:hover {
+    border-color: rgba(34, 211, 238, 0.45);
+    transform: translateY(-2px);
+  }
+
+  /* ---------- Sections ---------- */
+  section { padding-block: clamp(2.5rem, 6vw, 4rem); }
+
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 2.2rem;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  /* ---------- Services ---------- */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.1rem;
+  }
+
+  .service-card {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 1.7rem 1.5rem;
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .service-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(320px circle at 20% 0%, rgba(45, 212, 191, 0.09), transparent 65%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .service-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(34, 211, 238, 0.4);
+  }
+
+  .service-card:hover::after { opacity: 1; }
+
+  .service-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 1.2rem;
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    background: rgba(34, 211, 238, 0.07);
+    color: var(--cyan);
+  }
+
+  .service-icon svg { width: 20px; height: 20px; }
+
+  .service-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-weight: 600;
+    margin: 0 0 0.55rem;
+    letter-spacing: -0.005em;
+  }
+
+  .service-card p {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+
+  /* ---------- Stats ---------- */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--line);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .stat {
+    background: rgba(9, 15, 21, 0.85);
+    padding: 2rem 1.6rem;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: clamp(2.1rem, 5vw, 2.9rem);
+    font-weight: 500;
+    color: var(--cyan);
+    text-shadow: 0 0 22px rgba(34, 211, 238, 0.3);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .stat-value .suffix { color: var(--teal); }
+
+  .stat-label {
+    margin-top: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- Footer CTA ---------- */
+  .cta-band {
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: clamp(2.2rem, 6vw, 3.5rem);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-band::before {
+    content: "";
+    position: absolute;
+    inset: auto 25% -40%;
+    height: 200px;
+    background: radial-gradient(ellipse at center, rgba(45, 212, 191, 0.1), transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-band h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.7rem;
+    text-wrap: balance;
+  }
+
+  .cta-band p {
+    color: var(--muted);
+    max-width: 46ch;
+    margin: 0 auto 1.8rem;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    padding-block: 2.5rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+
+  .footer a { color: var(--teal); text-decoration: none; }
+  .footer a:hover { color: var(--cyan); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="nav" aria-label="Main navigation">
+    <a class="brand" href="#top">
+      <span class="brand-mark">H</span>
+      AI with Hammad
+    </a>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#results">Results</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <span class="eyebrow"><span class="eyebrow-dot"></span>AI Automation Agency</span>
+    <h1>Automate Your Business with <span class="accent">n8n &amp; AI Agents</span></h1>
+    <p>I design and build intelligent automation systems that eliminate repetitive work, connect your tools, and let AI agents handle operations — so your team can focus on growth.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#contact">Book a Free Automation Audit →</a>
+      <a class="btn btn-ghost" href="#services">Explore Services</a>
+    </div>
+  </header>
+
+  <section id="services" aria-labelledby="services-title">
+    <div class="section-head">
+      <span class="section-label">My Services</span>
+      <h2 class="section-title" id="services-title">Systems that work while you sleep</h2>
+    </div>
+    <div class="services-grid">
+
+      <article class="service-card">
+        <div class="service-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/>
+            <path d="M7.3 11 16.7 7M7.3 13l9.4 4"/>
+          </svg>
+        </div>
+        <h3>n8n Workflow Automation</h3>
+        <p>End-to-end workflow design in n8n — from lead capture and CRM syncs to invoicing and reporting. Reliable, self-hosted automations with error handling built in.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="service-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 3 7 21M17 3l-2 18M4 8h17M3 16h17"/>
+          </svg>
+        </div>
+        <h3>Custom API Integrations</h3>
+        <p>Connecting the tools your business already runs on — CRMs, payment platforms, databases, and internal systems — into one seamless, data-driven pipeline.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="service-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9zM12 1v3M12 20v3M1 12h3M20 12h3"/>
+          </svg>
+        </div>
+        <h3>Agentic AI Systems</h3>
+        <p>Autonomous AI agents that research, triage, draft, and decide — powered by LLMs and orchestrated through n8n to run real business processes around the clock.</p>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="results" aria-labelledby="results-title">
+    <div class="section-head">
+      <span class="section-label">Portfolio / Metrics</span>
+      <h2 class="section-title" id="results-title">Results, measured</h2>
+    </div>
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-value"><span class="count" data-target="2400">0</span><span class="suffix">+</span></div>
+        <div class="stat-label">Hours Automated</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value"><span class="count" data-target="120">0</span><span class="suffix">+</span></div>
+        <div class="stat-label">Custom Workflows Built</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value"><span class="count" data-target="35">0</span><span class="suffix">+</span></div>
+        <div class="stat-label">Happy Clients</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" aria-labelledby="contact-title">
+    <div class="cta-band">
+      <h2 id="contact-title">Ready to put your operations on autopilot?</h2>
+      <p>Tell me which process eats your team's time, and I'll show you exactly how an n8n workflow or AI agent can take it over.</p>
+      <a class="btn btn-primary" href="mailto:hello@aiwithhammad.com">Start the Conversation →</a>
+    </div>
+    <footer class="footer">
+      <span>© 2026 AI with Hammad</span>
+      <span>Built with <a href="https://n8n.io" rel="noopener">n8n</a> · Agentic AI · Custom Integrations</span>
+    </footer>
+  </section>
+
+</div>
+
+<script>
+  (function () {
+    var counters = document.querySelectorAll('.count');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function format(n) { return n.toLocaleString('en-US'); }
+
+    function animateCount(el) {
+      var target = parseInt(el.getAttribute('data-target'), 10);
+      if (reduced) { el.textContent = format(target); return; }
+      var duration = 1800;
+      var start = null;
+      function step(ts) {
+        if (!start) start = ts;
+        var p = Math.min((ts - start) / duration, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = format(Math.round(target * eased));
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    if ('IntersectionObserver' in window) {
+      var seen = new WeakSet();
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && !seen.has(entry.target)) {
+            seen.add(entry.target);
+            animateCount(entry.target);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.4 });
+      counters.forEach(function (c) { io.observe(c); });
+    } else {
+      counters.forEach(animateCount);
+    }
+  })();
+</script>
+</body>
+</html>
