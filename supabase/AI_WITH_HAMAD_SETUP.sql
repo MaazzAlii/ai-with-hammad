@@ -1389,6 +1389,7 @@ insert into public.site_settings (key, value) values
       jsonb_build_object('title', 'Integrations', 'body', 'CRMs, payments, databases and internal APIs connected reliably.'),
       jsonb_build_object('title', 'Data & retrieval', 'body', 'Search and retrieval over your documents with evaluation built in.')
     ),
+    'techStack', jsonb_build_array('n8n', 'Python', 'TypeScript', 'Next.js', 'Supabase', 'PostgreSQL', 'OpenAI API', 'Anthropic Claude', 'REST & webhooks', 'Vector search'),
     'process', jsonb_build_array(
       jsonb_build_object('title', 'Discover', 'body', 'Map the process, the data and what success means.'),
       jsonb_build_object('title', 'Design', 'body', 'Architecture, failure modes and a scoped plan.'),
@@ -1452,6 +1453,7 @@ from (values
   ('footer', 'Projects',    '/projects',    20),
   ('footer', 'Team',        '/team',        30),
   ('footer', 'Content',     '/content',     40),
+  ('footer', 'Testimonials', '/testimonials', 45),
   ('footer', 'Media kit',   '/media-kit',   50),
   ('footer', 'Contact',     '/contact',     60),
   ('legal',  'Privacy Policy', '/privacy-policy', 10),
