@@ -25,9 +25,17 @@ async function save(id: string | null, fd: FormData): Promise<Result> {
   const mid = await getDb().transaction(async (tx) => {
     let mid = id;
     if (mid) {
-      const [ex] = await tx.select({ publishedAt: teamMembers.publishedAt }).from(teamMembers).where(and(eq(teamMembers.id, mid), isNull(teamMembers.deletedAt)));
+      const [ex] = await tx
+        .select({ publishedAt: teamMembers.publishedAt, isLocked: teamMembers.isLocked, name: teamMembers.name, slug: teamMembers.slug })
+        .from(teamMembers)
+        .where(and(eq(teamMembers.id, mid), isNull(teamMembers.deletedAt)));
       if (!ex) return null;
-      await tx.update(teamMembers).set({ ...base, ...flags, ...(canPublish && isPublished && !ex.publishedAt ? { publishedAt: new Date() } : {}) }).where(eq(teamMembers.id, mid));
+      // Founders: name and URL are fixed; everything else stays editable.
+      const fixed = ex.isLocked ? { name: ex.name, slug: ex.slug } : {};
+      await tx
+        .update(teamMembers)
+        .set({ ...base, ...fixed, ...flags, ...(canPublish && isPublished && !ex.publishedAt ? { publishedAt: new Date() } : {}) })
+        .where(eq(teamMembers.id, mid));
       await tx.delete(teamSocialLinks).where(eq(teamSocialLinks.teamMemberId, mid));
     } else {
       const [row] = await tx.insert(teamMembers).values({ ...base, ...flags, ...(canPublish && isPublished ? { publishedAt: new Date() } : {}) }).returning({ id: teamMembers.id });
