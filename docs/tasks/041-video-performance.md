@@ -24,7 +24,7 @@ Iframes and video bytes are the largest LCP/INP risks.
 
 ## Acceptance Criteria
 
-- [ ] No iframe in initial HTML (E2E)
+- [x] No iframe in initial HTML (E2E)
 
 ## Verification
 
@@ -32,4 +32,6 @@ Iframes and video bytes are the largest LCP/INP risks.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: E2E asserts no iframe before clicking the facade; Lighthouse CLS 0.
