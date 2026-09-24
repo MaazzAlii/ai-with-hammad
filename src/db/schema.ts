@@ -17,6 +17,8 @@ import {
   pgEnum,
   pgTable,
   primaryKey,
+  smallint,
+  type AnyPgColumn,
   text,
   timestamp,
   uuid,
@@ -58,6 +60,9 @@ export const projectMediaType = pgEnum("project_media_type", [
 ]);
 export const tagKind = pgEnum("tag_kind", ["technology", "topic"]);
 export const navLocation = pgEnum("nav_location", ["header", "footer", "legal"]);
+export const accountKind = pgEnum("account_kind", ["staff", "client"]);
+export const threadStatus = pgEnum("thread_status", ["open", "closed"]);
+export const testimonialStatus = pgEnum("testimonial_status", ["pending", "approved", "rejected"]);
 
 export type AppRole = (typeof appRole.enumValues)[number];
 export type InquiryStatus = (typeof inquiryStatus.enumValues)[number];
@@ -66,6 +71,9 @@ export type ContentPlatform = (typeof contentPlatform.enumValues)[number];
 export type MediaKind = (typeof mediaKind.enumValues)[number];
 export type ProjectMediaType = (typeof projectMediaType.enumValues)[number];
 export type NavLocation = (typeof navLocation.enumValues)[number];
+export type AccountKind = (typeof accountKind.enumValues)[number];
+export type ThreadStatus = (typeof threadStatus.enumValues)[number];
+export type TestimonialStatus = (typeof testimonialStatus.enumValues)[number];
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -120,6 +128,9 @@ export const profiles = pgTable("profiles", {
     .notNull()
     .default("viewer")
     .references(() => roles.key),
+  kind: accountKind("kind").notNull().default("staff"),
+  /** Portal users (kind = client) belong to one client. */
+  clientId: uuid("client_id").references((): AnyPgColumn => clients.id, { onDelete: "set null" }),
   isActive: boolean("is_active").notNull().default(false),
   lastSignInAt: ts("last_sign_in_at"),
   createdAt: createdAt(),
@@ -200,6 +211,8 @@ export const teamMembers = pgTable("team_members", {
   isPublished: boolean("is_published").notNull().default(false),
   publishedAt: ts("published_at"),
   isFeatured: boolean("is_featured").notNull().default(false),
+  /** Founders: name/slug fixed, cannot be deleted (DB trigger enforces). */
+  isLocked: boolean("is_locked").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -506,6 +519,84 @@ export const inquiryNotes = pgTable("inquiry_notes", {
 });
 
 // ---------------------------------------------------------------------------
+// Client portal
+// ---------------------------------------------------------------------------
+export const clients = pgTable("clients", {
+  id: id(),
+  companyName: text("company_name").notNull(),
+  contactName: text("contact_name").notNull().default(""),
+  email: text("email").notNull().default(""),
+  phone: text("phone").notNull().default(""),
+  whatsapp: text("whatsapp").notNull().default(""),
+  notes: text("notes").notNull().default(""),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const messageThreads = pgTable("message_threads", {
+  id: id(),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "cascade" }),
+  subject: text("subject").notNull(),
+  status: threadStatus("status").notNull().default("open"),
+  projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
+  createdBy: uuid("created_by").references(() => profiles.id, { onDelete: "set null" }),
+  lastMessageAt: ts("last_message_at").notNull().defaultNow(),
+  staffLastReadAt: ts("staff_last_read_at"),
+  clientLastReadAt: ts("client_last_read_at"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const messages = pgTable("messages", {
+  id: id(),
+  threadId: uuid("thread_id")
+    .notNull()
+    .references(() => messageThreads.id, { onDelete: "cascade" }),
+  authorId: uuid("author_id").references(() => profiles.id, { onDelete: "set null" }),
+  authorKind: accountKind("author_kind").notNull(),
+  body: text("body").notNull(),
+  createdAt: createdAt(),
+});
+
+export const testimonials = pgTable("testimonials", {
+  id: id(),
+  clientId: uuid("client_id").references(() => clients.id, { onDelete: "set null" }),
+  projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
+  submittedBy: uuid("submitted_by").references(() => profiles.id, { onDelete: "set null" }),
+  source: text("source").notNull().default("portal"),
+  authorName: text("author_name").notNull(),
+  authorTitle: text("author_title").notNull().default(""),
+  company: text("company").notNull().default(""),
+  quote: text("quote").notNull(),
+  rating: smallint("rating").notNull(),
+  photoMediaId: uuid("photo_media_id").references(() => mediaAssets.id, { onDelete: "set null" }),
+  consentToPublish: boolean("consent_to_publish").notNull().default(false),
+  status: testimonialStatus("status").notNull().default("pending"),
+  isPublished: boolean("is_published").notNull().default(false),
+  isFeatured: boolean("is_featured").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  publishedAt: ts("published_at"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+  deletedAt: ts("deleted_at"),
+});
+
+export const faqs = pgTable("faqs", {
+  id: id(),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  category: text("category").notNull().default(""),
+  isPublished: boolean("is_published").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+  deletedAt: ts("deleted_at"),
+});
+
+// ---------------------------------------------------------------------------
 // Site
 // ---------------------------------------------------------------------------
 export const siteSettings = pgTable("site_settings", {
@@ -598,4 +689,9 @@ export const publicTables = {
   legalDocuments,
   auditLogs,
   rateLimits,
+  clients,
+  messageThreads,
+  messages,
+  testimonials,
+  faqs,
 };
