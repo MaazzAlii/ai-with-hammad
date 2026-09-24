@@ -11,13 +11,13 @@ const supabaseWs = supabaseUrl ? `wss://${supabaseUrl.host}` : "";
 const csp = [
   "default-src 'self'",
   // Next.js inlines bootstrap scripts; nonces would force dynamic rendering of every page (no ISR).
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://challenges.cloudflare.com`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${supabaseOrigin} https://i.ytimg.com https://i.vimeocdn.com`,
   `media-src 'self' blob: ${supabaseOrigin}`,
   "font-src 'self'",
-  `connect-src 'self' ${supabaseOrigin} ${supabaseWs} https://vitals.vercel-insights.com https://va.vercel-scripts.com`,
-  "frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com https://www.instagram.com https://www.facebook.com https://www.linkedin.com",
+  `connect-src 'self' ${supabaseOrigin} ${supabaseWs} https://vitals.vercel-insights.com https://va.vercel-scripts.com https://challenges.cloudflare.com`,
+  "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com https://www.instagram.com https://www.facebook.com https://www.linkedin.com",
   "frame-ancestors 'none'",
   "form-action 'self'",
   "base-uri 'self'",
