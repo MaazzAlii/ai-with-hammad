@@ -16,7 +16,7 @@ export function EntityRow({
   flags,
   canPublish,
 }: {
-  href: string;
+  href?: string;
   title: string;
   meta?: string;
   thumb?: AdminMedia | null | false;
@@ -29,7 +29,7 @@ export function EntityRow({
     <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center">
       {thumb !== false ? <MediaThumb media={thumb ?? null} className="hidden size-12 shrink-0 sm:grid" /> : null}
       <div className="min-w-0 flex-1">
-        <Link href={href} className="font-medium hover:text-accent">{title}</Link>
+        {href ? <Link href={href} className="font-medium hover:text-accent">{title}</Link> : <span className="font-medium">{title}</span>}
         {meta ? <p className="truncate text-xs text-subtle">{meta}</p> : null}
       </div>
       <div className="flex flex-wrap gap-1.5">
