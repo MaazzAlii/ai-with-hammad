@@ -1,0 +1,30 @@
+# Contabo / any VPS: app + Caddy (automatic HTTPS via Let's Encrypt).
+# Usage (on the server, in this folder):
+#   cp ../.env.example .env && edit .env        # server secrets (DATABASE_URL, SUPABASE_SECRET_KEY, IP_HASH_SALT, …)
+#   DOMAIN=your-domain.com docker compose up -d --build
+services:
+  app:
+    build:
+      context: ..
+      args:
+        NEXT_PUBLIC_SITE_URL: https://${DOMAIN}
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_ALLOW_INDEXING: "true"
+    env_file: .env
+    restart: unless-stopped
+    expose: ["3000"]
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [app]
+volumes:
+  caddy_data:
+  caddy_config:
