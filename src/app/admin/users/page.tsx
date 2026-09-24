@@ -38,7 +38,7 @@ export default async function UsersPage() {
                 </summary>
                 {editable ? (
                   <div className="border-t border-border p-4">
-                    <AdminForm action={updateUser.bind(null, u.id)}>
+                    <AdminForm action={updateUser.bind(null, u.id)} compact>
                       <div className="grid gap-4 sm:grid-cols-2">
                         <TextField name="fullName" label="Name" defaultValue={u.fullName} />
                         <SelectField name="role" label="Role" defaultValue={u.role} options={roleOptions} />
@@ -54,7 +54,7 @@ export default async function UsersPage() {
       </ul>
       {canManage ? (
         <div className="mt-8 max-w-2xl">
-          <AdminForm action={inviteUser} submitLabel="Send invitation">
+          <AdminForm action={inviteUser} submitLabel="Send invitation" compact>
             <FormSection title="Invite a user" description="They receive an email link to set a password.">
               <div className="grid gap-4 sm:grid-cols-2">
                 <TextField name="email" label="Email" type="email" required />
