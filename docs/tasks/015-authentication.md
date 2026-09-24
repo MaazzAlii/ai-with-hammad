@@ -28,7 +28,7 @@ Protects the CMS; invite-only reduces attack surface.
 
 ## Acceptance Criteria
 
-- [ ] E2E: login success/failure, logout, redirect when signed out
+- [x] E2E: login success/failure, logout, redirect when signed out
 
 ## Verification
 
@@ -36,4 +36,6 @@ Protects the CMS; invite-only reduces attack surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified with real Supabase Auth (GoTrue built from source): tests/e2e/auth.spec.ts.
