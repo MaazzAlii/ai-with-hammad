@@ -24,7 +24,7 @@ Technical SEO makes real content discoverable; it follows Google Search Essentia
 
 ## Acceptance Criteria
 
-- [ ] Validated by tests/e2e/seo.spec.ts
+- [x] Validated by tests/e2e/seo.spec.ts
 
 ## Verification
 
@@ -32,4 +32,6 @@ Technical SEO makes real content discoverable; it follows Google Search Essentia
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: seo.spec.ts sitemap assertions.
