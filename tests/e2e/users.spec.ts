@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import dotenv from "dotenv";
 
-import { db, expectToast, newContext, PASSWORD } from "./helpers";
+import { db, expectToast, newContext, PASSWORD, solveCaptcha } from "./helpers";
 
 dotenv.config({ path: ".env.local" });
 
@@ -24,6 +24,7 @@ test("admin changes a user's role and deactivates them (sessions revoked)", asyn
   await userPage.goto("/login");
   await userPage.fill("#email", email);
   await userPage.fill("#password", PASSWORD);
+  await solveCaptcha(userPage);
   await userPage.click("button[type=submit]");
   await expect(userPage).toHaveURL(/\/admin$/);
 
