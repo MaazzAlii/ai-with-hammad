@@ -25,7 +25,7 @@ Video is a key portfolio format.
 
 ## Acceptance Criteria
 
-- [ ] Unit tests for URL parsing incl. malicious inputs
+- [x] Unit tests for URL parsing incl. malicious inputs
 
 ## Verification
 
@@ -33,4 +33,6 @@ Video is a key portfolio format.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: tests/unit/embeds-urls.test.ts; uploaded-video player path covered by code review (same pipeline as images).
