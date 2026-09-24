@@ -27,7 +27,7 @@ Central, validated media handling prevents dangerous uploads and orphan files.
 
 ## Acceptance Criteria
 
-- [ ] Unit tests for validation; E2E upload
+- [x] Unit tests for validation; E2E upload
 
 ## Verification
 
@@ -36,4 +36,6 @@ Central, validated media handling prevents dangerous uploads and orphan files.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: tests/unit/media-validation.test.ts, tests/e2e/media.spec.ts (upload→finalize→edit→public URL→delete).
