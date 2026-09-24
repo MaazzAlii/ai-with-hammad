@@ -25,7 +25,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Unknown URL returns 404 status
+- [x] Unknown URL returns 404 status
 
 ## Verification
 
@@ -34,4 +34,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
