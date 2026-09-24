@@ -86,14 +86,14 @@ export default async function InquiryPage(props: PageProps<"/admin/inquiries/[ki
               </ul>
             ) : <p className="mb-4 text-sm text-muted">No notes yet.</p>}
             {canWrite ? (
-              <AdminForm action={addInquiryNote.bind(null, kind, id)} submitLabel="Add note">
+              <AdminForm action={addInquiryNote.bind(null, kind, id)} submitLabel="Add note" compact>
                 <TextAreaField name="body" label="New note" rows={3} />
               </AdminForm>
             ) : null}
           </section>
         </div>
         <div>
-          <AdminForm action={updateInquiry.bind(null, kind, id)} disabled={!canWrite} submitLabel="Update">
+          <AdminForm action={updateInquiry.bind(null, kind, id)} disabled={!canWrite} submitLabel="Update" compact>
             <FormSection title="Pipeline">
               <SelectField name="status" label="Status" defaultValue={r.status} options={inquiryStatus.enumValues.map((s) => ({ value: s, label: s[0]!.toUpperCase() + s.slice(1) }))} />
               <SelectField name="priority" label="Priority" defaultValue={r.priority} options={inquiryPriority.enumValues.map((s) => ({ value: s, label: s[0]!.toUpperCase() + s.slice(1) }))} />
