@@ -1,4 +1,4 @@
-import { expect, type Browser, type BrowserContext, type Page } from "@playwright/test";
+import { expect, type Browser, type BrowserContext, type Locator, type Page } from "@playwright/test";
 import postgres from "postgres";
 
 export const PASSWORD = "E2e-password-123!";
@@ -28,10 +28,21 @@ export async function newContext(browser: Browser, role?: RoleName): Promise<Bro
   return browser.newContext({ extraHTTPHeaders: randomIpHeaders(), ...(role ? { storageState: `.tmp/auth/${role}.json` } : {}) });
 }
 
-export async function login(page: Page, email: string, password = PASSWORD) {
-  await page.goto("/login");
+/** Answer the built-in arithmetic captcha inside `scope` (defaults to the page). */
+export async function solveCaptcha(page: Page, scope?: Locator) {
+  const root = scope ?? page.locator("body");
+  const q = root.getByTestId("captcha-question");
+  await expect(q).toHaveText(/What is \d+ [+−] \d+\?/);
+  const [, a, op, b] = (await q.textContent())!.match(/What is (\d+) ([+−]) (\d+)\?/)!;
+  const answer = op === "+" ? Number(a) + Number(b) : Number(a) - Number(b);
+  await root.locator('input[name="captchaAnswer"]').fill(String(answer));
+}
+
+export async function login(page: Page, email: string, password = PASSWORD, path = "/login") {
+  await page.goto(path);
   await page.fill("#email", email);
   await page.fill("#password", password);
+  await solveCaptcha(page);
   await page.click("button[type=submit]");
 }
 
