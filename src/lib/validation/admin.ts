@@ -1,3 +1,5 @@
+import "@/lib/zod-config";
+
 import { z } from "zod";
 
 import { contentPlatform, inquiryPriority, inquiryStatus, projectMediaType } from "@/db/schema";
