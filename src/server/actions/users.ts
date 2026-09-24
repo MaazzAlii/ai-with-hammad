@@ -47,7 +47,7 @@ export async function updateUser(id: string, _prev: unknown, fd: FormData): Prom
     const input = userUpdateSchema.parse(formDataToObject(fd));
     const db = getDb();
     const [target] = await db.select().from(profiles).where(eq(profiles.id, id));
-    if (!target) return fail("User not found.");
+    if (!target || target.kind !== "staff") return fail("User not found.");
     if (target.id === staff.id && (input.role !== target.role || !input.isActive)) return fail("You cannot change your own role or deactivate yourself.");
     if ((input.role !== target.role || input.isActive !== target.isActive) && !canManageRole(staff.role, target.role, input.role)) {
       return fail("You do not have permission to change this user's role or status.");
