@@ -28,13 +28,14 @@ export default async function ProjectsAdminPage() {
       />
       {rows.length ? (
         <SortableList
-          items={rows}
           disabled={!canPublish}
           onReorder={async (ids) => {
             "use server";
             return reorder("projects", ids);
           }}
-          render={(p) => (
+          items={rows.map((p) => ({
+            id: p.id,
+            content: (
             <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center">
               <MediaThumb media={p.coverMediaId ? (covers.get(p.coverMediaId) ?? null) : null} className="hidden size-14 shrink-0 sm:grid" />
               <div className="min-w-0 flex-1">
@@ -47,7 +48,8 @@ export default async function ProjectsAdminPage() {
                 <FlagToggle entity="projects" id={p.id} flag="isPinned" value={p.isPinned} label="Pinned" disabled={!canPublish} />
               </div>
             </div>
-          )}
+            ),
+          }))}
         />
       ) : (
         <EmptyState title="No projects yet">Create your first case study.</EmptyState>
