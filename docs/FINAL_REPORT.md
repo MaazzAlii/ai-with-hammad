@@ -12,11 +12,11 @@ credentials for those services. Each step is documented. Nothing below is claime
 | --- | --- |
 | `npm run lint` | 0 errors, 0 warnings |
 | `npm run typecheck` (`next typegen && tsc`) | clean |
-| Unit tests (`tests/unit`, 7 files) | **52 passed** |
-| Database tests (`tests/db`, 3 files; fresh DB built from the setup SQL **twice**) | **25 passed** |
-| E2E (`tests/e2e`, 9 files; real Supabase Auth + storage emulator enforcing real RLS) | **48 passed** (clean reset) |
-| `next build` | success; 46 routes (static, SSG and dynamic) |
-| Lighthouse 12 (local production build) | see below |
+| Unit tests (`tests/unit`, 9 files) | **74 passed** |
+| Database tests (`tests/db`, 3 files; fresh DB built from the setup SQL **twice**) | **31 passed** |
+| E2E (`tests/e2e`, 10 files; real Supabase Auth + storage emulator enforcing real RLS) | **56 passed** (clean reset) |
+| `next build` | success (also `BUILD_STANDALONE=1` for Docker) |
+| Lighthouse 12 (local production build) | see below (measured before the v2 redesign; re-run after deploy) |
 
 ### How it was tested
 
@@ -45,6 +45,33 @@ blocked **in this sandbox only**. Two Lighthouse findings were fixed during the 
 - An accessible-name mismatch on the logo link.
 - A CSP console report caused by Zod's JIT probe (Zod now runs jitless).
 
+## Version 2 — client portal, testimonials, captcha, redesign
+
+| Feature | Where |
+| --- | --- |
+| **Client login & portal** (`/portal/login`): clients message the team directly; staff with `messages.*` see and answer every conversation; unread badges; email notice without the message body | `src/app/portal/*`, Admin → Messages |
+| **Testimonials + 1–5 star ratings** submitted by clients after work → approved and published by managers+ → `/testimonials` and homepage (average from published reviews only) | Portal → Feedback, Admin → Testimonials |
+| **Clients admin**: organisations, invite/deactivate portal users | Admin → Clients |
+| **FAQ** module (homepage + contact) | Admin → FAQs |
+| **WhatsApp**: floating button and contact card, number and prefilled message editable | Admin → Settings → General |
+| **Everything visitors see is editable**: agency name, logo (also used on the loading screen), contact details, phone, address, hours, tech stack, team photos, navigation, legal pages | Admin → Settings / Team / Media |
+| **Founders fixed**: Hammadullah and Maaz Ali are seeded and locked. Their names and slugs can't be changed or deleted (DB trigger); photos, bios and links are editable | Admin → Team |
+| **Captcha** on contact, sponsorship, staff login, password reset and client login (built-in signed challenge, or Cloudflare Turnstile via env) | `src/server/captcha.ts` |
+| **Redesign**: animated AI-agent pipeline hero, aurora background, tech marquee, reveal-on-scroll, lazy rendering below the fold (`content-visibility`), branded navigation loader | `src/components/site/*` |
+| **Self-hosting**: Dockerfile, docker-compose + Caddy (HTTPS), `/api/health` | `docs/HOSTING_PLAN.md` |
+
+Issues found and fixed during v2:
+- Soft 404s caused by `loading.tsx`.
+- A Drizzle correlated-subquery bug in unread counts.
+- A helper exported from a `"use server"` file, which made it publicly callable; a guard test now prevents this.
+- Client accounts could pass the staff check; fixed in both code and SQL.
+
+**Hosting advice** (sources in `docs/HOSTING_PLAN.md`):
+- Vercel alone is enough; Render isn't needed.
+- Vercel's free Hobby plan is **non-commercial only**, so Pro (from about $20/month) is the compliant choice for the agency.
+- Supabase free pauses after 7 days of inactivity.
+- In 5–6 months, move to Contabo with the included Docker setup.
+
 ## What was built
 
 ### Architecture
@@ -55,14 +82,14 @@ and every CMS change triggers on-demand revalidation. Admin pages are dynamic an
 data access through a `server-only` DAL that returns DTOs. Details: `docs/PLAN.md`, `CLAUDE.md`.
 
 ### Repository
-- 401 commits, **one commit per file** as you asked. 355 tracked files; about 11.6k lines of TypeScript in `src/`.
+- **One commit per file** as you asked. 355 tracked files; about 11.6k lines of TypeScript in `src/`.
 - Pushed to `claude/ai-hamad-agency-platform-j478py`.
 - The original page is preserved at `docs/legacy/index.html`.
 - The repository was not renamed to `ai-with-hamad-agency`. That is an owner action; see `docs/GITHUB.md`.
 
 ### Database
-`supabase/AI_WITH_HAMAD_SETUP.sql` is 1,339 lines and idempotent. It contains:
-- 8 enums and 30 tables: identity/RBAC, media, services, team, projects (media, metrics, tags, features, team, services), social platforms, content and metric snapshots, sponsorship partners, packages, **separate internal rates table** and inquiries, contact inquiries and notes, settings, navigation, legal documents, audit logs, rate limits.
+`supabase/AI_WITH_HAMAD_SETUP.sql` is idempotent. It contains:
+- 11 enums and 35 tables (v2 adds clients, message threads, messages, testimonials and FAQs): identity/RBAC, media, services, team, projects (media, metrics, tags, features, team, services), social platforms, content and metric snapshots, sponsorship partners, packages, **separate internal rates table** and inquiries, contact inquiries and notes, settings, navigation, legal documents, audit logs, rate limits.
 - UUIDs, foreign keys with deliberate `on delete` behaviour, indexes, partial unique slugs, CHECK constraints (slugs, http(s)/https URLs, path safety, rate ordering), `updated_at` triggers and soft delete.
 - Seed data: roles and 29 permissions, starter settings and navigation, legal templates, and the 3 services from the original site.
 
@@ -161,7 +188,8 @@ also lists the residual trade-offs, such as the CSP allowing `'unsafe-inline'` s
 
 ## Tasks
 
-- **87 COMPLETED** (with verification notes in each file under `docs/tasks/`).
+- **106 of 107 COMPLETED** (with verification notes in each file under `docs/tasks/`); 107 (merge to main) is being done now.
+- Tasks 095–107 cover v2.
 - **7 BLOCKED**, each with its exact blocker:
 
 | Task | Blocker |
@@ -179,9 +207,11 @@ also lists the residual trade-offs, such as the CSP allowing `'unsafe-inline'` s
 1. Supabase: create the project → run the SQL → apply the auth settings and email templates → create your user → `select private.promote_to_owner('you@…');`
 2. Vercel: import the repo → set the env vars (Production: `NEXT_PUBLIC_ALLOW_INDEXING=true`) → deploy.
 3. Add the domain → set `NEXT_PUBLIC_SITE_URL` → redeploy → add the domain to Supabase redirect URLs.
-4. Confirm the brand spelling (Hamad vs Hammad) in Admin → Settings. Upload a logo, and add real projects, team members, content and audience data.
-5. Upload a > 6 MB video once, to confirm TUS works (task 042). Invite a teammate to confirm SMTP works (task 056).
-6. Have the legal templates reviewed by a lawyer. Choose a license; the README currently says "proprietary".
+4. Confirm the brand spelling (Hamad vs Hammad) in Admin → Settings. Upload a logo and the founders' photos. Set the WhatsApp number, phone and address. Add real projects, content and audience data.
+5. Add clients in Admin → Clients and invite their portal users. Invites need SMTP (step 1).
+6. Optional: create a Cloudflare Turnstile widget and set its two env vars.
+7. Upload a > 6 MB video once, to confirm TUS works (task 042). Invite a teammate to confirm SMTP works (task 056).
+8. Have the legal templates reviewed by a lawyer. Choose a license; the README currently says "proprietary".
 
 ## Optional future improvements
 
