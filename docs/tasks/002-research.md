@@ -25,7 +25,7 @@ Framework APIs changed (Next 16 proxy, async params); decisions must rest on cur
 
 ## Acceptance Criteria
 
-- [ ] RESEARCH.md contains findings and implications for all listed areas
+- [x] RESEARCH.md contains findings and implications for all listed areas
 
 ## Verification
 
@@ -33,4 +33,6 @@ Framework APIs changed (Next 16 proxy, async params); decisions must rest on cur
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Official doc sites were egress-blocked; research used bundled Next.js 16 docs, package sources, GoTrue source and search summaries (documented in RESEARCH.md).
