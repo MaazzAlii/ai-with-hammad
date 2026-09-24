@@ -16,6 +16,12 @@ export const settingsSchemas = {
     description: z.string().max(400).default(""),
     contactEmail: z.union([z.literal(""), z.email()]).default(""),
     location: z.string().max(120).default(""),
+    phone: z.string().max(40).regex(/^[+()\d\s.-]*$/, "Digits, spaces and + ( ) - only").default(""),
+    /** WhatsApp number in international format, e.g. +923001234567 */
+    whatsapp: z.string().max(20).regex(/^(\+?\d{7,15})?$/, "International format, e.g. +923001234567").default(""),
+    whatsappMessage: z.string().max(200).default(""),
+    address: z.string().max(300).default(""),
+    businessHours: z.string().max(120).default(""),
     logoMediaId: z.uuid().nullable().default(null),
   }),
   home: z.object({
@@ -30,6 +36,8 @@ export const settingsSchemas = {
     positioningTitle: z.string().max(140).default(""),
     positioningBody: z.string().max(800).default(""),
     capabilities: z.array(titled).max(12).default([]),
+    /** Technologies shown in the "stack we engineer with" strip (tools you actually use). */
+    techStack: z.array(z.string().max(40)).max(30).default([]),
     process: z.array(titled).max(8).default([]),
   }),
   about: z.object({
