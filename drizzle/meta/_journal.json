@@ -8,6 +8,13 @@
       "when": 1790286139059,
       "tag": "0000_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790292360548,
+      "tag": "0001_client_portal",
+      "breakpoints": true
     }
   ]
 }
