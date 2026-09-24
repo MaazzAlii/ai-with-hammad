@@ -12,7 +12,7 @@ import { projectSchema } from "@/lib/validation/admin";
 import { audit } from "../audit";
 import { authorize, type Staff } from "../auth/session";
 import { revalidatePublicSite } from "../revalidate";
-import { runAction } from "../run-action";
+import { assertId, runAction } from "../run-action";
 
 type Result = ActionResult<{ id?: string; redirectTo?: string }>;
 
@@ -110,6 +110,7 @@ export async function createProject(_prev: unknown, fd: FormData): Promise<Resul
 
 export async function updateProject(id: string, _prev: unknown, fd: FormData): Promise<Result> {
   return runAction(async () => {
+    assertId(id);
     const staff = await authorize("projects.write");
     try {
       return await save(staff, id, fd);
