@@ -13,7 +13,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { safeNextPath } from "@/lib/url-safety";
 
 import { audit } from "../audit";
-import { requestMeta } from "../request-meta";
+import { CAPTCHA_ERROR, verifyCaptcha } from "../captcha";
+import { clientIp, requestMeta } from "../request-meta";
 
 const signInSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email")),
@@ -27,6 +28,7 @@ export async function signIn(_prev: ActionResult | null, formData: FormData): Pr
   const parsed = signInSchema.safeParse({ email: formData.get("email"), password: formData.get("password"), next: formData.get("next") ?? undefined });
   if (!parsed.success) return fail("Please check the form.", z.flattenError(parsed.error).fieldErrors);
   const { email, password, next } = parsed.data;
+  if (!(await verifyCaptcha(Object.fromEntries(formData), await clientIp()))) return fail(CAPTCHA_ERROR, { captchaAnswer: [CAPTCHA_ERROR] });
   const meta = await requestMeta();
   if (!(await rateLimit(`login:ip:${meta.ipHash}`, 10, 600)) || !(await rateLimit(`login:email:${email}`, 8, 900))) {
     return fail("Too many sign-in attempts. Please wait a few minutes and try again.");
@@ -55,6 +57,7 @@ const resetSchema = z.object({ email: z.string().trim().toLowerCase().pipe(z.ema
 export async function requestPasswordReset(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   const parsed = resetSchema.safeParse({ email: formData.get("email") });
   if (!parsed.success) return fail("Enter a valid email.", z.flattenError(parsed.error).fieldErrors);
+  if (!(await verifyCaptcha(Object.fromEntries(formData), await clientIp()))) return fail(CAPTCHA_ERROR, { captchaAnswer: [CAPTCHA_ERROR] });
   const meta = await requestMeta();
   if (await rateLimit(`reset:ip:${meta.ipHash}`, 5, 900)) {
     const supabase = await createSupabaseServerClient();
