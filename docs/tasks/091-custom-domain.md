@@ -31,4 +31,6 @@ Release tasks move the verified product to production safely.
 
 ## Status
 
-**PLANNED**
+**BLOCKED**
+
+BLOCKER: domain + DNS are owner-controlled; depends on 090. Code is domain-agnostic via NEXT_PUBLIC_SITE_URL.
