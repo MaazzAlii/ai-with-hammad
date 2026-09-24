@@ -3,7 +3,7 @@ import "server-only";
 import { count, desc, eq, isNull, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { auditLogs, contactInquiries, contentItems, projects, services, sponsorshipInquiries, teamMembers } from "@/db/schema";
+import { auditLogs, contactInquiries, contentItems, projects, services, sponsorshipInquiries, teamMembers, testimonials } from "@/db/schema";
 
 import { mediaStats } from "./media";
 
@@ -29,6 +29,11 @@ export async function dashboardStats() {
     inquiries: { contact: contactByStatus, sponsorship: sponsorByStatus },
     media,
   };
+}
+
+export async function pendingTestimonialCount() {
+  const [r] = await getDb().select({ n: count() }).from(testimonials).where(sql`${testimonials.status} = 'pending' and ${testimonials.deletedAt} is null`);
+  return r?.n ?? 0;
 }
 
 export async function recentInquiries(limit = 6) {
