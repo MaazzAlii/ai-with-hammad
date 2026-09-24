@@ -31,8 +31,12 @@ export function ContactForm({
   const [pending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  // Render time for the anti-spam minimum-fill-time check (set after mount).
   const [startedAt, setStartedAt] = useState(0);
-  useEffect(() => setStartedAt(Date.now()), []);
+  useEffect(() => {
+    const t = setTimeout(() => setStartedAt(Date.now()), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const form = useForm<In & { website_url_confirm?: string }, unknown, Out>({
     resolver: zodResolver(contactInquirySchema),
@@ -45,7 +49,7 @@ export function ContactForm({
     setServerError(null);
     startTransition(async () => {
       const honeypot = (document.getElementById("contact-hp") as HTMLInputElement | null)?.value ?? "";
-      const result = await submitContactInquiry({ ...values, website_url_confirm: honeypot, started_at: startedAt });
+      const result = await submitContactInquiry({ ...values, website_url_confirm: honeypot, started_at: startedAt || undefined });
       if (result.ok) {
         track("inquiry_submitted", { form: "contact" });
         setDone(result.message ?? "Thanks!");
