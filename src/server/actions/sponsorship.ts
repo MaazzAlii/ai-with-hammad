@@ -11,12 +11,13 @@ import { packageSchema, partnerSchema, ratesSchema } from "@/lib/validation/admi
 import { audit } from "../audit";
 import { authorize } from "../auth/session";
 import { revalidatePublicSite } from "../revalidate";
-import { runAction } from "../run-action";
+import { assertId, runAction } from "../run-action";
 
 type Result = ActionResult<{ id?: string; redirectTo?: string }>;
 
 export async function savePackage(id: string | null, _prev: unknown, fd: FormData): Promise<Result> {
   return runAction(async () => {
+    assertId(id);
     const staff = await authorize("sponsorship.write");
     const obj = formDataToObject(fd);
     const input = packageSchema.parse({ ...obj, platforms: obj.platforms ?? [] });
@@ -41,6 +42,7 @@ export async function savePackage(id: string | null, _prev: unknown, fd: FormDat
 /** INTERNAL pricing — requires sponsorship.rates. Never read by public code. */
 export async function saveRates(packageId: string, _prev: unknown, fd: FormData): Promise<Result> {
   return runAction(async () => {
+    assertId(packageId);
     const staff = await authorize("sponsorship.rates");
     const input = ratesSchema.parse(formDataToObject(fd));
     const db = getDb();
@@ -58,6 +60,7 @@ export async function saveRates(packageId: string, _prev: unknown, fd: FormData)
 
 export async function savePartner(id: string | null, _prev: unknown, fd: FormData): Promise<Result> {
   return runAction(async () => {
+    assertId(id);
     const staff = await authorize("sponsorship.write");
     const input = partnerSchema.parse(formDataToObject(fd));
     const canPublish = staff.permissions.has("sponsorship.publish");
