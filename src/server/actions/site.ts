@@ -12,12 +12,13 @@ import { legalSchema, navItemSchema } from "@/lib/validation/admin";
 import { audit } from "../audit";
 import { authorize } from "../auth/session";
 import { revalidatePublicSite } from "../revalidate";
-import { runAction } from "../run-action";
+import { assertId, runAction } from "../run-action";
 
 type Result = ActionResult<{ id?: string; redirectTo?: string }>;
 
 export async function saveNavItem(id: string | null, _prev: unknown, fd: FormData): Promise<Result> {
   return runAction(async () => {
+    assertId(id);
     const staff = await authorize("navigation.write");
     const input = navItemSchema.parse(formDataToObject(fd));
     const values = { ...input, isExternal: input.href.startsWith("https://") };
