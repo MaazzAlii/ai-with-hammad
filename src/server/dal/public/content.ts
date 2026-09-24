@@ -162,7 +162,7 @@ export const listActivePlatforms = cache(async (): Promise<PlatformDTO[]> =>
       .from(socialPlatforms)
       .where(eq(socialPlatforms.isActive, true))
       .orderBy(asc(socialPlatforms.sortOrder));
-    return rows.flatMap(({ id: _id, ...r }) => {
+    return rows.flatMap(({ id: _unused, ...r }) => {
       const url = safeHttpUrl(r.profileUrl, { httpsOnly: true });
       return url ? [{ ...r, profileUrl: url }] : [];
     });
