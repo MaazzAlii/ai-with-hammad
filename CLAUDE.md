@@ -82,6 +82,13 @@ images (aspect-ratio locked, `next/image`). Respect `prefers-reduced-motion`. Ta
   editors' saves must ignore them server-side.
 - Owners: only owners grant/modify `owner`; the DB trigger blocks demoting/deactivating the last owner.
 - RLS mirrors the same matrix via `private.has_permission()` for the public Data API.
+- Two account kinds in `profiles.kind`: `staff` (admin panel) and `client` (portal, linked to `clients` via
+  `profiles.client_id`). `getCurrentStaff`/`has_permission` only accept `kind='staff'`. Portal pages use
+  `requireClient()`, portal actions `authorizeClient()`, and every portal query filters by the caller's `client_id`.
+- The founders (Hammadullah, Maaz Ali) are `team_members.is_locked`: a DB trigger blocks renaming, re-slugging,
+  unlocking and deleting them. Everything else a visitor sees must stay editable from Admin (no hard-coded copy).
+- Only async functions may be exported from `"use server"` files (every export is a public endpoint;
+  guarded by `tests/unit/server-actions-guard.test.ts`). Put read helpers in the DAL.
 
 ## 8. Storage rules
 
@@ -98,7 +105,7 @@ images (aspect-ratio locked, `next/image`). Respect `prefers-reduced-motion`. Ta
 - Validate all input with zod on the server (client validation is UX only).
 - No `dangerouslySetInnerHTML` except `JsonLd` (escaped serializer) and `Markdown` (escaping renderer).
 - URLs: `safeHttpUrl` / `safeHref` / `safeNextPath`; embeds only via `parseEmbed` allow-list — never store iframe HTML.
-- Public forms: honeypot + min fill time + DB rate limit + storage-first; errors never reveal internals.
+- Public forms and logins: captcha (`verifyCaptcha`, built-in or Turnstile) + honeypot + min fill time + DB rate limit + storage-first; errors never reveal internals.
 - `runAction` hides unexpected errors; never return stack traces or DB messages to users.
 - Audit every mutation (`audit()`), never log secrets (metadata is scrubbed; don't bypass it).
 - Secrets only in server env; `NEXT_PUBLIC_*` must never contain secrets.
@@ -118,6 +125,9 @@ images (aspect-ratio locked, `next/image`). Respect `prefers-reduced-motion`. Ta
 - Video: click-to-load facades (`VideoEmbed`), `preload="none"` (`VideoPlayer`). Never autoload iframes.
 - Admin-only libraries (dnd-kit, tus-js-client) must not be imported by public components.
 - Select only needed columns; batch child queries (no N+1).
+- Drizzle correlated subqueries: use fully qualified raw names (`sql\`message_threads.id\``) — `${table.id}` renders
+  unqualified and binds to the inner table.
+- No `loading.tsx` above routes that call `notFound()` (streams a 200 = soft 404). Use `NavigationLoader`.
 
 ## 12. Testing rules
 
@@ -135,7 +145,7 @@ images (aspect-ratio locked, `next/image`). Respect `prefers-reduced-motion`. Ta
 
 ## 14. Deployment rules
 
-- Vercel + Supabase. Env vars documented in `.env.example` and `docs/VERCEL_DEPLOYMENT.md`.
+- Vercel + Supabase now; Docker on a VPS later (`docs/HOSTING_PLAN.md`). Env vars documented in `.env.example` and `docs/VERCEL_DEPLOYMENT.md`.
 - Canonical URLs come from `NEXT_PUBLIC_SITE_URL` — never hard-code the Vercel or custom domain.
 - Run the SQL setup on the Supabase project before first deploy (`docs/SUPABASE_SETUP.md`).
 
