@@ -31,4 +31,6 @@ Release tasks move the verified product to production safely.
 
 ## Status
 
-**PLANNED**
+**BLOCKED**
+
+BLOCKER: depends on 089/090 (keys and env vars must be created in the owner's accounts). Matrix documented in docs/VERCEL_DEPLOYMENT.md and .env.example.
