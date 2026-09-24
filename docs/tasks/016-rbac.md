@@ -26,7 +26,7 @@ Frontend checks are cosmetic; server checks are the security boundary.
 
 ## Acceptance Criteria
 
-- [ ] Unit tests for matrix; E2E: editor cannot publish, viewer cannot edit, viewer cannot see inquiries
+- [x] Unit tests for matrix; E2E: editor cannot publish, viewer cannot edit, viewer cannot see inquiries
 
 ## Verification
 
@@ -34,4 +34,6 @@ Frontend checks are cosmetic; server checks are the security boundary.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: tests/unit/rbac-audit-email.test.ts, tests/e2e/roles.spec.ts, tests/e2e/users.spec.ts.
