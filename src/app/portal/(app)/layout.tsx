@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import { MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Toaster } from "sonner";
 
 import { Logo } from "@/components/site/logo";
+import { NavigationLoader } from "@/components/site/navigation-loader";
 import { NOINDEX } from "@/lib/seo";
 import { whatsappLink } from "@/lib/whatsapp";
 import { requireClient } from "@/server/auth/client-session";
@@ -50,6 +52,9 @@ export default async function PortalLayout({ children }: { children: React.React
         </p>
         {children}
       </main>
+      <Suspense fallback={null}>
+        <NavigationLoader siteName={general.siteName} logoUrl={media.logo?.url ?? null} />
+      </Suspense>
       <Toaster theme="dark" position="bottom-right" richColors closeButton />
     </div>
   );
