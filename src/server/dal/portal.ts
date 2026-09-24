@@ -13,8 +13,10 @@ export async function listClientThreads(clientId: string) {
       subject: messageThreads.subject,
       status: messageThreads.status,
       lastMessageAt: messageThreads.lastMessageAt,
-      unread: sql<boolean>`(${messageThreads.clientLastReadAt} is null or ${messageThreads.clientLastReadAt} < ${messageThreads.lastMessageAt})
-        and exists (select 1 from ${messages} m where m.thread_id = ${messageThreads.id} and m.author_kind = 'staff' and m.created_at > coalesce(${messageThreads.clientLastReadAt}, 'epoch'))`,
+      // Column references are written fully qualified: in a single-table select Drizzle renders
+      // ${messageThreads.id} as a bare "id", which inside the subquery would bind to messages.id.
+      unread: sql<boolean>`exists (select 1 from messages m where m.thread_id = message_threads.id and m.author_kind = 'staff'
+        and m.created_at > coalesce(message_threads.client_last_read_at, 'epoch'))`,
     })
     .from(messageThreads)
     .where(eq(messageThreads.clientId, clientId))
@@ -49,7 +51,7 @@ export async function getThread(threadId: string, clientId: string | null) {
 
 /** Staff inbox: every thread with client name, last message preview and unread flag for staff. */
 export async function listInboxThreads(filter: { status?: "open" | "closed"; clientId?: string; unreadOnly?: boolean } = {}) {
-  const unread = sql<boolean>`exists (select 1 from ${messages} m where m.thread_id = ${messageThreads.id} and m.author_kind = 'client' and m.created_at > coalesce(${messageThreads.staffLastReadAt}, 'epoch'))`;
+  const unread = sql<boolean>`exists (select 1 from messages m where m.thread_id = message_threads.id and m.author_kind = 'client' and m.created_at > coalesce(message_threads.staff_last_read_at, 'epoch'))`;
   const conds = [
     filter.status ? eq(messageThreads.status, filter.status) : undefined,
     filter.clientId ? eq(messageThreads.clientId, filter.clientId) : undefined,
@@ -64,7 +66,7 @@ export async function listInboxThreads(filter: { status?: "open" | "closed"; cli
       clientId: clients.id,
       companyName: clients.companyName,
       unread,
-      preview: sql<string>`(select left(m.body, 140) from ${messages} m where m.thread_id = ${messageThreads.id} order by m.created_at desc limit 1)`,
+      preview: sql<string>`(select left(m.body, 140) from messages m where m.thread_id = message_threads.id order by m.created_at desc limit 1)`,
     })
     .from(messageThreads)
     .innerJoin(clients, eq(clients.id, messageThreads.clientId))
@@ -78,7 +80,7 @@ export async function unreadThreadCount() {
     .select({ n: count() })
     .from(messageThreads)
     .where(
-      sql`exists (select 1 from ${messages} m where m.thread_id = ${messageThreads.id} and m.author_kind = 'client' and m.created_at > coalesce(${messageThreads.staffLastReadAt}, 'epoch'))`,
+      sql`exists (select 1 from messages m where m.thread_id = message_threads.id and m.author_kind = 'client' and m.created_at > coalesce(message_threads.staff_last_read_at, 'epoch'))`,
     );
   return r?.n ?? 0;
 }
@@ -99,8 +101,8 @@ export async function listClientsAdmin() {
       contactName: clients.contactName,
       email: clients.email,
       isActive: clients.isActive,
-      users: sql<number>`(select count(*)::int from ${profiles} p where p.client_id = ${clients.id} and p.kind = 'client')`,
-      openThreads: sql<number>`(select count(*)::int from ${messageThreads} t where t.client_id = ${clients.id} and t.status = 'open')`,
+      users: sql<number>`(select count(*)::int from profiles p where p.client_id = clients.id and p.kind = 'client')`,
+      openThreads: sql<number>`(select count(*)::int from message_threads t where t.client_id = clients.id and t.status = 'open')`,
     })
     .from(clients)
     .orderBy(desc(clients.isActive), asc(clients.companyName));
