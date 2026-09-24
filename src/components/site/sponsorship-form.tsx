@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { track } from "@vercel/analytics";
 import type { z } from "zod";
 
+import { Captcha } from "@/components/forms/captcha";
 import { Field, Honeypot } from "@/components/forms/field";
 import { Button } from "@/components/ui/button";
 import { Input, NativeSelect, Textarea } from "@/components/ui/input";
@@ -30,6 +31,8 @@ const PLATFORM_OPTIONS: { value: ContentPlatform; label: string }[] = [
 export function SponsorshipForm({ packages }: { packages: { id: string; name: string }[] }) {
   const [pending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const [captchaError, setCaptchaError] = useState<string | undefined>();
   const [done, setDone] = useState<string | null>(null);
   // Render time for the anti-spam minimum-fill-time check (set after mount).
   const [startedAt, setStartedAt] = useState(0);
@@ -45,18 +48,24 @@ export function SponsorshipForm({ packages }: { packages: { id: string; name: st
   const { register, handleSubmit, formState, setError } = form;
   const e = formState.errors;
 
-  const onSubmit = handleSubmit((values) => {
+  const onSubmit = handleSubmit((values, event) => {
     setServerError(null);
+    setCaptchaError(undefined);
+    const formEl = (event?.target as HTMLFormElement | undefined) ?? null;
+    const fd = formEl ? new FormData(formEl) : new FormData();
     startTransition(async () => {
       const honeypot = (document.getElementById("sponsor-hp") as HTMLInputElement | null)?.value ?? "";
-      const result = await submitSponsorshipInquiry({ ...values, website_url_confirm: honeypot, started_at: startedAt || undefined });
+      const captcha = { captchaToken: fd.get("captchaToken") ?? "", captchaAnswer: fd.get("captchaAnswer") ?? "", turnstileToken: fd.get("turnstileToken") ?? "" };
+      const result = await submitSponsorshipInquiry({ ...values, website_url_confirm: honeypot, started_at: startedAt || undefined, ...captcha });
       if (result.ok) {
         track("inquiry_submitted", { form: "sponsorship" });
         setDone(result.message ?? "Thanks!");
         form.reset();
       } else {
         setServerError(result.error);
-        for (const [k, v] of Object.entries(result.fieldErrors ?? {})) if (v?.[0]) setError(k as keyof In, { message: v[0] });
+        setCaptchaKey((k) => k + 1);
+        if (result.fieldErrors?.captchaAnswer?.[0]) setCaptchaError(result.fieldErrors.captchaAnswer[0]);
+        for (const [k, v] of Object.entries(result.fieldErrors ?? {})) if (v?.[0] && k !== "captchaAnswer") setError(k as keyof In, { message: v[0] });
       }
     });
   });
@@ -125,6 +134,9 @@ export function SponsorshipForm({ packages }: { packages: { id: string; name: st
       <Field id="sp-message" label="Tell us about your product" required error={e.message?.message} className="sm:col-span-2">
         <Textarea rows={5} {...register("message")} />
       </Field>
+      <div className="sm:col-span-2">
+        <Captcha resetKey={captchaKey} error={captchaError} idPrefix="sponsor-hp-captcha" />
+      </div>
       <Honeypot register={{ id: "sponsor-hp", name: "website_url_confirm" }} />
       <div className="flex justify-end sm:col-span-2">
         <Button type="submit" size="lg" disabled={pending}>
