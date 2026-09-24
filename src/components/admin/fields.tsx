@@ -17,9 +17,9 @@ function Wrap({ name, label, hint, required, className, children }: Base & { chi
   const errorId = error ? `${id}-err` : undefined;
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <Label htmlFor={id}>
+      <Label htmlFor={id} className={required ? "after:ml-0.5 after:text-accent after:content-['*']" : undefined}>
         {label}
-        {required ? <span aria-hidden className="ml-0.5 text-accent">*</span> : null}
+        
       </Label>
       {React.cloneElement(children, { id, name, "aria-invalid": Boolean(error) || undefined, "aria-describedby": [hintId, errorId].filter(Boolean).join(" ") || undefined })}
       {hint ? <p id={hintId} className="text-xs text-subtle">{hint}</p> : null}
