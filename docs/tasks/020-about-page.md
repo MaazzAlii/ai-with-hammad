@@ -23,7 +23,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Page renders; metadata unique
+- [x] Page renders; metadata unique
 
 ## Verification
 
@@ -32,4 +32,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
