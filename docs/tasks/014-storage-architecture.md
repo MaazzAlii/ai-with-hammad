@@ -26,7 +26,7 @@ Binary media must never live in Postgres; bucket limits are the server-side uplo
 
 ## Acceptance Criteria
 
-- [ ] Storage policy tests pass
+- [x] Storage policy tests pass
 
 ## Verification
 
@@ -34,4 +34,6 @@ Binary media must never live in Postgres; bucket limits are the server-side uplo
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: tests/db/storage-policies.test.ts + E2E direct-upload-by-viewer → 403.
