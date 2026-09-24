@@ -14,6 +14,11 @@ import { SectionHeading } from "./section";
 
 /** Shared blocks used by /sponsorship and /media-kit. Every block hides itself when its data is empty. */
 
+export function hasAudienceData(s: PublicSettings["sponsorship"], platforms: PlatformDTO[]) {
+  const a = s.audience;
+  return Boolean(s.audienceSummary || a.ageRanges.length || a.topCountries.length || a.genderSplit.length || platforms.some((p) => p.followers != null));
+}
+
 export function AudienceBlock({ s, platforms }: { s: PublicSettings["sponsorship"]; platforms: PlatformDTO[] }) {
   const a = s.audience;
   const hasBreakdown = a.ageRanges.length || a.topCountries.length || a.genderSplit.length;
