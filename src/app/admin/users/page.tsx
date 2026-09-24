@@ -1,4 +1,4 @@
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 import { AdminForm } from "@/components/admin/admin-form";
 import { FormSection, SelectField, SwitchField, TextField } from "@/components/admin/fields";
@@ -14,12 +14,12 @@ export const metadata = { title: "Users" };
 
 export default async function UsersPage() {
   const staff = await requirePagePermission("users.read");
-  const users = await getDb().select().from(profiles).orderBy(asc(profiles.email));
+  const users = await getDb().select().from(profiles).where(eq(profiles.kind, "staff")).orderBy(asc(profiles.email));
   const canManage = can(staff, "users.manage");
   const roleOptions = ROLES.filter((r) => canManageRole(staff.role, "viewer", r)).map((r) => ({ value: r, label: r[0]!.toUpperCase() + r.slice(1) }));
   return (
     <>
-      <AdminPageHeader title="Users" description="Staff access is invite-only. New accounts from any other source get no access until activated here." />
+      <AdminPageHeader title="Users" description="Staff access is invite-only. Client portal accounts are managed under Clients." />
       <ul className="space-y-2">
         {users.map((u) => {
           const editable = canManage && u.id !== staff.id && canManageRole(staff.role, u.role, u.role);
