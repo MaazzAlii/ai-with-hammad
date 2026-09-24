@@ -43,7 +43,7 @@ export default async function NavigationPage() {
                           <EntityRow title={i.label} meta={i.href} thumb={false} entity="navigation" id={i.id} canPublish flags={[{ flag: "isVisible", value: i.isVisible, label: "Visible", offLabel: "Hidden" }]} />
                         </summary>
                         <div className="border-t border-border p-4">
-                          <AdminForm action={saveNavItem.bind(null, i.id)} footer={<DeleteEntityButton entity="navigation" id={i.id} redirectTo="/admin/navigation" label="link" />}>
+                          <AdminForm compact action={saveNavItem.bind(null, i.id)} footer={<DeleteEntityButton entity="navigation" id={i.id} redirectTo="/admin/navigation" label="link" />}>
                             <div className="grid gap-4 sm:grid-cols-3">
                               <SelectField name="location" label="Menu" defaultValue={i.location} options={LOCATIONS} />
                               <TextField name="label" label="Label" required defaultValue={i.label} />
@@ -60,7 +60,7 @@ export default async function NavigationPage() {
             </section>
           );
         })}
-        <AdminForm action={saveNavItem.bind(null, null)} submitLabel="Add link">
+        <AdminForm action={saveNavItem.bind(null, null)} submitLabel="Add link" compact>
           <FormSection title="Add link">
             <div className="grid gap-4 sm:grid-cols-3">
               <SelectField name="location" label="Menu" defaultValue="header" options={LOCATIONS} />
