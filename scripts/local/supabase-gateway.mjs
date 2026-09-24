@@ -37,7 +37,7 @@ mkdirSync(STORAGE_DIR, { recursive: true });
 
 const CORS = {
   "access-control-allow-origin": "*",
-  "access-control-allow-headers": "authorization, apikey, content-type, x-client-info, x-upsert, cache-control, x-metadata, tus-resumable, upload-length, upload-metadata, upload-offset",
+  "access-control-allow-headers": "authorization, apikey, content-type, x-client-info, x-upsert, cache-control, x-metadata, tus-resumable, upload-length, upload-metadata, upload-offset, x-forwarded-for",
   "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS",
   "access-control-expose-headers": "content-length, content-type, etag, location, upload-offset",
 };
