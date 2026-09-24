@@ -31,6 +31,5 @@ export function NativeSelect({ className, children, ...props }: React.ComponentP
 }
 
 export function Label({ className, ...props }: React.ComponentProps<"label">) {
-  // eslint-disable-next-line jsx-a11y/label-has-associated-control -- htmlFor supplied by callers
   return <label data-slot="label" className={cn("text-sm font-medium text-fg", className)} {...props} />;
 }
