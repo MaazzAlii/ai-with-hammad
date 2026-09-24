@@ -122,6 +122,7 @@ indexes on every FK and on `(is_published, sort_order)`.
 | G. Quality (a11y, perf, security, email, analytics) | 068–077 |
 | H. Testing | 078–085 |
 | I. Release | 086–094 |
+| J. Client portal & platform v2 | 095–107 |
 
 See `docs/tasks/` for the full list; statuses are kept current there and summarised in `docs/FINAL_REPORT.md`.
 
