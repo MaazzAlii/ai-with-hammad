@@ -22,7 +22,7 @@ export default async function EditTeamMemberPage(props: PageProps<"/admin/team/[
         actions={
           <>
             <StatusBadges isPublished={data.member.isPublished} isFeatured={data.member.isFeatured} />
-            {can(staff, "team.delete") ? <DeleteEntityButton entity="team" id={id} redirectTo="/admin/team" label="team member" /> : null}
+            {can(staff, "team.delete") && !data.member.isLocked ? <DeleteEntityButton entity="team" id={id} redirectTo="/admin/team" label="team member" /> : null}
           </>
         }
       />
