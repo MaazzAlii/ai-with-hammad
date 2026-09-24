@@ -12,7 +12,7 @@ export function SiteHeader({ siteName, logo, links }: { siteName: string; logo: 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-bg/80 backdrop-blur-xl supports-[backdrop-filter]:bg-bg/65">
       <div className="container-page flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="rounded-control" aria-label={`${siteName} — home`}>
+        <Link href="/" className="rounded-control">
           <Logo name={siteName} logo={logo} />
         </Link>
         <nav aria-label="Main" className="hidden lg:block">
