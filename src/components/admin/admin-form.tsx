@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, useActionState, useContext, useEffect } from "react";
+import { createContext, useActionState, useContext, useEffect, useId } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,13 @@ import type { ActionResult, FieldErrors } from "@/lib/action-result";
 
 const ErrorsContext = createContext<FieldErrors>({});
 export const useFieldError = (name: string) => useContext(ErrorsContext)[name]?.[0];
+
+/** Field ids are scoped per form so several forms on one page never share ids. */
+const FormIdContext = createContext<string>("f");
+export const useFieldId = (name: string) => {
+  const scope = useContext(FormIdContext);
+  return scope === "f" ? `f-${name}` : `f${scope}-${name}`;
+};
 
 export type FormAction = (prev: ActionResult<{ id?: string; redirectTo?: string }> | null, fd: FormData) => Promise<ActionResult<{ id?: string; redirectTo?: string }>>;
 
@@ -48,7 +55,9 @@ export function AdminForm({
     }
   }, [state, router]);
   const errors = state && !state.ok ? (state.fieldErrors ?? {}) : {};
+  const formId = useId().replace(/[^a-zA-Z0-9]/g, "");
   return (
+    <FormIdContext.Provider value={compact ? formId : "f"}>
     <ErrorsContext.Provider value={errors}>
       <form action={formAction} className={className} noValidate>
         {state && !state.ok ? (
@@ -76,5 +85,6 @@ export function AdminForm({
         </div>
       </form>
     </ErrorsContext.Provider>
+    </FormIdContext.Provider>
   );
 }
