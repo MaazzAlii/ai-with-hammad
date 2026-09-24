@@ -29,8 +29,8 @@ The data model underpins every feature.
 
 ## Acceptance Criteria
 
-- [ ] SQL applies twice without error
-- [ ] Schema consistency test passes
+- [x] SQL applies twice without error
+- [x] Schema consistency test passes
 
 ## Verification
 
@@ -38,4 +38,6 @@ The data model underpins every feature.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: tests/db global setup applies the SQL twice; tests/db/schema-consistency.test.ts passes.
