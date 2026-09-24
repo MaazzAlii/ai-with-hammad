@@ -32,4 +32,6 @@ Standard uploads are only recommended to 6 MB.
 
 ## Status
 
-**PLANNED**
+**BLOCKED**
+
+BLOCKER: the TUS resumable path (> 6 MB) needs real Supabase Storage; the local emulator does not implement TUS. Standard uploads (≤ 6 MB) are E2E-verified. Verify by uploading a > 6 MB video after the Supabase project exists.
