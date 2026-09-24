@@ -23,7 +23,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Seeded case study renders all sections
+- [x] Seeded case study renders all sections
 
 ## Verification
 
@@ -32,4 +32,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
