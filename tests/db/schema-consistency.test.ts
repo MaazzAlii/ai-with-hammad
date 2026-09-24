@@ -18,7 +18,7 @@ function expectedUdt(col: { getSQLType(): string; enumValues?: string[] }): stri
   if (t.startsWith("numeric")) return "numeric";
   if (t.startsWith("char")) return "bpchar";
   return (
-    { integer: "int4", bigint: "int8", boolean: "bool", text: "text", uuid: "uuid", jsonb: "jsonb", date: "date" }[
+    { integer: "int4", smallint: "int2", bigint: "int8", boolean: "bool", text: "text", uuid: "uuid", jsonb: "jsonb", date: "date" }[
       t
     ] ?? t
   );
