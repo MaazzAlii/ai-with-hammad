@@ -31,8 +31,12 @@ export function SponsorshipForm({ packages }: { packages: { id: string; name: st
   const [pending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  // Render time for the anti-spam minimum-fill-time check (set after mount).
   const [startedAt, setStartedAt] = useState(0);
-  useEffect(() => setStartedAt(Date.now()), []);
+  useEffect(() => {
+    const t = setTimeout(() => setStartedAt(Date.now()), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const form = useForm<In, unknown, Out>({
     resolver: zodResolver(sponsorshipInquirySchema),
@@ -45,7 +49,7 @@ export function SponsorshipForm({ packages }: { packages: { id: string; name: st
     setServerError(null);
     startTransition(async () => {
       const honeypot = (document.getElementById("sponsor-hp") as HTMLInputElement | null)?.value ?? "";
-      const result = await submitSponsorshipInquiry({ ...values, website_url_confirm: honeypot, started_at: startedAt });
+      const result = await submitSponsorshipInquiry({ ...values, website_url_confirm: honeypot, started_at: startedAt || undefined });
       if (result.ok) {
         track("inquiry_submitted", { form: "sponsorship" });
         setDone(result.message ?? "Thanks!");
