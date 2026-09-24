@@ -130,7 +130,7 @@ test.describe("CMS workflows (owner)", () => {
     await expectToast(page, "Metrics recorded");
     const pub = await ctx.newPage();
     await pub.goto(`/content/n8n-agent-${id}`);
-    await expect(pub.getByText("125K")).toBeVisible();
+    await expect(pub.locator("dl").first().getByText("125K")).toBeVisible();
     await pub.goto("/content");
     await expect(pub.getByRole("heading", { name: "Audience favourites" })).toBeVisible();
     await ctx.close();
