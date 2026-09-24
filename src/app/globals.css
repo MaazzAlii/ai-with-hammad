@@ -153,3 +153,35 @@
   0% { transform: translateX(-110%); }
   100% { transform: translateX(330%); }
 }
+
+/* ---------- Motion (all disabled by prefers-reduced-motion above) ---------- */
+@keyframes agent-flow { to { stroke-dashoffset: -64; } }
+.agent-flow { animation: agent-flow 1.6s linear infinite; }
+@keyframes agent-pulse { 0%, 100% { opacity: 0.55; transform: scale(0.92); } 50% { opacity: 1; transform: scale(1.05); } }
+.agent-pulse { transform-box: fill-box; transform-origin: center; animation: agent-pulse 2.8s ease-in-out infinite; }
+@keyframes agent-log { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.agent-log { opacity: 0; animation: agent-log 0.5s ease-out forwards; }
+
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee-track { animation: marquee 38s linear infinite; width: max-content; }
+
+@keyframes aurora { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(4%, -3%, 0) scale(1.08); } }
+.aurora { animation: aurora 18s ease-in-out infinite; }
+
+/* Scroll-reveal without JavaScript where scroll-driven animations are supported. */
+@supports (animation-timeline: view()) {
+  @keyframes reveal { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% cover 22%; }
+}
+
+/* Skip rendering work for off-screen sections until they approach the viewport. */
+.cv-auto { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+
+/* Gradient hairline border for highlighted cards. */
+.glow-border { position: relative; }
+.glow-border::before {
+  content: ""; position: absolute; inset: 0; padding: 1px; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(135deg, rgb(34 211 238 / 0.55), transparent 40%, transparent 60%, rgb(45 212 191 / 0.45));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
