@@ -26,13 +26,9 @@ export function Field({
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <Label htmlFor={id}>
+      <Label htmlFor={id} className={required ? "after:ml-0.5 after:text-accent after:content-['*']" : undefined}>
         {label}
-        {required ? (
-          <span aria-hidden className="ml-0.5 text-accent">
-            *
-          </span>
-        ) : null}
+        
       </Label>
       {React.cloneElement(children, { id, "aria-invalid": Boolean(error) || undefined, "aria-describedby": describedBy, "aria-required": required || undefined })}
       {hint ? (
