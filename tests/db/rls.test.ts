@@ -176,3 +176,75 @@ describe("constraints", () => {
     expect(b.c).toBe(a.c + 1);
   });
 });
+
+describe("client portal isolation", () => {
+  let clientA = "";
+  let clientB = "";
+  let userA = "";
+  let threadB = "";
+  beforeAll(async () => {
+    [{ id: clientA }] = await sql`insert into clients (company_name) values ('Client A') returning id`;
+    [{ id: clientB }] = await sql`insert into clients (company_name) values ('Client B') returning id`;
+    userA = crypto.randomUUID();
+    await sql`insert into auth.users (id, email) values (${userA}, 'portal-a@test.local')`;
+    await sql`update profiles set kind = 'client', client_id = ${clientA}, is_active = true where id = ${userA}`;
+    [{ id: threadB }] = await sql`insert into message_threads (client_id, subject) values (${clientB}, 'B only') returning id`;
+    await sql`insert into messages (thread_id, author_kind, body) values (${threadB}, 'staff', 'secret for B')`;
+  });
+
+  it("a client user has no staff permissions even though active", async () => {
+    const [{ ok }] = await asRole(sql, "authenticated", userA, (tx) => tx`select private.has_permission('cms.read') as ok`).catch(() => [{ ok: "err" }]);
+    expect(ok === false || ok === "err").toBe(true);
+    await asRole(sql, "authenticated", userA, async (tx) => {
+      expect(await tx`select slug from projects where not is_published`).toHaveLength(0);
+      expect(await tx`select * from contact_inquiries`).toHaveLength(0);
+    });
+  });
+
+  it("clients only see and write their own threads/messages", async () => {
+    await asRole(sql, "authenticated", userA, async (tx) => {
+      expect(await tx`select * from message_threads where id = ${threadB}`).toHaveLength(0);
+      expect(await tx`select * from messages where thread_id = ${threadB}`).toHaveLength(0);
+      const [t] = await tx`insert into message_threads (client_id, subject, created_by) values (${clientA}, 'Mine', ${userA}) returning id`;
+      await tx`insert into messages (thread_id, author_id, author_kind, body) values (${t!.id}, ${userA}, 'client', 'hello')`;
+      expect(await tx`select body from messages`).toEqual([{ body: "hello" }]);
+    });
+    await expect(asRole(sql, "authenticated", userA, (tx) => tx`insert into message_threads (client_id, subject, created_by) values (${clientB}, 'x', ${userA})`)).rejects.toThrow(/row-level security/);
+    await expect(asRole(sql, "authenticated", userA, (tx) => tx`insert into messages (thread_id, author_id, author_kind, body) values (${threadB}, ${userA}, 'client', 'x')`)).rejects.toThrow(/row-level security/);
+  });
+
+  it("clients can submit only pending, unpublished testimonials for themselves", async () => {
+    await asRole(sql, "authenticated", userA, async (tx) => {
+      await tx`insert into testimonials (client_id, submitted_by, author_name, quote, rating, consent_to_publish) values (${clientA}, ${userA}, 'A', 'Great engineering work.', 5, true)`;
+    });
+    await expect(
+      asRole(sql, "authenticated", userA, (tx) => tx`insert into testimonials (client_id, submitted_by, author_name, quote, rating, is_published, status, consent_to_publish) values (${clientA}, ${userA}, 'A', 'Great engineering work.', 5, true, 'approved', true)`),
+    ).rejects.toThrow(/row-level security/);
+  });
+
+  it("testimonials cannot be published without approval and consent", async () => {
+    await expect(sql`insert into testimonials (author_name, quote, rating, is_published, status) values ('X', 'Some quote here', 4, true, 'approved')`).rejects.toThrow(/testimonials_publish_requires_approval/);
+    await expect(sql`insert into testimonials (author_name, quote, rating) values ('X', 'Some quote here', 6)`).rejects.toThrow();
+  });
+
+  it("editors read client conversations; viewers do not", async () => {
+    await asRole(sql, "authenticated", ids.editor, async (tx) => {
+      expect((await tx`select * from messages where thread_id = ${threadB}`).length).toBe(1);
+    });
+    await asRole(sql, "authenticated", ids.viewer, async (tx) => {
+      expect(await tx`select * from messages`).toHaveLength(0);
+    });
+  });
+});
+
+describe("locked founders", () => {
+  it("are seeded, cannot be renamed or deleted, but other fields are editable", async () => {
+    const rows = await sql`select slug, name, is_locked from team_members where is_locked order by sort_order`;
+    expect(rows.map((r) => r.name)).toEqual(["Hammadullah", "Maaz Ali"]);
+    await expect(sql`update team_members set name = 'Someone else' where slug = 'maaz-ali'`).rejects.toThrow(/locked/);
+    await expect(sql`update team_members set deleted_at = now() where slug = 'maaz-ali'`).rejects.toThrow(/locked/);
+    await expect(sql`delete from team_members where slug = 'hammadullah'`).rejects.toThrow(/locked/);
+    await expect(sql`update team_members set is_locked = false where slug = 'hammadullah'`).rejects.toThrow(/locked/);
+    await sql`update team_members set bio = 'Builds agents.', role_title = 'Co-founder' where slug = 'hammadullah'`;
+  });
+});
