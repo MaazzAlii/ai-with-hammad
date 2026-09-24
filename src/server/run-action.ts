@@ -37,3 +37,14 @@ export async function runAction<T>(fn: () => Promise<ActionResult<T>>): Promise<
 export function parse<S extends z.ZodType>(schema: S, input: unknown): z.infer<S> {
   return schema.parse(input);
 }
+
+const uuid = z.uuid();
+/** Validate ids that arrive as bound server-action arguments (client-controlled). */
+export function assertId(id: string): string;
+export function assertId(id: string | null): string | null;
+export function assertId(id: string | null): string | null {
+  if (id === null) return null;
+  const r = uuid.safeParse(id);
+  if (!r.success) throw new UserFacingError("Invalid identifier.");
+  return r.data;
+}
