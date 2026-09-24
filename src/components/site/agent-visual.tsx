@@ -3,7 +3,7 @@
  * It illustrates how the studio builds systems — it does not claim any metrics.
  */
 const NODES = [
-  { x: 60, y: 70, label: "Trigger", sub: "webhook · form · email" },
+  { x: 68, y: 70, label: "Trigger", sub: "webhook · form" },
   { x: 250, y: 70, label: "AI agent", sub: "LLM + guardrails", core: true },
   { x: 440, y: 30, label: "CRM", sub: "tool" },
   { x: 440, y: 110, label: "Database", sub: "tool" },
