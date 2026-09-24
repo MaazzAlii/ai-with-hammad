@@ -11,7 +11,8 @@ import { toast } from "sonner";
 import type { ActionResult } from "@/lib/action-result";
 import { cn } from "@/lib/utils";
 
-type Item = { id: string };
+/** Rows are pre-rendered on the server (functions cannot cross the server/client boundary). */
+export type SortableItem = { id: string; content: React.ReactNode };
 
 function Row({ id, children, disabled }: { id: string; children: React.ReactNode; disabled?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled });
@@ -31,15 +32,13 @@ function Row({ id, children, disabled }: { id: string; children: React.ReactNode
  * Drag-and-drop (mouse, touch and keyboard) ordering persisted through a
  * server action that receives the full ordered id list. Optimistic UI.
  */
-export function SortableList<T extends Item>({
+export function SortableList({
   items: initial,
   onReorder,
-  render,
   disabled = false,
 }: {
-  items: T[];
+  items: SortableItem[];
   onReorder: (ids: string[]) => Promise<ActionResult>;
-  render: (item: T) => React.ReactNode;
   disabled?: boolean;
 }) {
   const router = useRouter();
@@ -68,7 +67,7 @@ export function SortableList<T extends Item>({
         <ul className="space-y-2">
           {items.map((item) => (
             <Row key={item.id} id={item.id} disabled={disabled}>
-              {render(item)}
+              {item.content}
             </Row>
           ))}
         </ul>
