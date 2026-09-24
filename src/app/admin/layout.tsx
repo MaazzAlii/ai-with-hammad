@@ -8,6 +8,7 @@ import { getDb } from "@/db";
 import { contactInquiries, sponsorshipInquiries } from "@/db/schema";
 import { NOINDEX } from "@/lib/seo";
 import { requireStaff } from "@/server/auth/session";
+import { unreadThreadCount } from "@/server/dal/portal";
 
 export const metadata: Metadata = { title: { default: "Admin", template: "%s · Admin" }, ...NOINDEX };
 
@@ -23,9 +24,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     ]);
     newInquiries = (a?.n ?? 0) + (b?.n ?? 0);
   }
+  const unreadMessages = staff.permissions.has("messages.read") ? await unreadThreadCount() : 0;
   return (
     <div className="min-h-dvh lg:flex">
-      <AdminSidebar groups={groups} user={{ email: staff.email, role: staff.role }} newInquiries={newInquiries} />
+      <AdminSidebar groups={groups} user={{ email: staff.email, role: staff.role }} newInquiries={newInquiries} unreadMessages={unreadMessages} />
       <main id="main" className="min-w-0 flex-1 px-4 py-8 sm:px-8 lg:py-10">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
