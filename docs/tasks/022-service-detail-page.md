@@ -24,7 +24,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Draft slug returns 404
+- [x] Draft slug returns 404
 
 ## Verification
 
@@ -33,4 +33,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
