@@ -150,12 +150,11 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
           {project.metrics.length ? (
             <section aria-labelledby="sec-metrics">
               <h2 id="sec-metrics" className="mb-6 text-2xl font-semibold">Outcomes</h2>
-              <dl className="grid gap-px overflow-hidden rounded-card border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+              <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {project.metrics.map((m) => (
-                  <div key={m.label} className="bg-surface p-6">
+                  <div key={m.label} className="flex flex-col-reverse rounded-card border border-border bg-surface p-6">
+                    <dt className="mt-2 text-sm font-medium text-fg">{m.label}{m.description ? <span className="mt-1 block text-xs font-normal text-muted">{m.description}</span> : null}</dt>
                     <dd className="font-mono text-3xl text-accent">{m.value}</dd>
-                    <dt className="mt-2 text-sm font-medium text-fg">{m.label}</dt>
-                    {m.description ? <p className="mt-1 text-xs text-muted">{m.description}</p> : null}
                   </div>
                 ))}
               </dl>
