@@ -43,8 +43,13 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           websiteLd(general.siteName),
         ]}
       />
-      <Analytics />
-      <SpeedInsights />
+      {/* Vercel serves the analytics scripts; elsewhere they would 404. */}
+      {process.env.VERCEL ? (
+        <>
+          <Analytics />
+          <SpeedInsights />
+        </>
+      ) : null}
     </>
   );
 }
