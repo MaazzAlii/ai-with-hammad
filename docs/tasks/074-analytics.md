@@ -31,4 +31,6 @@ Quality attributes determine whether the platform is production-ready rather tha
 
 ## Status
 
-**PLANNED**
+**BLOCKED**
+
+BLOCKER: Vercel Analytics/Speed Insights only run on Vercel (components are mounted only when VERCEL is set). Verify after the first Vercel deployment by enabling both in the project dashboard.
