@@ -25,7 +25,7 @@ A single agreed architecture keeps ~90 tasks coherent.
 
 ## Acceptance Criteria
 
-- [ ] PLAN.md contains architecture, data model summary, RBAC matrix, phases, DoD, risks
+- [x] PLAN.md contains architecture, data model summary, RBAC matrix, phases, DoD, risks
 
 ## Verification
 
@@ -33,4 +33,4 @@ A single agreed architecture keeps ~90 tasks coherent.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
