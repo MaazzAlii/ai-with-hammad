@@ -27,8 +27,8 @@ Everything on the public site must be editable without a deploy, safely and by t
 
 ## Acceptance Criteria
 
-- [ ] CRUD works end-to-end
-- [ ] Role restrictions enforced server-side
+- [x] CRUD works end-to-end
+- [x] Role restrictions enforced server-side
 
 ## Verification
 
@@ -37,4 +37,6 @@ Everything on the public site must be editable without a deploy, safely and by t
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: audit rows asserted in admin.spec.ts/users.spec.ts; scrubbing unit-tested.
