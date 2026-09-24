@@ -30,7 +30,7 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
     case "general":
       return { ...o, logoMediaId: nullable(o.logoMediaId) };
     case "home":
-      return { ...o, heroMediaId: nullable(o.heroMediaId), capabilities: json(o.capabilities), process: json(o.process) };
+      return { ...o, heroMediaId: nullable(o.heroMediaId), capabilities: json(o.capabilities), process: json(o.process), techStack: lines(o.techStack) };
     case "about":
       return { ...o, values: json(o.values) };
     case "seo":
