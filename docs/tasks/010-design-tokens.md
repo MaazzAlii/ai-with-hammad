@@ -26,7 +26,7 @@ Tokens enforce consistent radius (media vs cards vs buttons) and contrast.
 
 ## Acceptance Criteria
 
-- [ ] All components use tokens; body text contrast >= 4.5:1
+- [x] All components use tokens; body text contrast >= 4.5:1
 
 ## Verification
 
@@ -34,4 +34,6 @@ Tokens enforce consistent radius (media vs cards vs buttons) and contrast.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified by tests/unit/contrast.test.ts (11 token pairs ≥ 4.5:1).
