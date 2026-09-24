@@ -6,13 +6,13 @@ import { Input, Label, NativeSelect, Textarea } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-import { useFieldError } from "./admin-form";
+import { useFieldError, useFieldId } from "./admin-form";
 
 type Base = { name: string; label: string; hint?: React.ReactNode; required?: boolean; className?: string };
 
 function Wrap({ name, label, hint, required, className, children }: Base & { children: React.ReactElement<Record<string, unknown>> }) {
   const error = useFieldError(name);
-  const id = `f-${name}`;
+  const id = useFieldId(name);
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-err` : undefined;
   return (
@@ -59,7 +59,7 @@ export function SelectField({ defaultValue, options, ...b }: Base & { defaultVal
 /** Switch that submits "on" when checked (hidden input mirrors state for native forms). */
 export function SwitchField({ name, label, defaultChecked, hint, disabled }: { name: string; label: string; defaultChecked?: boolean; hint?: string; disabled?: boolean }) {
   const [checked, setChecked] = React.useState(Boolean(defaultChecked));
-  const id = `f-${name}`;
+  const id = useFieldId(name);
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
