@@ -24,7 +24,7 @@ The publishable key is public; RLS is the only protection of the Data API.
 
 ## Acceptance Criteria
 
-- [ ] RLS tests pass for anon, viewer, editor, admin
+- [x] RLS tests pass for anon, viewer, editor, admin
 
 ## Verification
 
@@ -32,4 +32,6 @@ The publishable key is public; RLS is the only protection of the Data API.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: tests/db/rls.test.ts (anon, viewer, editor, manager, inactive admin, escalation, helper execution).
