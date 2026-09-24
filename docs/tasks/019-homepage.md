@@ -25,7 +25,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Renders with seed data and with empty DB
+- [x] Renders with seed data and with empty DB
 
 ## Verification
 
@@ -34,4 +34,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
