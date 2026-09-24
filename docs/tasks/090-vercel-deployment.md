@@ -31,4 +31,6 @@ Release tasks move the verified product to production safely.
 
 ## Status
 
-**PLANNED**
+**BLOCKED**
+
+BLOCKER: no Vercel account/credentials in this session. Steps: docs/VERCEL_DEPLOYMENT.md.
