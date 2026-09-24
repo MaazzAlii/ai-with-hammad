@@ -72,6 +72,18 @@ do $$ begin
   create type public.nav_location as enum ('header', 'footer', 'legal');
 exception when duplicate_object then null; end $$;
 
+do $$ begin
+  create type public.account_kind as enum ('staff', 'client');
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create type public.thread_status as enum ('open', 'closed');
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create type public.testimonial_status as enum ('pending', 'approved', 'rejected');
+exception when duplicate_object then null; end $$;
+
 -- -----------------------------------------------------------------------------
 -- 2. Utility functions
 -- -----------------------------------------------------------------------------
@@ -140,11 +152,14 @@ create table if not exists public.profiles (
   full_name       text            not null default '',
   avatar_url      text,
   role            public.app_role not null default 'viewer' references public.roles (key),
+  kind            public.account_kind not null default 'staff',
   is_active       boolean         not null default false,
   last_sign_in_at timestamptz,
   created_at      timestamptz     not null default now(),
   updated_at      timestamptz     not null default now()
 );
+-- Upgrade path for databases created before the client portal existed.
+alter table public.profiles add column if not exists kind public.account_kind not null default 'staff';
 create unique index if not exists profiles_email_unique on public.profiles (lower(email));
 create index if not exists profiles_role_idx on public.profiles (role);
 select private.ensure_updated_at_trigger('public.profiles');
@@ -231,6 +246,8 @@ create table if not exists public.team_members (
   updated_at      timestamptz not null default now(),
   deleted_at      timestamptz
 );
+-- Locked members (the founders) cannot be renamed, re-slugged, unlocked or deleted.
+alter table public.team_members add column if not exists is_locked boolean not null default false;
 create unique index if not exists team_members_slug_unique on public.team_members (slug) where deleted_at is null;
 create index if not exists team_members_public_idx on public.team_members (is_published, sort_order) where deleted_at is null;
 create index if not exists team_members_photo_idx on public.team_members (photo_media_id);
@@ -544,6 +561,103 @@ create index if not exists inquiry_notes_contact_idx on public.inquiry_notes (co
 create index if not exists inquiry_notes_sponsorship_idx on public.inquiry_notes (sponsorship_inquiry_id, created_at);
 create index if not exists inquiry_notes_author_idx on public.inquiry_notes (author_id);
 
+-- 3.8b Client portal ---------------------------------------------------------
+create table if not exists public.clients (
+  id           uuid primary key default gen_random_uuid(),
+  company_name text        not null check (length(company_name) between 1 and 160),
+  contact_name text        not null default '',
+  email        text        not null default '',
+  phone        text        not null default '',
+  whatsapp     text        not null default '',
+  notes        text        not null default '',   -- internal, staff only
+  is_active    boolean     not null default true,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+create index if not exists clients_active_idx on public.clients (is_active, company_name);
+select private.ensure_updated_at_trigger('public.clients');
+
+-- A portal user (profiles.kind = 'client') belongs to exactly one client.
+alter table public.profiles add column if not exists client_id uuid references public.clients (id) on delete set null;
+create index if not exists profiles_client_idx on public.profiles (client_id);
+
+create table if not exists public.message_threads (
+  id                  uuid primary key default gen_random_uuid(),
+  client_id           uuid                 not null references public.clients (id) on delete cascade,
+  subject             text                 not null check (length(subject) between 1 and 200),
+  status              public.thread_status not null default 'open',
+  project_id          uuid                 references public.projects (id) on delete set null,
+  created_by          uuid                 references public.profiles (id) on delete set null,
+  last_message_at     timestamptz          not null default now(),
+  staff_last_read_at  timestamptz,
+  client_last_read_at timestamptz,
+  created_at          timestamptz          not null default now(),
+  updated_at          timestamptz          not null default now()
+);
+create index if not exists message_threads_client_idx on public.message_threads (client_id, last_message_at desc);
+create index if not exists message_threads_recent_idx on public.message_threads (last_message_at desc);
+create index if not exists message_threads_project_idx on public.message_threads (project_id);
+create index if not exists message_threads_created_by_idx on public.message_threads (created_by);
+select private.ensure_updated_at_trigger('public.message_threads');
+
+create table if not exists public.messages (
+  id          uuid primary key default gen_random_uuid(),
+  thread_id   uuid                not null references public.message_threads (id) on delete cascade,
+  author_id   uuid                references public.profiles (id) on delete set null,
+  author_kind public.account_kind not null,
+  body        text                not null check (length(body) between 1 and 5000),
+  created_at  timestamptz         not null default now()
+);
+create index if not exists messages_thread_idx on public.messages (thread_id, created_at);
+create index if not exists messages_author_idx on public.messages (author_id);
+
+-- 3.8c Testimonials & FAQ -----------------------------------------------------
+create table if not exists public.testimonials (
+  id                 uuid primary key default gen_random_uuid(),
+  client_id          uuid                      references public.clients (id) on delete set null,
+  project_id         uuid                      references public.projects (id) on delete set null,
+  submitted_by       uuid                      references public.profiles (id) on delete set null,
+  source             text                      not null default 'portal' check (source in ('portal', 'manual')),
+  author_name        text                      not null check (length(author_name) between 1 and 120),
+  author_title       text                      not null default '',
+  company            text                      not null default '',
+  quote              text                      not null check (length(quote) between 10 and 2000),
+  rating             smallint                  not null check (rating between 1 and 5),
+  photo_media_id     uuid                      references public.media_assets (id) on delete set null,
+  consent_to_publish boolean                   not null default false,
+  status             public.testimonial_status not null default 'pending',
+  is_published       boolean                   not null default false,
+  is_featured        boolean                   not null default false,
+  sort_order         integer                   not null default 0,
+  published_at       timestamptz,
+  created_at         timestamptz               not null default now(),
+  updated_at         timestamptz               not null default now(),
+  deleted_at         timestamptz,
+  -- Only approved testimonials whose author consented can ever be public.
+  constraint testimonials_publish_requires_approval check (not is_published or (status = 'approved' and consent_to_publish))
+);
+create index if not exists testimonials_public_idx on public.testimonials (is_published, sort_order) where deleted_at is null;
+create index if not exists testimonials_status_idx on public.testimonials (status, created_at desc);
+create index if not exists testimonials_client_idx on public.testimonials (client_id);
+create index if not exists testimonials_project_idx on public.testimonials (project_id);
+create index if not exists testimonials_submitted_by_idx on public.testimonials (submitted_by);
+create index if not exists testimonials_photo_idx on public.testimonials (photo_media_id);
+select private.ensure_updated_at_trigger('public.testimonials');
+
+create table if not exists public.faqs (
+  id           uuid primary key default gen_random_uuid(),
+  question     text        not null check (length(question) between 3 and 300),
+  answer       text        not null check (length(answer) between 1 and 4000),
+  category     text        not null default '',
+  is_published boolean     not null default true,
+  sort_order   integer     not null default 0,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now(),
+  deleted_at   timestamptz
+);
+create index if not exists faqs_public_idx on public.faqs (is_published, sort_order) where deleted_at is null;
+select private.ensure_updated_at_trigger('public.faqs');
+
 -- 3.9 Site -------------------------------------------------------------------
 -- Keys starting with 'internal.' are never readable publicly.
 create table if not exists public.site_settings (
@@ -624,7 +738,7 @@ set search_path = ''
 as $$
   select p.role
   from public.profiles p
-  where p.id = (select auth.uid()) and p.is_active
+  where p.id = (select auth.uid()) and p.is_active and p.kind = 'staff'
 $$;
 
 create or replace function private.has_permission(perm text)
@@ -640,6 +754,7 @@ as $$
     join public.role_permissions rp on rp.role = p.role
     where p.id = (select auth.uid())
       and p.is_active
+      and p.kind = 'staff'
       and rp.permission_key = perm
   )
 $$;
@@ -648,6 +763,50 @@ revoke all on function private.current_role_key() from public;
 revoke all on function private.has_permission(text) from public;
 grant execute on function private.current_role_key() to authenticated;
 grant execute on function private.has_permission(text) to authenticated;
+
+-- The client a signed-in portal user belongs to (null for staff / inactive clients).
+create or replace function private.current_client_id()
+returns uuid
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select p.client_id
+  from public.profiles p
+  join public.clients c on c.id = p.client_id
+  where p.id = (select auth.uid())
+    and p.kind = 'client'
+    and p.is_active
+    and c.is_active
+$$;
+revoke all on function private.current_client_id() from public;
+grant execute on function private.current_client_id() to authenticated;
+
+-- Founders' team entries: name/slug are fixed and the entry cannot be removed.
+create or replace function private.protect_locked_team_members()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if tg_op = 'DELETE' then
+    if old.is_locked then
+      raise exception 'This team member is locked and cannot be deleted';
+    end if;
+    return old;
+  end if;
+  if old.is_locked and (
+       new.name is distinct from old.name
+    or new.slug is distinct from old.slug
+    or not new.is_locked
+    or new.deleted_at is not null
+  ) then
+    raise exception 'This team member is locked: name and URL cannot be changed and it cannot be deleted';
+  end if;
+  return new;
+end;
+$$;
 
 -- Atomic rate-limit hit: returns the count in the current window.
 create or replace function private.rate_limit_hit(p_key text, p_window_seconds integer)
@@ -708,6 +867,11 @@ begin
   return new;
 end;
 $$;
+
+drop trigger if exists protect_locked_team_members on public.team_members;
+create trigger protect_locked_team_members
+  before update or delete on public.team_members
+  for each row execute function private.protect_locked_team_members();
 
 drop trigger if exists protect_last_owner on public.profiles;
 create trigger protect_last_owner
@@ -789,6 +953,7 @@ begin
     'project_team_members','project_services',
     'social_platforms','content_items','content_metrics',
     'sponsorship_partners','sponsorship_packages','sponsorship_package_rates','sponsorship_inquiries',
+    'clients','message_threads','messages','testimonials','faqs',
     'contact_inquiries','inquiry_notes','site_settings','navigation_items','legal_documents',
     'audit_logs','rate_limits'
   ] loop
@@ -797,6 +962,7 @@ begin
 end $$;
 
 -- Sensitive tables: remove default Data API privileges from anon entirely.
+revoke all on public.clients, public.message_threads, public.messages from anon;
 revoke all on public.sponsorship_package_rates, public.sponsorship_inquiries, public.contact_inquiries,
               public.inquiry_notes, public.audit_logs, public.rate_limits, public.profiles
   from anon;
@@ -971,6 +1137,69 @@ create policy "audit read" on public.audit_logs
 
 -- rate_limits: no policies → inaccessible through the Data API.
 
+-- 6.5 Client portal ---------------------------------------------------------
+drop policy if exists "staff read clients" on public.clients;
+create policy "staff read clients" on public.clients
+  for select to authenticated using ((select private.has_permission('clients.read')));
+drop policy if exists "staff manage clients" on public.clients;
+create policy "staff manage clients" on public.clients
+  for all to authenticated
+  using ((select private.has_permission('clients.manage')))
+  with check ((select private.has_permission('clients.manage')));
+drop policy if exists "client reads own client" on public.clients;
+create policy "client reads own client" on public.clients
+  for select to authenticated using (id = (select private.current_client_id()));
+
+drop policy if exists "staff read threads" on public.message_threads;
+create policy "staff read threads" on public.message_threads
+  for select to authenticated using ((select private.has_permission('messages.read')));
+drop policy if exists "staff write threads" on public.message_threads;
+create policy "staff write threads" on public.message_threads
+  for all to authenticated
+  using ((select private.has_permission('messages.write')))
+  with check ((select private.has_permission('messages.write')));
+drop policy if exists "client reads own threads" on public.message_threads;
+create policy "client reads own threads" on public.message_threads
+  for select to authenticated using (client_id = (select private.current_client_id()));
+drop policy if exists "client creates own threads" on public.message_threads;
+create policy "client creates own threads" on public.message_threads
+  for insert to authenticated with check (client_id = (select private.current_client_id()) and created_by = (select auth.uid()));
+
+drop policy if exists "staff read messages" on public.messages;
+create policy "staff read messages" on public.messages
+  for select to authenticated using ((select private.has_permission('messages.read')));
+drop policy if exists "staff send messages" on public.messages;
+create policy "staff send messages" on public.messages
+  for insert to authenticated
+  with check ((select private.has_permission('messages.write')) and author_id = (select auth.uid()) and author_kind = 'staff');
+drop policy if exists "client reads own messages" on public.messages;
+create policy "client reads own messages" on public.messages
+  for select to authenticated
+  using (exists (select 1 from public.message_threads t where t.id = thread_id and t.client_id = (select private.current_client_id())));
+drop policy if exists "client sends own messages" on public.messages;
+create policy "client sends own messages" on public.messages
+  for insert to authenticated
+  with check (
+    author_id = (select auth.uid()) and author_kind = 'client'
+    and exists (select 1 from public.message_threads t where t.id = thread_id and t.client_id = (select private.current_client_id()))
+  );
+
+-- 6.6 Testimonials & FAQ ----------------------------------------------------
+select private.apply_content_policies('testimonials',
+  'is_published and deleted_at is null', 'testimonials.moderate', 'testimonials.moderate');
+drop policy if exists "client reads own testimonials" on public.testimonials;
+create policy "client reads own testimonials" on public.testimonials
+  for select to authenticated using (client_id = (select private.current_client_id()));
+drop policy if exists "client submits testimonial" on public.testimonials;
+create policy "client submits testimonial" on public.testimonials
+  for insert to authenticated
+  with check (
+    client_id = (select private.current_client_id()) and submitted_by = (select auth.uid())
+    and source = 'portal' and status = 'pending' and not is_published and not is_featured
+  );
+
+select private.apply_content_policies('faqs', 'is_published and deleted_at is null', 'faqs.write', 'faqs.write');
+
 -- -----------------------------------------------------------------------------
 -- 7. Storage buckets & policies
 -- -----------------------------------------------------------------------------
@@ -1088,7 +1317,13 @@ insert into public.permissions (key, description) values
   ('legal.write',         'Edit legal documents'),
   ('users.read',          'View staff users'),
   ('users.manage',        'Invite users, change roles, deactivate users'),
-  ('audit.read',          'Read audit logs')
+  ('audit.read',          'Read audit logs'),
+  ('clients.read',        'View client accounts'),
+  ('clients.manage',      'Create clients and invite or deactivate portal users'),
+  ('messages.read',       'Read client portal conversations'),
+  ('messages.write',      'Reply to clients and manage conversations'),
+  ('testimonials.moderate','Approve, publish, feature and add testimonials'),
+  ('faqs.write',          'Edit FAQs')
 on conflict (key) do update set description = excluded.description;
 
 -- Role → permission matrix. Keep in sync with src/lib/permissions.ts
@@ -1109,13 +1344,15 @@ select 'manager'::public.app_role, key from public.permissions
     'sponsorship.write','sponsorship.publish','sponsorship.delete','sponsorship.rates',
     'inquiries.read','inquiries.write',
     'media.upload','media.update','media.delete',
-    'audit.read'
+    'audit.read',
+    'clients.read','clients.manage','messages.read','messages.write','testimonials.moderate','faqs.write'
   )
 union all
 select 'editor'::public.app_role, key from public.permissions
   where key in (
     'cms.read','projects.write','services.write','team.write','content.write','sponsorship.write',
-    'media.upload','media.update'
+    'media.upload','media.update',
+    'clients.read','messages.read','messages.write','faqs.write'
   )
 union all
 select 'viewer'::public.app_role, key from public.permissions
@@ -1128,6 +1365,11 @@ insert into public.site_settings (key, value) values
     'tagline', 'AI engineering, automation and agentic systems',
     'description', 'AI With Hamad is an AI engineering and automation studio. We design and build n8n workflows, API integrations and agentic AI systems, and share what we learn through technical content.',
     'contactEmail', '',
+    'phone', '',
+    'whatsapp', '',
+    'whatsappMessage', 'Hi AI With Hamad, I would like to talk about a project.',
+    'address', '',
+    'businessHours', '',
     'location', '',
     'logoMediaId', null
   )),
@@ -1335,5 +1577,24 @@ join (values
   ('agentic-ai-systems', 'Human in the loop', 'Review steps where decisions carry risk.', 30)
 ) as f(slug, title, description, sort_order) on f.slug = s.slug
 where not exists (select 1 from public.service_features sf where sf.service_id = s.id);
+
+-- Founders (names locked; everything else editable in Admin → Team).
+insert into public.team_members (slug, name, role_title, is_published, published_at, is_featured, is_locked, sort_order)
+select v.slug, v.name, v.role_title, true, now(), true, true, v.sort_order
+from (values
+  ('hammadullah', 'Hammadullah', 'Co-founder · AI Engineer', 10),
+  ('maaz-ali',    'Maaz Ali',    'Co-founder · AI Engineer', 20)
+) as v(slug, name, role_title, sort_order)
+where not exists (select 1 from public.team_members m where m.slug = v.slug and m.deleted_at is null);
+
+insert into public.faqs (question, answer, sort_order)
+select v.q, v.a, v.o
+from (values
+  ('How do we start working together?', 'Send us a message through the contact form or WhatsApp. We reply to schedule a short discovery call about your process and goals.', 10),
+  ('Do you only build with n8n?', 'No. We choose tools per project — workflow platforms, custom code, APIs and LLM providers — based on reliability and what your team can operate.', 20),
+  ('Who owns the work?', 'You do. Workflows, code and documentation are handed over at the end of the engagement.', 30),
+  ('How do we communicate during a project?', 'Day-to-day communication happens on WhatsApp. Clients also get a private portal to message the team and share feedback.', 40)
+) as v(q, a, o)
+where not exists (select 1 from public.faqs);
 
 commit;
