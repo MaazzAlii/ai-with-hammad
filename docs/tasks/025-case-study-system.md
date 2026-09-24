@@ -23,7 +23,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Unit test for markdown escaping
+- [x] Unit test for markdown escaping
 
 ## Verification
 
@@ -32,4 +32,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
