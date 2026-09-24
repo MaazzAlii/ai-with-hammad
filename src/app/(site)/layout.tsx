@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { JsonLd } from "@/components/site/json-ld";
+import { NavigationLoader } from "@/components/site/navigation-loader";
 import { WhatsAppButton } from "@/components/site/whatsapp-button";
 import { organizationLd, websiteLd } from "@/lib/jsonld";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -38,6 +40,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         location={general.location}
       />
       {wa ? <WhatsAppButton href={wa} /> : null}
+      <Suspense fallback={null}>
+        <NavigationLoader siteName={general.siteName} logoUrl={media.logo?.url ?? null} />
+      </Suspense>
       <JsonLd
         data={[
           organizationLd({
