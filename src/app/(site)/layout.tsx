@@ -4,12 +4,15 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { JsonLd } from "@/components/site/json-ld";
+import { WhatsAppButton } from "@/components/site/whatsapp-button";
 import { organizationLd, websiteLd } from "@/lib/jsonld";
+import { whatsappLink } from "@/lib/whatsapp";
 import { getNavigation, getPublicSettings, getSiteMedia } from "@/server/dal/public/site";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const [settings, nav, media] = await Promise.all([getPublicSettings(), getNavigation(), getSiteMedia()]);
   const { general, social } = settings;
+  const wa = whatsappLink(general.whatsapp, general.whatsappMessage);
   return (
     <>
       <a
@@ -30,7 +33,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         legal={nav.legal}
         social={social.links}
         email={general.contactEmail}
+        phone={general.phone}
+        whatsapp={wa}
+        location={general.location}
       />
+      {wa ? <WhatsAppButton href={wa} /> : null}
       <JsonLd
         data={[
           organizationLd({
