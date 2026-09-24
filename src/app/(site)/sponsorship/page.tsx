@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { JsonLd } from "@/components/site/json-ld";
 import { PageHeader, Section } from "@/components/site/section";
-import { AudienceBlock, CategoriesBlock, FormatsBlock, PartnersBlock, PlatformsBlock, TopContentBlock, WhyPartnerBlock } from "@/components/site/sponsorship-sections";
+import { AudienceBlock, hasAudienceData, CategoriesBlock, FormatsBlock, PartnersBlock, PlatformsBlock, TopContentBlock, WhyPartnerBlock } from "@/components/site/sponsorship-sections";
 import { SponsorshipForm } from "@/components/site/sponsorship-form";
 import { buttonVariants } from "@/components/ui/button";
 import { breadcrumbLd } from "@/lib/jsonld";
@@ -50,13 +50,13 @@ export default async function SponsorshipPage() {
           <p className="text-lg text-muted">{general.description}</p>
         </div>
       </Section>
-      <Section className="border-t border-border"><AudienceBlock s={s} platforms={platforms} /></Section>
+      {hasAudienceData(s, platforms) ? <Section className="border-t border-border"><AudienceBlock s={s} platforms={platforms} /></Section> : null}
       {s.contentCategories.length ? <Section className="border-t border-border"><CategoriesBlock categories={s.contentCategories} /></Section> : null}
       {platforms.length ? <Section className="border-t border-border"><PlatformsBlock platforms={platforms} /></Section> : null}
       {top.length ? <Section className="border-t border-border"><TopContentBlock items={top} title="Top-performing content" /></Section> : null}
       {campaign.length ? <Section className="border-t border-border"><TopContentBlock items={campaign} title="Campaign examples" /></Section> : null}
       {partners.length ? <Section className="border-t border-border"><PartnersBlock partners={partners} /></Section> : null}
-      <Section className="border-t border-border"><FormatsBlock formats={s.formats} packages={packages} ratesNotice={s.ratesNotice} /></Section>
+      {s.formats.length || packages.length ? <Section className="border-t border-border"><FormatsBlock formats={s.formats} packages={packages} ratesNotice={s.ratesNotice} /></Section> : null}
       {s.whyPartner.length ? <Section className="border-t border-border"><WhyPartnerBlock items={s.whyPartner} /></Section> : null}
       <Section className="border-t border-border" id="inquiry" aria-labelledby="inquiry-title">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr]">
