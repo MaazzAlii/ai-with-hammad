@@ -1,6 +1,6 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
@@ -45,7 +45,8 @@ export const getCurrentStaff = cache(async (): Promise<Staff | null> => {
     })
     .from(profiles)
     .leftJoin(rolePermissions, eq(rolePermissions.role, profiles.role))
-    .where(eq(profiles.id, data.user.id));
+    // Client-portal accounts are never staff, whatever their role column says.
+    .where(and(eq(profiles.id, data.user.id), eq(profiles.kind, "staff")));
   if (rows.length === 0) return null;
   const first = rows[0]!;
   return {
