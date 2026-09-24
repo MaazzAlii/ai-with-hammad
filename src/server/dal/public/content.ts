@@ -157,7 +157,7 @@ export const listActivePlatforms = cache(async (): Promise<PlatformDTO[]> =>
         description: socialPlatforms.description,
         followers: socialPlatforms.followers,
         followersUpdatedAt: socialPlatforms.followersUpdatedAt,
-        contentCount: sql<number>`(select count(*)::int from ${contentItems} ci where ci.social_platform_id = ${socialPlatforms.id} and ci.is_published and ci.deleted_at is null)`,
+        contentCount: sql<number>`(select count(*)::int from content_items ci where ci.social_platform_id = social_platforms.id and ci.is_published and ci.deleted_at is null)`,
       })
       .from(socialPlatforms)
       .where(eq(socialPlatforms.isActive, true))
