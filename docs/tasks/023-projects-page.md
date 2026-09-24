@@ -24,7 +24,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Filter narrows results
+- [x] Filter narrows results
 
 ## Verification
 
@@ -33,4 +33,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
