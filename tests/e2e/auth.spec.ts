@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { login, newContext, USERS } from "./helpers";
+import { login, newContext, solveCaptcha, USERS } from "./helpers";
 
 test.describe("authentication", () => {
   test("anonymous visitors are redirected from /admin to /login", async ({ browser }) => {
@@ -40,6 +40,7 @@ test.describe("authentication", () => {
     await page.goto("/login?next=/admin/media");
     await page.fill("#email", USERS.session);
     await page.fill("#password", "E2e-password-123!");
+    await solveCaptcha(page);
     await page.click("button[type=submit]");
     await expect(page).toHaveURL(/\/admin\/media$/);
     await page.getByRole("button", { name: "Sign out" }).click();
@@ -55,6 +56,7 @@ test.describe("authentication", () => {
     await page.goto("/login?next=https://evil.example");
     await page.fill("#email", USERS.session);
     await page.fill("#password", "E2e-password-123!");
+    await solveCaptcha(page);
     await page.click("button[type=submit]");
     await expect(page).toHaveURL(/localhost:3000\/admin$/);
     await ctx.close();
