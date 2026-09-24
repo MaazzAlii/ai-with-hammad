@@ -23,7 +23,7 @@ Avoids duplicate uploads and keeps forms consistent.
 
 ## Acceptance Criteria
 
-- [ ] Used by project/service/team/content/settings forms
+- [x] Used by project/service/team/content/settings forms
 
 ## Verification
 
@@ -31,4 +31,4 @@ Avoids duplicate uploads and keeps forms consistent.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
