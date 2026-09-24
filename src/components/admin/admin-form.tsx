@@ -24,6 +24,7 @@ export function AdminForm({
   className,
   footer,
   disabled = false,
+  compact = false,
 }: {
   action: FormAction;
   children: React.ReactNode;
@@ -31,6 +32,8 @@ export function AdminForm({
   className?: string;
   footer?: React.ReactNode;
   disabled?: boolean;
+  /** Secondary forms (several per page): inline save bar instead of a sticky one. */
+  compact?: boolean;
 }) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(action, null);
@@ -61,7 +64,7 @@ export function AdminForm({
         <fieldset disabled={disabled || pending} className="contents">
           {children}
         </fieldset>
-        <div className="sticky bottom-0 z-10 -mx-4 mt-8 flex flex-wrap items-center justify-end gap-3 border-t border-border bg-bg/90 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-card sm:border sm:px-5">
+        <div className={compact ? "mt-4 flex flex-wrap items-center justify-end gap-3" : "sticky bottom-0 z-10 -mx-4 mt-8 flex flex-wrap items-center justify-end gap-3 border-t border-border bg-bg/90 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-card sm:border sm:px-5"}>
           {footer}
           {!disabled ? (
             <Button type="submit" disabled={pending}>
