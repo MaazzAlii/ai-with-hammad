@@ -30,7 +30,7 @@ Every other task builds on this foundation.
 
 ## Acceptance Criteria
 
-- [ ] `npm run lint`, `npm run typecheck`, `npm run build` pass
+- [x] `npm run lint`, `npm run typecheck`, `npm run build` pass
 
 ## Verification
 
@@ -38,4 +38,4 @@ Every other task builds on this foundation.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
