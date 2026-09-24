@@ -24,7 +24,7 @@ Makes progress verifiable and lets any agent resume work.
 
 ## Acceptance Criteria
 
-- [ ] All task files render and contain the sections
+- [x] All task files render and contain the sections
 
 ## Verification
 
@@ -32,4 +32,4 @@ Makes progress verifiable and lets any agent resume work.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
