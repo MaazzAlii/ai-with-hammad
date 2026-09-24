@@ -24,7 +24,7 @@ Agents must follow the same security, data and design rules as humans.
 
 ## Acceptance Criteria
 
-- [ ] CLAUDE.md complete; AGENTS.md references it without duplication
+- [x] CLAUDE.md complete; AGENTS.md references it without duplication
 
 ## Verification
 
@@ -32,4 +32,4 @@ Agents must follow the same security, data and design rules as humans.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
