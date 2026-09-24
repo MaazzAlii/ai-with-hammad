@@ -23,7 +23,7 @@ Automated tests are the evidence that acceptance criteria are met.
 
 ## Acceptance Criteria
 
-- [ ] All tests green
+- [x] All tests green
 
 ## Verification
 
@@ -31,4 +31,4 @@ Automated tests are the evidence that acceptance criteria are met.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
