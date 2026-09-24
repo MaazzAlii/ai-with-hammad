@@ -12,11 +12,12 @@ import { contentItemSchema, contentMetricsSchema, socialPlatformSchema } from "@
 import { audit } from "../audit";
 import { authorize } from "../auth/session";
 import { revalidatePublicSite } from "../revalidate";
-import { runAction } from "../run-action";
+import { assertId, runAction } from "../run-action";
 
 type Result = ActionResult<{ id?: string; redirectTo?: string }>;
 
 async function saveItem(id: string | null, fd: FormData): Promise<Result> {
+  assertId(id);
   const staff = await authorize("content.write");
   const input = contentItemSchema.parse(formDataToObject(fd));
   if (input.embedUrl && !parseEmbed(input.embedUrl)) {
@@ -50,6 +51,7 @@ export async function updateContentItem(id: string, _prev: unknown, fd: FormData
 /** Manual metric snapshot (official API providers can write the same table later). */
 export async function addContentMetrics(contentItemId: string, _prev: unknown, fd: FormData): Promise<Result> {
   return runAction(async () => {
+    assertId(contentItemId);
     const staff = await authorize("content.write");
     const input = contentMetricsSchema.parse(formDataToObject(fd));
     if ([input.views, input.likes, input.comments, input.shares, input.engagementRate].every((v) => v == null)) return fail("Enter at least one metric.");
@@ -63,6 +65,7 @@ export async function addContentMetrics(contentItemId: string, _prev: unknown, f
 
 export async function saveSocialPlatform(id: string | null, _prev: unknown, fd: FormData): Promise<Result> {
   return runAction(async () => {
+    assertId(id);
     const staff = await authorize("content.write");
     const input = socialPlatformSchema.parse(formDataToObject(fd));
     const db = getDb();
