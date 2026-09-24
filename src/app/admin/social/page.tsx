@@ -53,7 +53,7 @@ export default async function SocialAdminPage() {
                   <EntityRow title={`${PLATFORM_LABELS[p.platform]} · @${p.handle}`} meta={p.followers != null ? `${formatCompactNumber(p.followers)} followers` : undefined} thumb={false} entity="social" id={p.id} canPublish={canPublish} flags={[{ flag: "isActive", value: p.isActive, label: "Visible", offLabel: "Hidden" }]} />
                 </summary>
                 <div className="border-t border-border p-4">
-                  <AdminForm action={saveSocialPlatform.bind(null, p.id)} disabled={!canWrite}>
+                  <AdminForm action={saveSocialPlatform.bind(null, p.id)} disabled={!canWrite} compact>
                     <PlatformFields p={p} />
                   </AdminForm>
                 </div>
@@ -64,7 +64,7 @@ export default async function SocialAdminPage() {
       ) : null}
       {canWrite ? (
         <div className="mt-8">
-          <AdminForm action={saveSocialPlatform.bind(null, null)} submitLabel="Add platform">
+          <AdminForm action={saveSocialPlatform.bind(null, null)} submitLabel="Add platform" compact>
             <FormSection title="Add platform">
               <PlatformFields />
             </FormSection>
