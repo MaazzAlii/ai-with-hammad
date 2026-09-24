@@ -49,7 +49,7 @@ export default async function EditContentPage(props: PageProps<"/admin/content/[
           ) : <p className="text-sm text-muted">No metrics recorded. The latest snapshot is shown publicly.</p>}
         </section>
         {canWrite ? (
-          <AdminForm action={addContentMetrics.bind(null, id)} submitLabel="Record metrics">
+          <AdminForm action={addContentMetrics.bind(null, id)} submitLabel="Record metrics" compact>
             <FormSection title="Record metrics" description="Copy numbers from the platform's own analytics.">
               <div className="grid grid-cols-2 gap-3">
                 <TextField name="views" label="Views" type="number" />
