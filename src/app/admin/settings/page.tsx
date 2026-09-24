@@ -66,11 +66,18 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <TextField name="siteName" label="Site name" required defaultValue={s.general.siteName} />
               <TextField name="tagline" label="Tagline" defaultValue={s.general.tagline} />
               <TextAreaField name="description" label="Organisation description" rows={3} defaultValue={s.general.description} hint="Used in the footer, sponsorship page and Organization structured data." />
+              <MediaField name="logoMediaId" label="Logo (also used on the loading screen)" defaultMedia={m(s.general.logoMediaId)} uploadBucket="site-assets" />
+            </FormSection>
+            <FormSection title="Contact details" description="Shown on the contact page, footer, client portal and WhatsApp button." className="mt-6">
               <div className="grid gap-5 sm:grid-cols-2">
                 <TextField name="contactEmail" label="Public contact email" type="email" defaultValue={s.general.contactEmail} />
-                <TextField name="location" label="Location" defaultValue={s.general.location} />
+                <TextField name="phone" label="Phone" type="tel" defaultValue={s.general.phone} />
+                <TextField name="whatsapp" label="WhatsApp number" defaultValue={s.general.whatsapp} placeholder="+923001234567" hint="International format. Leave empty to hide WhatsApp buttons." />
+                <TextField name="businessHours" label="Business hours" defaultValue={s.general.businessHours} placeholder="Mon–Sat, 10:00–19:00 PKT" />
+                <TextField name="location" label="City / country" defaultValue={s.general.location} />
+                <TextField name="address" label="Address (optional)" defaultValue={s.general.address} />
               </div>
-              <MediaField name="logoMediaId" label="Logo" defaultMedia={m(s.general.logoMediaId)} uploadBucket="site-assets" />
+              <TextField name="whatsappMessage" label="WhatsApp pre-filled message" defaultValue={s.general.whatsappMessage} />
             </FormSection>
           </AdminForm>
         ) : null}
@@ -95,6 +102,7 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
             <FormSection title="Capabilities & process" className="mt-6">
               <RepeaterField name="capabilities" label="Capabilities" columns={titled} defaultValue={s.home.capabilities} max={12} />
               <RepeaterField name="process" label="Process steps" columns={titled} defaultValue={s.home.process} max={8} />
+              <TextAreaField name="techStack" label="Tech stack strip" rows={4} defaultValue={s.home.techStack.join("\n")} hint="One technology per line — only tools you actually use. Leave empty to hide." />
             </FormSection>
           </AdminForm>
         ) : null}
