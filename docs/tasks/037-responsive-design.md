@@ -24,7 +24,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Playwright overflow check at 8 widths
+- [x] Playwright overflow check at 8 widths
 
 ## Verification
 
@@ -33,4 +33,6 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: tests/e2e/responsive.spec.ts (8 widths × 6 pages) + public.spec at 360px.
