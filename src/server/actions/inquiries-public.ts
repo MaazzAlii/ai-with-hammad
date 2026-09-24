@@ -19,7 +19,8 @@ import {
 import { audit } from "../audit";
 import { sendEmailSafely } from "../email";
 import { inquiryNotification } from "../email/templates";
-import { requestMeta } from "../request-meta";
+import { CAPTCHA_ERROR, verifyCaptcha, type CaptchaInput } from "../captcha";
+import { clientIp, requestMeta } from "../request-meta";
 import { runAction } from "../run-action";
 import { isPublic } from "../dal/public/filters";
 
@@ -58,6 +59,7 @@ export async function submitContactInquiry(raw: unknown): Promise<ActionResult<{
     if (!isDatabaseConfigured()) return fail("The contact form is temporarily unavailable. Please email us instead.");
     const spam = checkSpam(raw);
     if (spam.reject) return spam.silent ? ok(undefined, "Thanks — we'll be in touch.") : fail(spam.message!);
+    if (!(await verifyCaptcha(raw as CaptchaInput, await clientIp()))) return fail(CAPTCHA_ERROR, { captchaAnswer: [CAPTCHA_ERROR] });
     const input = contactInquirySchema.parse(raw);
     if (looksLikeSpam(input.message)) return ok(undefined, "Thanks — we'll be in touch.");
     const meta = await requestMeta();
@@ -115,6 +117,7 @@ export async function submitSponsorshipInquiry(raw: unknown): Promise<ActionResu
     if (!isDatabaseConfigured()) return fail("The form is temporarily unavailable. Please email us instead.");
     const spam = checkSpam(raw);
     if (spam.reject) return spam.silent ? ok(undefined, "Thanks — we'll be in touch.") : fail(spam.message!);
+    if (!(await verifyCaptcha(raw as CaptchaInput, await clientIp()))) return fail(CAPTCHA_ERROR, { captchaAnswer: [CAPTCHA_ERROR] });
     const input = sponsorshipInquirySchema.parse(raw);
     if (looksLikeSpam(input.message)) return ok(undefined, "Thanks — we'll be in touch.");
     const meta = await requestMeta();
