@@ -31,4 +31,6 @@ Release tasks move the verified product to production safely.
 
 ## Status
 
-**PLANNED**
+**BLOCKED**
+
+BLOCKER: no Supabase account/credentials in this session (and no Supabase MCP). Steps: docs/SUPABASE_SETUP.md (≈15 min).
