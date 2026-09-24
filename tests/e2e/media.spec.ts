@@ -9,6 +9,7 @@ test.describe("media library", () => {
     const page = await ctx.newPage();
     await page.goto("/admin/media");
     await page.getByLabel("Upload to").selectOption("media-library");
+    await expect(page.locator('[data-testid="media-file-input"]')).toBeEnabled();
     await page.locator('[data-testid="media-file-input"]').setInputFiles(path.resolve(__dirname, "fixtures/gallery.png"));
     await expectToast(page, "gallery.png uploaded");
     const sql = db();
@@ -40,6 +41,7 @@ test.describe("media library", () => {
     const ctx = await newContext(browser, "editor");
     const page = await ctx.newPage();
     await page.goto("/admin/media");
+    await expect(page.locator('[data-testid="media-file-input"]')).toBeEnabled();
     await page.locator('[data-testid="media-file-input"]').setInputFiles(path.resolve(__dirname, "fixtures/evil.html"));
     await expect(page.locator("[data-sonner-toast]").first()).toContainText(/not allowed/);
     await ctx.close();
