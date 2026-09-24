@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const ALLOWED_TYPES: EmailOtpType[] = ["invite", "recovery", "magiclink", "email", "email_change"];
-const ALLOWED_NEXT = new Set(["/auth/set-password", "/admin"]);
+const ALLOWED_NEXT = new Set(["/auth/set-password", "/admin", "/portal"]);
 
 /**
  * Email link handler (invite / password recovery). Configure the Supabase email
