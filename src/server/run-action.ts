@@ -25,6 +25,11 @@ export async function runAction<T>(fn: () => Promise<ActionResult<T>>): Promise<
       throw error;
     }
     const pgCode = (error as { code?: string; cause?: { code?: string } })?.code ?? (error as { cause?: { code?: string } })?.cause?.code;
+    // Business-rule violations raised by our own DB triggers carry user-safe messages.
+    if (pgCode === "P0001") {
+      const msg = (error as { cause?: { message?: string } })?.cause?.message ?? (error as Error).message;
+      return fail(msg.replace(/^.*?: /, "").slice(0, 200));
+    }
     if (pgCode === "23505") return fail("That value is already in use (for example the slug). Choose another.");
     if (pgCode === "23503") return fail("This item is referenced elsewhere and cannot be changed that way.");
     if (pgCode === "23514") return fail("A value is not allowed (for example an invalid URL or slug).");
