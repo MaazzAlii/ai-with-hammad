@@ -12,13 +12,19 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
       { href: "/admin/team", label: "Team", icon: "team", permission: "cms.read" },
       { href: "/admin/content", label: "Content", icon: "content", permission: "cms.read" },
       { href: "/admin/social", label: "Social platforms", icon: "social", permission: "cms.read" },
+      { href: "/admin/testimonials", label: "Testimonials", icon: "testimonials", permission: "cms.read" },
+      { href: "/admin/faqs", label: "FAQs", icon: "faqs", permission: "cms.read" },
       { href: "/admin/sponsorship", label: "Sponsorship", icon: "sponsorship", permission: "cms.read" },
       { href: "/admin/media", label: "Media library", icon: "media", permission: "cms.read" },
     ],
   },
   {
     group: "CRM",
-    items: [{ href: "/admin/inquiries", label: "Inquiries", icon: "inquiries", permission: "inquiries.read" }],
+    items: [
+      { href: "/admin/messages", label: "Messages", icon: "messages", permission: "messages.read" },
+      { href: "/admin/clients", label: "Clients", icon: "clients", permission: "clients.read" },
+      { href: "/admin/inquiries", label: "Inquiries", icon: "inquiries", permission: "inquiries.read" },
+    ],
   },
   {
     group: "Site",
