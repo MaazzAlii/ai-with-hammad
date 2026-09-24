@@ -13,7 +13,11 @@ templates and the three starter services carried over from the original site). I
 
 1. Dashboard → **SQL Editor** → New query → paste the full contents of `supabase/AI_WITH_HAMAD_SETUP.sql` → **Run**.
 2. Re-running later is safe (use it to apply updates to buckets/policies/seed).
-3. Check: Table editor shows 30 tables in `public`; Storage shows 10 buckets.
+3. Check: Table editor shows 35 tables in `public` (including `clients`, `message_threads`, `messages`,
+   `testimonials`, `faqs`); Storage shows 10 buckets; `team_members` contains the two locked founders
+   (Hammadullah, Maaz Ali).
+4. **Already ran an older version?** Just run the whole file again — it adds the client portal tables,
+   new permissions, founders and FAQs without touching your existing data.
 
 ## 3. Configure Auth
 
@@ -33,6 +37,8 @@ Dashboard → **Authentication**:
 1. **Authentication → Users → Add user → Create new user** (your email + strong password, "Auto confirm").
 2. SQL Editor: `select private.promote_to_owner('you@example.com');`
 3. Sign in at `/login`. Invite everyone else from **Admin → Users** (requires `SUPABASE_SECRET_KEY`).
+4. Clients: **Admin → Clients → New client → Invite portal user**. They receive an invite email, set a
+   password and sign in at `/portal/login`. Clients can never reach `/admin`.
 
 ## 5. Keys and connection string
 
@@ -53,7 +59,7 @@ lower). Resumable (TUS) uploads are used automatically above 6 MB.
 
 ## 7. What the SQL guarantees
 
-- RLS enabled on all 30 tables; anonymous Data API access limited to published content.
+- RLS enabled on all 35 tables; clients only see their own organisation's threads, messages and testimonials; anonymous Data API access limited to published content.
 - `sponsorship_package_rates`, inquiries, notes, audit logs, profiles, rate limits: no anonymous access.
 - Helper functions in schema `private` (not exposed by the Data API).
 - New auth users → inactive `viewer` profile; last active owner cannot be demoted/deactivated.
