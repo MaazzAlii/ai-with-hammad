@@ -26,7 +26,7 @@ Correct cookie handling and key separation are prerequisites for auth and storag
 
 ## Acceptance Criteria
 
-- [ ] Clients compile; secret key never imported by client code
+- [x] Clients compile; secret key never imported by client code
 
 ## Verification
 
@@ -34,4 +34,4 @@ Correct cookie handling and key separation are prerequisites for auth and storag
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
