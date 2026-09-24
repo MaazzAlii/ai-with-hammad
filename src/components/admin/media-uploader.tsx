@@ -1,7 +1,7 @@
 "use client";
 
 import { UploadCloud, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import * as tus from "tus-js-client";
 
@@ -72,6 +72,12 @@ export function MediaUploader({
   const [bucket, setBucket] = useState<BucketId>(defaultBucket);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [dragging, setDragging] = useState(false);
+  // Disabled until hydrated so a file chosen before React attaches handlers is never silently dropped.
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const input = useRef<HTMLInputElement>(null);
   const cfg = BUCKETS[bucket];
   const setJob = (name: string, patch: Partial<Job>) => setJobs((js) => js.map((j) => (j.name === name ? { ...j, ...patch } : j)));
@@ -164,10 +170,10 @@ export function MediaUploader({
       >
         <UploadCloud aria-hidden className="size-7 text-muted" />
         <p className="text-sm text-muted">Drag files here or</p>
-        <Button type="button" size="sm" variant="secondary" onClick={() => input.current?.click()}>
+        <Button type="button" size="sm" variant="secondary" disabled={!hydrated} onClick={() => input.current?.click()}>
           {replaceId ? "Choose replacement file" : "Choose files"}
         </Button>
-        <input ref={input} type="file" className="sr-only" accept={acceptAttr} multiple={!replaceId} onChange={(e) => void handleFiles(e.target.files)} aria-label="Choose files to upload" data-testid="media-file-input" />
+        <input ref={input} type="file" disabled={!hydrated} className="sr-only" accept={acceptAttr} multiple={!replaceId} onChange={(e) => void handleFiles(e.target.files)} aria-label="Choose files to upload" data-testid="media-file-input" />
         <p className="text-xs text-subtle">
           {cfg.mimeTypes.map((m) => m.split("/")[1]).join(", ")} · max {formatBytes(cfg.maxBytes)}
         </p>
