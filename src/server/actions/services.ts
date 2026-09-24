@@ -11,11 +11,12 @@ import { serviceSchema } from "@/lib/validation/admin";
 import { audit } from "../audit";
 import { authorize } from "../auth/session";
 import { revalidatePublicSite } from "../revalidate";
-import { runAction } from "../run-action";
+import { assertId, runAction } from "../run-action";
 
 type Result = ActionResult<{ id?: string; redirectTo?: string }>;
 
 async function save(id: string | null, fd: FormData): Promise<Result> {
+  assertId(id);
   const staff = await authorize("services.write");
   const input = serviceSchema.parse(formDataToObject(fd));
   const canPublish = staff.permissions.has("services.publish");
