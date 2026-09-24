@@ -40,7 +40,11 @@ export async function signIn(_prev: ActionResult | null, formData: FormData): Pr
     return fail(GENERIC);
   }
   const db = getDb();
-  const [profile] = await db.select({ id: profiles.id, isActive: profiles.isActive }).from(profiles).where(eq(profiles.id, data.user.id));
+  const [profile] = await db.select({ id: profiles.id, isActive: profiles.isActive, kind: profiles.kind }).from(profiles).where(eq(profiles.id, data.user.id));
+  if (profile?.kind === "client") {
+    await supabase.auth.signOut({ scope: "local" });
+    return fail("This is a client account — please sign in through the client portal.");
+  }
   if (!profile?.isActive) {
     await supabase.auth.signOut();
     await audit({ id: data.user.id, email }, { action: "auth.login_blocked", entityType: "auth", summary: "Inactive account attempted sign-in", ipHash: meta.ipHash });
@@ -84,5 +88,6 @@ export async function setPassword(_prev: ActionResult | null, formData: FormData
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) return fail(error.message.includes("different") ? "Choose a password different from your current one." : "Could not update your password.");
   await audit({ id: userData.user.id, email: userData.user.email ?? "" }, { action: "auth.password_set", entityType: "auth", summary: "Password set" });
-  redirect("/admin");
+  const [p] = await getDb().select({ kind: profiles.kind }).from(profiles).where(eq(profiles.id, userData.user.id));
+  redirect(p?.kind === "client" ? "/portal" : "/admin");
 }
