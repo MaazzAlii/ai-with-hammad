@@ -24,7 +24,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Response HTML contains no rate values (E2E)
+- [x] Response HTML contains no rate values (E2E)
 
 ## Verification
 
@@ -33,4 +33,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
