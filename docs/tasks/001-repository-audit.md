@@ -26,8 +26,8 @@ None
 
 ## Acceptance Criteria
 
-- [ ] INITIAL_AUDIT.md covers state, technologies, files, dependencies, problems, reuse, replace, missing
-- [ ] Legacy page preserved
+- [x] INITIAL_AUDIT.md covers state, technologies, files, dependencies, problems, reuse, replace, missing
+- [x] Legacy page preserved
 
 ## Verification
 
@@ -36,4 +36,6 @@ None
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: docs/INITIAL_AUDIT.md; `git log --follow docs/legacy/index.html` shows the original commit.
