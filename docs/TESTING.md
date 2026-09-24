@@ -2,9 +2,9 @@
 
 | Suite | Command | What it proves |
 | --- | --- | --- |
-| Unit (52) | `npm run test:unit` | validation, upload security, embeds/URL safety, Markdown XSS escaping, JSON-LD escaping, RBAC matrix, audit scrubbing, email failure handling, action error mapping, WCAG contrast |
-| DB (25) | `npm run test:db` | SQL applies twice (idempotent), Drizzle ⇄ SQL consistency, RLS per role, rates isolation, storage bucket config + policies, owner protection, constraints |
-| E2E (47) | `npm run test:e2e` | every public route, inquiries stored, honeypot, login/logout/inactive/open-redirect/CSRF, CMS create/publish/pin/unpublish, uploads, video facade, content metrics, CRM pipeline, rates never public, settings, role restrictions, media upload/delete, storage RLS, SEO, responsive widths, basic a11y |
+| Unit (74) | `npm run test:unit` | captcha signing/expiry/tamper, WhatsApp links, "use server" export guard, validation, upload security, embeds/URL safety, Markdown XSS escaping, JSON-LD escaping, RBAC matrix, audit scrubbing, email failure handling, action error mapping, WCAG contrast |
+| DB (31) | `npm run test:db` | SQL applies twice (idempotent), Drizzle ⇄ SQL consistency, RLS per role, client isolation (clients see only their own threads/messages/testimonials), locked founders, rates isolation, storage bucket config + policies, owner protection, constraints |
+| E2E (56) | `npm run test:e2e` | client portal (login, captcha, new conversation, staff reply, unread badges, testimonial → moderation → public page, isolation), every public route, inquiries stored, honeypot, login/logout/inactive/open-redirect/CSRF, CMS create/publish/pin/unpublish, uploads, video facade, content metrics, CRM pipeline, rates never public, settings, role restrictions, media upload/delete, storage RLS, SEO, responsive widths, basic a11y |
 
 `npm test` runs unit + DB. `npm run check` = lint + typecheck + tests + build.
 
