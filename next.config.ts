@@ -37,6 +37,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Self-hosting (Contabo VPS / Docker): BUILD_STANDALONE=1 produces a minimal server bundle.
+  ...(process.env.BUILD_STANDALONE === "1" ? { output: "standalone" as const } : {}),
   poweredByHeader: false,
   reactStrictMode: true,
   images: {
