@@ -26,7 +26,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] No horizontal overflow at 360px
+- [x] No horizontal overflow at 360px
 
 ## Verification
 
@@ -35,4 +35,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
