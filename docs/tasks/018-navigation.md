@@ -24,7 +24,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Keyboard operable; tested at 390px
+- [x] Keyboard operable; tested at 390px
 
 ## Verification
 
@@ -33,4 +33,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
