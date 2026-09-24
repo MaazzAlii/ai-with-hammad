@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 
+import { Captcha } from "@/components/forms/captcha";
 import { Field } from "@/components/forms/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ export function LoginForm({ next }: { next: string }) {
         <Field id="reset-email" label="Email" error={resetState && !resetState.ok ? resetState.fieldErrors?.email?.[0] : undefined}>
           <Input name="email" type="email" autoComplete="email" required />
         </Field>
+        <Captcha idPrefix="reset-captcha" resetKey={resetState} error={resetState && !resetState.ok ? resetState.fieldErrors?.captchaAnswer?.[0] : undefined} />
         <Button type="submit" className="w-full" disabled={resetPending}>{resetPending ? "Sending…" : "Send reset link"}</Button>
         <button type="button" onClick={() => setMode("signin")} className="w-full text-sm text-muted hover:text-fg">Back to sign in</button>
       </form>
@@ -37,6 +39,7 @@ export function LoginForm({ next }: { next: string }) {
       <Field id="password" label="Password" error={state && !state.ok ? state.fieldErrors?.password?.[0] : undefined}>
         <Input name="password" type="password" autoComplete="current-password" required />
       </Field>
+      <Captcha idPrefix="login-captcha" resetKey={state} error={state && !state.ok ? state.fieldErrors?.captchaAnswer?.[0] : undefined} />
       <Button type="submit" className="w-full" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</Button>
       <button type="button" onClick={() => setMode("reset")} className="w-full text-sm text-muted hover:text-fg">Forgot password?</button>
     </form>
