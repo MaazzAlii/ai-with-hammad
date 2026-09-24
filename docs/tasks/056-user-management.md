@@ -37,4 +37,6 @@ Everything on the public site must be editable without a deploy, safely and by t
 
 ## Status
 
-**PLANNED**
+**BLOCKED**
+
+BLOCKER: the email-invite step needs a real Supabase project with SMTP (local GoTrue has no mail server). Role change, deactivation (session revocation) and owner protections are verified in tests/e2e/users.spec.ts and roles.spec.ts.
