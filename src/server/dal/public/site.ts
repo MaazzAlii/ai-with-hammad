@@ -51,6 +51,7 @@ const DEFAULT_NAV: Record<"header" | "footer" | "legal", NavLink[]> = {
   footer: [
     { label: "Services", href: "/services", external: false },
     { label: "Projects", href: "/projects", external: false },
+    { label: "Testimonials", href: "/testimonials", external: false },
     { label: "Media kit", href: "/media-kit", external: false },
     { label: "Contact", href: "/contact", external: false },
   ],
