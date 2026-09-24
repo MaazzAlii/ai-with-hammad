@@ -27,6 +27,8 @@ First deployment: **Vercel (Next.js) + Supabase (Postgres/Auth/Storage)**.
 | `RESEND_API_KEY` | optional | optional | email notifications |
 | `EMAIL_FROM` | `AI With Hamad <notifications@your-domain>` | | verified sender domain in Resend |
 | `INQUIRY_NOTIFICATION_EMAIL` | comma-separated | | more recipients in Admin → Settings |
+| `CAPTCHA_SECRET` | optional, `openssl rand -hex 32` | | **Sensitive**; signs built-in captcha challenges (falls back to `IP_HASH_SALT`) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | optional | optional | set both to use Cloudflare Turnstile instead of the built-in captcha; secret is **Sensitive** |
 
 Mark secrets as **Sensitive** in Vercel. Production requires `DATABASE_URL`, Supabase URL/key and
 `IP_HASH_SALT` (the app refuses to run without them when `VERCEL_ENV=production`).
@@ -64,6 +66,10 @@ curl -s https://your-domain.com/sitemap.xml | head
 - Google Search Console: add the domain property, submit `/sitemap.xml`. (No ranking is guaranteed.)
 
 ## 7. Future VPS migration (portability notes)
+
+The full plan, plan-limit facts and the ready-made Docker/Caddy setup are in `docs/HOSTING_PLAN.md`
+(`Dockerfile`, `deploy/docker-compose.yml`, `deploy/Caddyfile`, health check at `/api/health`).
+
 
 The app is a standard Next.js server; nothing is Vercel-only except the optional analytics components.
 
