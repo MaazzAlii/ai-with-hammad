@@ -4,7 +4,7 @@ import Link from "next/link";
 import { JsonLd } from "@/components/site/json-ld";
 import { PrintButton } from "@/components/site/print-button";
 import { Section } from "@/components/site/section";
-import { AudienceBlock, CategoriesBlock, FormatsBlock, PartnersBlock, PlatformsBlock, TopContentBlock } from "@/components/site/sponsorship-sections";
+import { AudienceBlock, hasAudienceData, CategoriesBlock, FormatsBlock, PartnersBlock, PlatformsBlock, TopContentBlock } from "@/components/site/sponsorship-sections";
 import { buttonVariants } from "@/components/ui/button";
 import { breadcrumbLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
@@ -58,12 +58,12 @@ export default async function MediaKitPage() {
           </div>
         </div>
       </Section>
-      <Section className="border-t border-border"><AudienceBlock s={s} platforms={platforms} /></Section>
+      {hasAudienceData(s, platforms) ? <Section className="border-t border-border"><AudienceBlock s={s} platforms={platforms} /></Section> : null}
       {platforms.length ? <Section className="border-t border-border print-break"><PlatformsBlock platforms={platforms} /></Section> : null}
       {s.contentCategories.length ? <Section className="border-t border-border"><CategoriesBlock categories={s.contentCategories} /></Section> : null}
       {top.length ? <Section className="border-t border-border"><TopContentBlock items={top} title="Top-performing content" /></Section> : null}
       {partners.length ? <Section className="border-t border-border print-break"><PartnersBlock partners={partners} /></Section> : null}
-      <Section className="border-t border-border"><FormatsBlock formats={s.formats} packages={packages} ratesNotice={s.ratesNotice} /></Section>
+      {s.formats.length || packages.length ? <Section className="border-t border-border"><FormatsBlock formats={s.formats} packages={packages} ratesNotice={s.ratesNotice} /></Section> : null}
       <Section className="border-t border-border" aria-labelledby="mk-contact">
         <div className="rounded-card border border-border bg-surface p-8">
           <h2 id="mk-contact" className="text-2xl font-semibold">Contact</h2>
