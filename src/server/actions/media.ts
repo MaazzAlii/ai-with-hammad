@@ -15,7 +15,7 @@ import { authorize } from "../auth/session";
 import { getMedia, listMedia, mediaUsage, type AdminMedia, type MediaQuery } from "../dal/admin/media";
 import { UserFacingError } from "../errors";
 import { revalidatePublicSite } from "../revalidate";
-import { runAction } from "../run-action";
+import { assertId, runAction } from "../run-action";
 import { createSignedUrl, getStoredObject, removeStoredObjects } from "../storage";
 
 type PrepareInput = { bucket: string; filename: string; mimeType: string; size: number; width?: number | null; height?: number | null; durationSeconds?: number | null };
@@ -92,6 +92,7 @@ export async function finalizeUpload(raw: unknown): Promise<ActionResult<{ media
 
 export async function updateMedia(id: string, _prev: unknown, fd: FormData): Promise<ActionResult<{ id?: string }>> {
   return runAction(async () => {
+    assertId(id);
     const staff = await authorize("media.update");
     const input = mediaUpdateSchema.parse(formDataToObject(fd));
     const [row] = await getDb().update(mediaAssets).set(input).where(and(eq(mediaAssets.id, id), isNull(mediaAssets.deletedAt))).returning({ id: mediaAssets.id });
@@ -104,6 +105,7 @@ export async function updateMedia(id: string, _prev: unknown, fd: FormData): Pro
 
 export async function deleteMedia(id: string): Promise<ActionResult> {
   return runAction(async () => {
+    assertId(id);
     const staff = await authorize("media.delete");
     const media = await getMedia(id);
     if (!media) return fail("Media not found.");
@@ -127,6 +129,7 @@ export async function searchMedia(query: MediaQuery): Promise<ActionResult<Await
 
 export async function getMediaDownloadUrl(id: string): Promise<ActionResult<{ url: string }>> {
   return runAction(async () => {
+    assertId(id);
     await authorize("cms.read");
     const media = await getMedia(id);
     if (!media) return fail("Media not found.");
