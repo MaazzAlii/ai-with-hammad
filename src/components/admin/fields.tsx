@@ -28,10 +28,10 @@ function Wrap({ name, label, hint, required, className, children }: Base & { chi
   );
 }
 
-export function TextField({ defaultValue, type = "text", placeholder, maxLength, ...b }: Base & { defaultValue?: string | number | null; type?: string; placeholder?: string; maxLength?: number }) {
+export function TextField({ defaultValue, type = "text", placeholder, maxLength, readOnly, ...b }: Base & { defaultValue?: string | number | null; type?: string; placeholder?: string; maxLength?: number; readOnly?: boolean }) {
   return (
     <Wrap {...b}>
-      <Input type={type} defaultValue={defaultValue ?? ""} placeholder={placeholder} maxLength={maxLength} required={b.required} />
+      <Input type={type} defaultValue={defaultValue ?? ""} placeholder={placeholder} maxLength={maxLength} required={b.required} readOnly={readOnly} className={readOnly ? "cursor-not-allowed opacity-70" : undefined} />
     </Wrap>
   );
 }
