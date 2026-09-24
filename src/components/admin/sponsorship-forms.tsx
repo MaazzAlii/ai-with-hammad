@@ -35,7 +35,7 @@ export function PackageForm({ action, pkg, canWrite, canPublish }: { action: For
 
 export function RatesForm({ action, rates }: { action: FormAction; rates: typeof sponsorshipPackageRates.$inferSelect | null }) {
   return (
-    <AdminForm action={action} submitLabel="Save internal rates">
+    <AdminForm action={action} submitLabel="Save internal rates" compact>
       <FormSection title="Internal rates (confidential)" description="Visible only to roles with the sponsorship.rates permission. Never shown on the website or in public APIs.">
         <div className="grid gap-5 sm:grid-cols-3">
           <TextField name="currency" label="Currency" defaultValue={rates?.currency ?? "USD"} maxLength={3} />
