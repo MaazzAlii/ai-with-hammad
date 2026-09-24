@@ -11,7 +11,7 @@ import type { ActionResult, FieldErrors } from "@/lib/action-result";
 const ErrorsContext = createContext<FieldErrors>({});
 export const useFieldError = (name: string) => useContext(ErrorsContext)[name]?.[0];
 
-type FormAction = (prev: ActionResult<{ id?: string; redirectTo?: string }> | null, fd: FormData) => Promise<ActionResult<{ id?: string; redirectTo?: string }>>;
+export type FormAction = (prev: ActionResult<{ id?: string; redirectTo?: string }> | null, fd: FormData) => Promise<ActionResult<{ id?: string; redirectTo?: string }>>;
 
 /**
  * Admin form shell: progressive-enhancement <form action>, server-side zod
