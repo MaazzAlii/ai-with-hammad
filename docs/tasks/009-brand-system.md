@@ -25,7 +25,7 @@ Consistent identity across public site, media kit and OG images.
 
 ## Acceptance Criteria
 
-- [ ] Design doc lists palette, type scale, voice rules
+- [x] Design doc lists palette, type scale, voice rules
 
 ## Verification
 
@@ -33,4 +33,4 @@ Consistent identity across public site, media kit and OG images.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
