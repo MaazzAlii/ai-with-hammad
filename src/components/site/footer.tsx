@@ -13,6 +13,9 @@ export function SiteFooter({
   legal,
   social,
   email,
+  phone = "",
+  whatsapp = null,
+  location = "",
 }: {
   siteName: string;
   tagline: string;
@@ -21,6 +24,9 @@ export function SiteFooter({
   legal: NavLink[];
   social: { platform: string; url: string }[];
   email: string;
+  phone?: string;
+  whatsapp?: string | null;
+  location?: string;
 }) {
   const year = new Date().getUTCFullYear();
   return (
@@ -29,11 +35,24 @@ export function SiteFooter({
         <div className="lg:col-span-2">
           <Logo name={siteName} logo={logo} />
           <p className="mt-3 max-w-sm text-sm text-muted">{tagline}</p>
-          {email ? (
-            <a href={`mailto:${email}`} className="mt-4 inline-block text-sm text-accent hover:underline">
-              {email}
-            </a>
-          ) : null}
+          <ul className="mt-4 space-y-1.5 text-sm">
+            {email ? (
+              <li>
+                <a href={`mailto:${email}`} className="text-accent hover:underline">{email}</a>
+              </li>
+            ) : null}
+            {phone ? (
+              <li>
+                <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="text-muted hover:text-fg">{phone}</a>
+              </li>
+            ) : null}
+            {whatsapp ? (
+              <li>
+                <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="text-success hover:underline">WhatsApp</a>
+              </li>
+            ) : null}
+            {location ? <li className="text-subtle">{location}</li> : null}
+          </ul>
         </div>
         <nav aria-label="Footer">
           <h2 className="eyebrow mb-3">Explore</h2>
@@ -67,6 +86,7 @@ export function SiteFooter({
           <p>
             © {year} {siteName}
           </p>
+          <Link href="/portal/login" className="hover:text-fg">Client portal</Link>
           <nav aria-label="Legal">
             <ul className="flex flex-wrap gap-x-5 gap-y-2">
               {legal.map((l) => (
