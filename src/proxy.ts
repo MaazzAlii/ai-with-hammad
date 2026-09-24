@@ -40,9 +40,15 @@ export async function proxy(request: NextRequest) {
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
+  if (pathname.startsWith("/portal") && pathname !== "/portal/login" && !signedIn) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/portal/login";
+    loginUrl.search = "";
+    return NextResponse.redirect(loginUrl);
+  }
   return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login", "/auth/:path*"],
+  matcher: ["/admin/:path*", "/login", "/auth/:path*", "/portal/:path*"],
 };
