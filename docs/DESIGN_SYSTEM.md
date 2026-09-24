@@ -55,6 +55,18 @@ All pairs used for text are checked ≥ 4.5:1 in `tests/unit/contrast.test.ts`.
 - Subtle borders first; `shadow-card` for panels; `shadow-glow` only on primary CTAs.
 - Transitions 200–500ms `ease-out-soft`; hover lift ≤ 4px, image zoom ≤ 1.03. Disabled under reduced motion.
 
+### Motion & "AI engineer" visuals (v2)
+
+- **Agent pipeline** (`agent-visual.tsx`): an SVG of input → agent → tools → output, with animated dashed flows (`agent-flow`),
+  pulsing nodes (`agent-pulse`) and a staggered run log (`agent-log`). Decorative.
+- **Aurora** hero background (`aurora`): blurred gradient blobs, GPU transforms only.
+- **Tech marquee** (`marquee`): the tech-stack list from Admin → Settings, duplicated for a seamless loop; pauses on hover.
+- **Reveal on scroll** (`.reveal`): CSS scroll-driven animation (`animation-timeline: view()`), inside `@supports` —
+  no JavaScript; unsupported browsers just show the content.
+- **Lazy rendering** (`.cv-auto`): `content-visibility: auto` on below-the-fold sections.
+- **Navigation loader**: logo + agency name from settings, shown only for slow navigations.
+- All of the above are disabled under `prefers-reduced-motion: reduce`.
+
 ## Components
 
 Primitives (`src/components/ui`): Button (primary/secondary/ghost/outline/danger/link; sm/md/lg/icon),
