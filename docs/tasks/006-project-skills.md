@@ -23,7 +23,7 @@ Encodes repeatable procedures (adding a CMS module, a table, a public page) so w
 
 ## Acceptance Criteria
 
-- [ ] All skills present, no generic filler
+- [x] All skills present, no generic filler
 
 ## Verification
 
@@ -31,4 +31,4 @@ Encodes repeatable procedures (adding a CMS module, a table, a public page) so w
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
