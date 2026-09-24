@@ -22,12 +22,16 @@ against the checklist below + automated evidence (unit, DB/RLS and E2E tests)._
 | **SQL injection** | ✅ | Drizzle parameterised queries; `sql` templates use bound params; `ilike` input escaped; enum/uuid inputs validated by zod. |
 | **Rate abuse / spam** | ✅ | DB-backed fixed-window limits (contact/sponsorship per hashed IP + per email; login per IP + email; password reset per IP), honeypot, minimum fill time, link-count heuristic; Supabase Auth has its own limits. |
 | **Headers** | ✅ | CSP (`frame-ancestors 'none'`, `object-src 'none'`, frame-src allow-list, `form-action 'self'`), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, COOP; `X-Powered-By` removed; HSTS provided by Vercel. E2E `seo.spec.ts`. |
-| **Indexing of private areas** | ✅ | `/admin`, `/login`: `noindex` meta + `X-Robots-Tag` + robots disallow; previews fully noindexed. |
+| **Indexing of private areas** | ✅ | `/admin`, `/login`, `/portal`: `noindex` meta + `X-Robots-Tag` + robots disallow; previews fully noindexed. |
+| **Client portal isolation** | ✅ | Clients are `profiles.kind='client'`; `getCurrentStaff` and SQL `has_permission` reject them, staff login refuses them. Portal DAL filters every query by the session's `client_id`; RLS mirrors it (`rls.test.ts`: client A cannot read client B's threads/messages/testimonials; clients cannot read inquiries). E2E `portal.spec.ts`. |
+| **Exported server functions** | ✅ fixed | A non-action helper exported from a `"use server"` file was callable by anyone; moved to the DAL. `server-actions-guard.test.ts` now fails the build on any non-async export. |
+| **Bots / credential stuffing** | ✅ | Captcha on contact, sponsorship, staff login, password reset and client login: HMAC-signed, 10-minute TTL, single-use nonce in `rate_limits`; optional Cloudflare Turnstile verified server-side. |
+| **Founder records** | ✅ | `private.protect_locked_team_members` trigger blocks rename/re-slug/unlock/delete of locked founders even via SQL/API (DB test). |
 
 ## Residual risks / accepted trade-offs
 
 1. **CSP allows `'unsafe-inline'` scripts.** Nonces would force dynamic rendering of every page (no ISR). Mitigated by the absence of any injection sink (see XSS row). Revisit if Next.js adds static-compatible hashes.
-2. **Rate limiting trusts `X-Forwarded-For`.** Correct on Vercel (the edge overwrites it). On a VPS the reverse proxy must overwrite the header (documented).
+2. **Rate limiting trusts `X-Forwarded-For`.** Correct on Vercel (the edge overwrites it). On a VPS the reverse proxy must overwrite the header — `deploy/Caddyfile` does this.
 3. **Server-side content sniffing of uploads is limited to size + declared MIME** (enforced by Storage bucket rules + finalize). Files are served by Supabase with their declared type and images go through the Next image optimizer; SVG is restricted to settings managers. Magic-byte verification could be added with a server-side check if untrusted uploaders are ever allowed.
 4. **Image dimensions/duration are client-measured** (informational metadata only).
 5. **The app's database connection bypasses RLS** (Drizzle as `postgres`). The data-access layer is the enforcement point; covered by E2E role tests. RLS protects the public Data API.
