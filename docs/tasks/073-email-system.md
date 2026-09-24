@@ -23,7 +23,7 @@ Quality attributes determine whether the platform is production-ready rather tha
 
 ## Acceptance Criteria
 
-- [ ] Checks pass
+- [x] Checks pass
 
 ## Verification
 
@@ -31,4 +31,6 @@ Quality attributes determine whether the platform is production-ready rather tha
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified: failure/timeout/no-recipient handling unit-tested; inquiry stored before email (E2E). Live Resend delivery needs RESEND_API_KEY + verified domain (owner configuration).
