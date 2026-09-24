@@ -102,7 +102,7 @@ Sources: [SEO Starter Guide](https://developers.google.com/search/docs/fundament
 
 ## 6. Accessibility (WCAG 2.2 AA)
 
-- Colour contrast ≥ 4.5:1 for body text (tokens checked: `--muted` on `--bg` ≈ 7.3:1).
+- Colour contrast ≥ 4.5:1 for body text (verified by `tests/unit/contrast.test.ts`: `--muted` on `--bg` ≈ 8.9:1, `--subtle` ≈ 6.3:1, `--fg` ≈ 17.4:1).
 - Visible focus (`:focus-visible` ring), skip link, landmarks (`header`/`nav`/`main`/`footer`), one `h1` per page, logical heading order.
 - Target size ≥ 24×24 CSS px (WCAG 2.5.8) — buttons are ≥ 40 px tall.
 - Forms: associated `<label>`, `aria-invalid` + `aria-describedby` for errors, errors announced via `role="alert"`.
