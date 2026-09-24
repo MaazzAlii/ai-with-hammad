@@ -22,7 +22,7 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Acceptance Criteria
 
-- [ ] Cards hidden when no platforms
+- [x] Cards hidden when no platforms
 
 ## Verification
 
@@ -31,4 +31,4 @@ Public pages are the agency's storefront and the main SEO surface.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
