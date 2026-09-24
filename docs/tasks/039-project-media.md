@@ -26,7 +26,7 @@ Media is the core of the portfolio.
 
 ## Acceptance Criteria
 
-- [ ] E2E: add image + YouTube, reorder
+- [x] E2E: add image + YouTube, reorder
 
 ## Verification
 
@@ -34,4 +34,6 @@ Media is the core of the portfolio.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+Verified in tests/e2e/admin.spec.ts (cover + gallery upload + YouTube item, order persisted, public render).
