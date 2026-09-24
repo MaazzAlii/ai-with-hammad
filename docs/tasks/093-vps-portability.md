@@ -23,7 +23,7 @@ Release tasks move the verified product to production safely.
 
 ## Acceptance Criteria
 
-- [ ] Evidence recorded in FINAL_REPORT.md
+- [x] Evidence recorded in FINAL_REPORT.md
 
 ## Verification
 
@@ -31,4 +31,6 @@ Release tasks move the verified product to production safely.
 
 ## Status
 
-**PLANNED**
+**COMPLETED**
+
+docs/VERCEL_DEPLOYMENT.md §7.
