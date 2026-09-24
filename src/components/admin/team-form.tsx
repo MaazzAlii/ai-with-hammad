@@ -15,8 +15,17 @@ export function TeamForm({ action, data, canWrite, canPublish }: { action: FormA
         <div className="space-y-6">
           <FormSection title="Profile" description="Only publish information the person has approved.">
             <div className="grid gap-5 sm:grid-cols-2">
-              <TextField name="name" label="Name" required defaultValue={m?.name} />
-              <TextField name="slug" label="URL slug" required defaultValue={m?.slug} />
+              {m?.isLocked ? (
+                <>
+                  <TextField name="name" label="Name" defaultValue={m.name} readOnly hint="Founder — name is fixed." />
+                  <TextField name="slug" label="URL slug" defaultValue={m.slug} readOnly hint="Fixed" />
+                </>
+              ) : (
+                <>
+                  <TextField name="name" label="Name" required defaultValue={m?.name} />
+                  <TextField name="slug" label="URL slug" required defaultValue={m?.slug} />
+                </>
+              )}
               <TextField name="roleTitle" label="Role" defaultValue={m?.roleTitle} />
               <TextField name="location" label="Location" defaultValue={m?.location} />
             </div>
