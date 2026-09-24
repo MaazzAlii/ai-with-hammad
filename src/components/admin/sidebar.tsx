@@ -2,6 +2,10 @@
 
 import {
   Briefcase,
+  Building2,
+  HelpCircle,
+  MessagesSquare,
+  Quote,
   FileText,
   FolderKanban,
   Handshake,
@@ -42,9 +46,13 @@ const ICONS: Record<string, LucideIcon> = {
   legal: FileText,
   users: Shield,
   audit: ScrollText,
+  messages: MessagesSquare,
+  clients: Building2,
+  testimonials: Quote,
+  faqs: HelpCircle,
 };
 
-export function AdminSidebar({ groups, user, newInquiries }: { groups: { group: string; items: AdminNavItem[] }[]; user: { email: string; role: string }; newInquiries: number }) {
+export function AdminSidebar({ groups, user, newInquiries, unreadMessages = 0 }: { groups: { group: string; items: AdminNavItem[] }[]; user: { email: string; role: string }; newInquiries: number; unreadMessages?: number }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const nav = (
@@ -66,6 +74,9 @@ export function AdminSidebar({ groups, user, newInquiries }: { groups: { group: 
                   >
                     <Icon aria-hidden className="size-4" />
                     <span className="flex-1">{item.label}</span>
+                    {item.href === "/admin/messages" && unreadMessages > 0 ? (
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-semibold text-accent-fg">{unreadMessages}<span className="sr-only"> unread</span></span>
+                    ) : null}
                     {item.href === "/admin/inquiries" && newInquiries > 0 ? (
                       <span className="rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-semibold text-accent-fg">{newInquiries}<span className="sr-only"> new</span></span>
                     ) : null}
