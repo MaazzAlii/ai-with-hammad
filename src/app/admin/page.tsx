@@ -4,7 +4,8 @@ import { AdminPageHeader } from "@/components/admin/page-header";
 import { Alert } from "@/components/ui/misc";
 import { formatBytes, formatDate } from "@/lib/utils";
 import { can, requireStaff } from "@/server/auth/session";
-import { dashboardStats, recentActivity, recentInquiries } from "@/server/dal/admin/dashboard";
+import { dashboardStats, pendingTestimonialCount, recentActivity, recentInquiries } from "@/server/dal/admin/dashboard";
+import { unreadThreadCount } from "@/server/dal/portal";
 
 export const metadata = { title: "Dashboard" };
 
@@ -26,10 +27,12 @@ function Stat({ label, value, sub, href }: { label: string; value: number | stri
 export default async function DashboardPage(props: PageProps<"/admin">) {
   const staff = await requireStaff();
   const sp = await props.searchParams;
-  const [stats, inquiries, activity] = await Promise.all([
+  const [stats, inquiries, activity, unread, pendingReviews] = await Promise.all([
     dashboardStats(),
     can(staff, "inquiries.read") ? recentInquiries() : Promise.resolve([]),
     can(staff, "audit.read") ? recentActivity() : Promise.resolve([]),
+    can(staff, "messages.read") ? unreadThreadCount() : Promise.resolve(0),
+    pendingTestimonialCount(),
   ]);
   const newCount = [...stats.inquiries.contact, ...stats.inquiries.sponsorship].filter((r) => r.status === "new").reduce((n, r) => n + r.n, 0);
   const openCount = [...stats.inquiries.contact, ...stats.inquiries.sponsorship].filter((r) => ["new", "contacted", "qualified", "proposal"].includes(r.status)).reduce((n, r) => n + r.n, 0);
@@ -42,6 +45,8 @@ export default async function DashboardPage(props: PageProps<"/admin">) {
       {sp.denied ? <Alert tone="warning" className="mb-6">You don&apos;t have permission to open that page.</Alert> : null}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {can(staff, "inquiries.read") ? <Stat label="New inquiries" value={newCount} sub={`${openCount} open in pipeline`} href="/admin/inquiries?status=new" /> : null}
+        {can(staff, "messages.read") ? <Stat label="Unread client messages" value={unread} href="/admin/messages?unread=1" /> : null}
+        <Stat label="Testimonials to review" value={pendingReviews} href="/admin/testimonials?status=pending" />
         <Stat label="Projects" value={c.projects.published} sub={`${c.projects.drafts} draft${c.projects.drafts === 1 ? "" : "s"}`} href="/admin/projects" />
         <Stat label="Content items" value={c.content.published} sub={`${c.content.drafts} draft${c.content.drafts === 1 ? "" : "s"}`} href="/admin/content" />
         <Stat label="Services" value={c.services.published} sub={`${c.services.drafts} draft${c.services.drafts === 1 ? "" : "s"}`} href="/admin/services" />
