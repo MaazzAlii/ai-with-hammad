@@ -74,8 +74,8 @@ export function SwitchField({ name, label, defaultChecked, hint, disabled }: { n
 
 export function FormSection({ title, description, children, className }: { title: string; description?: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={cn("rounded-card border border-border bg-surface/60 p-5 sm:p-6", className)}>
-      <h2 className="font-display text-base font-semibold">{title}</h2>
+    <section className={cn("glass-card rounded-card p-5 sm:p-6", className)}>
+      <h2 className="text-base font-semibold tracking-tight">{title}</h2>
       {description ? <p className="mt-1 text-sm text-muted">{description}</p> : null}
       <div className="mt-5 grid gap-5">{children}</div>
     </section>
