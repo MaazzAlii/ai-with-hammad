@@ -23,8 +23,8 @@ export function LoginForm({ next }: { next: string }) {
           <Input name="email" type="email" autoComplete="email" required />
         </Field>
         <Captcha idPrefix="reset-captcha" resetKey={resetState} error={resetState && !resetState.ok ? resetState.fieldErrors?.captchaAnswer?.[0] : undefined} />
-        <Button type="submit" className="w-full" disabled={resetPending}>{resetPending ? "Sending…" : "Send reset link"}</Button>
-        <button type="button" onClick={() => setMode("signin")} className="w-full text-sm text-muted hover:text-fg">Back to sign in</button>
+        <Button type="submit" size="lg" className="w-full" disabled={resetPending}>{resetPending ? "Sending…" : "Send reset link"}</Button>
+        <button type="button" onClick={() => setMode("signin")} className="w-full rounded-full py-2 text-sm text-muted transition-colors hover:text-fg">Back to sign in</button>
       </form>
     );
   }
@@ -40,8 +40,8 @@ export function LoginForm({ next }: { next: string }) {
         <Input name="password" type="password" autoComplete="current-password" required />
       </Field>
       <Captcha idPrefix="login-captcha" resetKey={state} error={state && !state.ok ? state.fieldErrors?.captchaAnswer?.[0] : undefined} />
-      <Button type="submit" className="w-full" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</Button>
-      <button type="button" onClick={() => setMode("reset")} className="w-full text-sm text-muted hover:text-fg">Forgot password?</button>
+      <Button type="submit" size="lg" className="w-full" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</Button>
+      <button type="button" onClick={() => setMode("reset")} className="w-full rounded-full py-2 text-sm text-muted transition-colors hover:text-fg">Forgot password?</button>
     </form>
   );
 }
