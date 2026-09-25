@@ -17,7 +17,7 @@ export type SortableItem = { id: string; content: React.ReactNode };
 function Row({ id, children, disabled }: { id: string; children: React.ReactNode; disabled?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled });
   return (
-    <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={cn("flex items-stretch rounded-card border border-border bg-surface", isDragging && "z-10 border-accent shadow-2xl")}>
+    <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={cn("flex items-stretch surface-solid rounded-card", isDragging && "z-10 border-accent shadow-2xl")}>
       {!disabled ? (
         <button type="button" className="flex cursor-grab items-center px-2 text-subtle hover:text-fg active:cursor-grabbing" aria-label="Drag to reorder (or focus and use arrow keys)" {...attributes} {...listeners}>
           <GripVertical className="size-4" />
