@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { JsonLd } from "@/components/site/json-ld";
 import { NavigationLoader } from "@/components/site/navigation-loader";
+import { RevealObserver } from "@/components/site/reveal-observer";
 import { WhatsAppButton } from "@/components/site/whatsapp-button";
 import { organizationLd, websiteLd } from "@/lib/jsonld";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -19,12 +20,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <>
       <a
         href="#main"
-        className="sr-only z-50 rounded-control bg-accent px-4 py-2 font-semibold text-accent-fg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        className="sr-only z-50 rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
         Skip to content
       </a>
       <SiteHeader siteName={general.siteName} logo={media.logo} links={nav.header} />
-      <main id="main" tabIndex={-1} className="outline-none">
+      <main id="main" tabIndex={-1} className="pt-[calc(var(--header-h)+max(0.75rem,env(safe-area-inset-top)))] outline-none">
         {children}
       </main>
       <SiteFooter
@@ -40,6 +41,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         location={general.location}
       />
       {wa ? <WhatsAppButton href={wa} /> : null}
+      <RevealObserver />
       <Suspense fallback={null}>
         <NavigationLoader siteName={general.siteName} logoUrl={media.logo?.url ?? null} />
       </Suspense>
