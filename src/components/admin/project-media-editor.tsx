@@ -48,7 +48,7 @@ function Row({ item, media, onChange, onRemove, onPick }: { item: EditorItem; me
   const embedOk = item.type === "youtube" || item.type === "vimeo" ? Boolean(parseVideoEmbed(item.externalUrl)) : true;
   const id = (f: string) => `pm-${item.key}-${f}`;
   return (
-    <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className="flex gap-2 rounded-card border border-border bg-surface p-3">
+    <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className="flex gap-2 surface-solid rounded-card p-3">
       <button type="button" className="cursor-grab self-start rounded p-1 text-subtle hover:text-fg" aria-label="Drag to reorder" {...attributes} {...listeners}>
         <GripVertical className="size-4" />
       </button>
