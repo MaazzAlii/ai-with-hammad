@@ -12,6 +12,9 @@ import { unreadThreadCount } from "@/server/dal/portal";
 
 export const metadata: Metadata = { title: { default: "Admin", template: "%s · Admin" }, ...NOINDEX };
 
+/** Signed-in, per-user screens: never prerender or cache (always fresh data, never a baked-in redirect). */
+export const dynamic = "force-dynamic";
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const staff = await requireStaff();
   const groups = ADMIN_NAV.map((g) => ({ group: g.group, items: g.items.filter((i) => staff.permissions.has(i.permission)) })).filter((g) => g.items.length);
@@ -31,7 +34,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <main id="main" className="min-w-0 flex-1 px-4 py-8 sm:px-8 lg:py-10">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
-      <Toaster theme="dark" position="bottom-right" richColors closeButton />
+      <Toaster theme="system" position="top-center" richColors closeButton toastOptions={{ className: "!rounded-2xl" }} />
     </div>
   );
 }
