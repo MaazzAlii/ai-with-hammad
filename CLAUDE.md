@@ -54,10 +54,13 @@ scripts/local            local test stack (Postgres + real GoTrue + storage emul
 
 ## 5. Design system (see `docs/DESIGN_SYSTEM.md`)
 
-Dark theme, cyan `--color-accent` / teal `--color-accent-2`, fonts Sora (display) / Manrope (body) /
-JetBrains Mono (labels) self-hosted via `next/font/local`. Radius tokens: `rounded-control` (inputs),
-`rounded-button`, `rounded-card`, `rounded-media` (all images/video). Use `MediaImage` for public
-images (aspect-ratio locked, `next/image`). Respect `prefers-reduced-motion`. Tap targets ≥ 40px.
+"Liquid Glass": light by default with a dark palette via `prefers-color-scheme`; ocean-blue
+`--color-accent` / teal `--color-accent-2` reserved for primary actions and selection. Glass materials form
+a hierarchy (`glass-chrome` > `glass-panel` > `glass-card`; `glass-float`, `glass-sheet`, `surface-solid`) —
+don't make everything glass. System font (SF Pro) then Inter, self-hosted via `next/font/local`; JetBrains
+Mono for code. Radius tokens: `rounded-control`, `rounded-button` (capsule), `rounded-card`, `rounded-media`.
+Use `MediaImage` for public images. Motion via tokens (`ease-spring`, `data-reveal`); respect
+`prefers-reduced-motion`. Tap targets ≥ 40px.
 
 ## 6. Database rules
 
