@@ -8,7 +8,7 @@ import { JsonLd } from "@/components/site/json-ld";
 import { Markdown } from "@/components/site/markdown";
 import { MediaImage } from "@/components/site/media-image";
 import { ProjectCard } from "@/components/site/project-card";
-import { Section, SectionHeading } from "@/components/site/section";
+import { Breadcrumb, PageHeader, Section, SectionHeading } from "@/components/site/section";
 import { buttonVariants } from "@/components/ui/button";
 import { breadcrumbLd, serviceLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
@@ -35,38 +35,41 @@ export default async function ServicePage(props: PageProps<"/services/[slug]">) 
   const projects = await listProjectsForService(service.id);
   return (
     <>
-      <header className="relative overflow-hidden border-b border-border">
-        <div aria-hidden className="bg-grid absolute inset-0" />
-        <div className="container-page relative py-14 sm:py-20">
-          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-subtle">
-            <Link href="/services" className="hover:text-fg">Services</Link> <span aria-hidden>/</span> <span className="text-muted">{service.title}</span>
-          </nav>
-          <span className="mb-5 grid size-12 place-items-center rounded-control border border-accent/30 bg-accent-soft text-accent">
-            <ServiceIcon name={service.icon} className="size-6" />
-          </span>
-          <h1 className="max-w-3xl text-3xl font-semibold sm:text-5xl">{service.title}</h1>
-          <p className="mt-4 max-w-2xl text-muted sm:text-lg">{service.summary}</p>
-          <Link href={`/contact?service=${service.id}`} className={buttonVariants({ size: "lg", className: "mt-8" })}>
-            Discuss this service <ArrowRight aria-hidden />
-          </Link>
-        </div>
-      </header>
+      <PageHeader
+        title={service.title}
+        description={service.summary}
+        breadcrumb={
+          <>
+            <Breadcrumb href="/services" label="Services" current={service.title} />
+            <span className="mb-6 grid size-14 place-items-center rounded-[1.1rem] bg-accent-soft text-accent">
+              <ServiceIcon name={service.icon} className="size-7" />
+            </span>
+          </>
+        }
+      >
+        <Link href={`/contact?service=${service.id}`} className={buttonVariants({ size: "lg", className: "group/btn mt-9" })}>
+          Discuss this service
+          <ArrowRight aria-hidden className="transition-transform duration-(--duration-base) ease-spring group-hover/btn:translate-x-0.5" />
+        </Link>
+      </PageHeader>
       <Section>
-        <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr]">
-          <div>
-            {service.cover ? <MediaImage media={service.cover} priority className="mb-10" sizes="(min-width: 1024px) 55vw, 100vw" /> : null}
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
+          <div className="min-w-0">
+            {service.cover ? <MediaImage media={service.cover} priority className="mb-10 shadow-panel" sizes="(min-width: 1024px) 55vw, 100vw" /> : null}
             <Markdown source={service.description} />
           </div>
           {service.features.length ? (
-            <aside aria-labelledby="included" className="h-fit rounded-card border border-border bg-surface/60 p-6">
-              <h2 id="included" className="font-semibold text-fg">What&apos;s included</h2>
-              <ul className="mt-4 space-y-4">
+            <aside aria-labelledby="included" className="glass-panel h-fit rounded-card p-6 sm:p-7 lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
+              <h2 id="included" className="text-lg">What&apos;s included</h2>
+              <ul className="mt-5 space-y-4">
                 {service.features.map((f) => (
                   <li key={f.title} className="flex gap-3">
-                    <Check aria-hidden className="mt-0.5 size-5 shrink-0 text-accent-2" />
+                    <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-accent-2 text-white dark:text-bg">
+                      <Check aria-hidden className="size-3" strokeWidth={3} />
+                    </span>
                     <div>
                       <p className="font-medium text-fg">{f.title}</p>
-                      {f.description ? <p className="mt-1 text-sm text-muted">{f.description}</p> : null}
+                      {f.description ? <p className="mt-1 text-sm leading-relaxed text-muted">{f.description}</p> : null}
                     </div>
                   </li>
                 ))}
@@ -76,9 +79,9 @@ export default async function ServicePage(props: PageProps<"/services/[slug]">) 
         </div>
       </Section>
       {projects.length ? (
-        <Section className="border-t border-border" aria-labelledby="related-work">
+        <Section aria-labelledby="related-work">
           <SectionHeading id="related-work" eyebrow="Related work" title={`${service.title} projects`} />
-          <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p) => (
               <li key={p.id}>
                 <ProjectCard project={p} />
