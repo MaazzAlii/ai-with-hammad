@@ -1,187 +1,440 @@
 @import "tailwindcss";
 
 /*
- * AI With Hamad design tokens.
- * Palette carried over from the original site (near-black + cyan/teal accent).
- * Contrast verified in tests/unit/contrast.test.ts.
+ * AI With Hamad design system — "Liquid Glass".
+ *
+ * Layers, back to front:
+ *   1. canvas        --color-bg
+ *   2. ambient light .ambient (fixed, blurred light sources)
+ *   3. chrome        glass-chrome   navigation, tab bar, sheets
+ *   4. panels        glass-panel    primary surfaces (hero visual, forms, CTAs)
+ *   5. cards         glass-card     secondary, repeated surfaces
+ *   6. floating      glass-float    floating controls (WhatsApp, lightbox controls)
+ *   7. highlights    accent fills   primary CTA, active states
+ *
+ * Light values live in @theme; dark overrides follow (system preference).
+ * Text contrast of both palettes is verified in tests/unit/contrast.test.ts.
  */
 @theme {
-  --color-bg: #05090e;
-  --color-surface: #0b131b;
-  --color-surface-2: #111c26;
-  --color-surface-3: #172532;
-  --color-border: #1e2e3b;
-  --color-border-strong: #2b4050;
-  --color-fg: #e8f1f2;
-  --color-muted: #9bb1ba;
-  --color-subtle: #7d949e;
-  --color-accent: #22d3ee;
-  --color-accent-2: #2dd4bf;
-  --color-accent-fg: #03181c;
-  --color-accent-soft: rgb(34 211 238 / 0.1);
-  --color-danger: #f87171;
-  --color-danger-soft: rgb(248 113 113 / 0.12);
-  --color-success: #34d399;
-  --color-success-soft: rgb(52 211 153 / 0.12);
-  --color-warning: #fbbf24;
-  --color-warning-soft: rgb(251 191 36 / 0.12);
+  --color-bg: #f2f3f6;
+  --color-surface: #ffffff;
+  --color-surface-2: #f6f7f9;
+  --color-surface-3: #eceef2;
+  --color-border: #e2e5ea;
+  --color-border-strong: #cdd2da;
+  --color-fg: #0f1115;
+  --color-muted: #4d5562;
+  --color-subtle: #646b77;
+  --color-accent: #0a6c9e;
+  --color-accent-2: #0e7c74;
+  --color-accent-fg: #ffffff;
+  --color-accent-soft: rgb(10 108 158 / 0.09);
+  --color-danger: #c42b1c;
+  --color-danger-soft: rgb(196 43 28 / 0.08);
+  --color-success: #117a53;
+  --color-success-soft: rgb(17 122 83 / 0.09);
+  --color-warning: #a45a00;
+  --color-warning-soft: rgb(164 90 0 / 0.1);
+  --color-whatsapp: #25d366;
+  --color-whatsapp-fg: #03240f;
 
-  --font-display: var(--font-display), "Segoe UI", system-ui, sans-serif;
-  --font-sans: var(--font-body), "Segoe UI", system-ui, sans-serif;
-  --font-mono: var(--font-mono), Consolas, ui-monospace, monospace;
+  --font-display: var(--font-sans);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", var(--font-jetbrains), Consolas, monospace;
 
-  /* Radius scale — one value per element class, used consistently. */
-  --radius-control: 0.625rem; /* inputs, selects, small chips   10px */
-  --radius-button: 0.75rem;   /* buttons                          12px */
-  --radius-card: 1rem;        /* cards, panels                    16px */
-  --radius-media: 1.25rem;    /* images, video, galleries         20px */
+  /* Radius scale — concentric: a control inside a card is smaller than the card. */
+  --radius-control: 0.75rem;  /* inputs, selects, chips, thumbnails   12px */
+  --radius-button: 9999px;    /* buttons are capsules                      */
+  --radius-card: 1.5rem;      /* cards, panels, sheets                24px */
+  --radius-media: 1.125rem;   /* images, video, galleries             18px */
 
-  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px -12px rgb(0 0 0 / 0.6);
-  --shadow-glow: 0 0 24px rgb(34 211 238 / 0.25);
+  --shadow-card: 0 1px 1px rgb(16 24 40 / 0.03), 0 2px 8px -2px rgb(16 24 40 / 0.06);
+  --shadow-panel: 0 1px 2px rgb(16 24 40 / 0.04), 0 12px 32px -14px rgb(16 24 40 / 0.18);
+  --shadow-float: 0 2px 6px rgb(16 24 40 / 0.05), 0 22px 48px -18px rgb(16 24 40 / 0.28);
+  --shadow-glow: 0 1px 2px rgb(10 108 158 / 0.25), 0 8px 20px -8px rgb(10 108 158 / 0.55);
 
+  /* Motion: iOS-like curves. Fast by default; nothing longer than ~0.5s. */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-snap: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+  --duration-fast: 160ms;
+  --duration-base: 260ms;
+  --duration-slow: 480ms;
+
+  --animate-shimmer: shimmer 1.6s var(--ease-out-soft) infinite;
+}
+
+/* Glass materials (not colours, so not part of the Tailwind palette). */
+:root {
+  color-scheme: light;
+  --glass-chrome: rgb(255 255 255 / 0.68);
+  --glass-strong: rgb(255 255 255 / 0.76);
+  --glass-soft: rgb(255 255 255 / 0.55);
+  --glass-sheen: rgb(255 255 255 / 0.55);
+  --glass-edge: rgb(255 255 255 / 0.9);
+  --glass-line: rgb(15 23 42 / 0.08);
+  --ambient-1: rgb(10 108 158 / 0.16);
+  --ambient-2: rgb(14 124 116 / 0.12);
+  --ambient-3: rgb(148 163 184 / 0.22);
+  --scrim: rgb(15 17 21 / 0.28);
+  --header-h: 3.5rem;
+}
+
+/* dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --color-bg: #0b0c0f;
+    --color-surface: #15171b;
+    --color-surface-2: #1b1d22;
+    --color-surface-3: #24272d;
+    --color-border: #2a2d34;
+    --color-border-strong: #3a3e46;
+    --color-fg: #f3f4f6;
+    --color-muted: #aab0ba;
+    --color-subtle: #8a919c;
+    --color-accent: #5cc8ec;
+    --color-accent-2: #4fd1c1;
+    --color-accent-fg: #04121a;
+    --color-accent-soft: rgb(92 200 236 / 0.12);
+    --color-danger: #ff7a6b;
+    --color-danger-soft: rgb(255 122 107 / 0.12);
+    --color-success: #3ddc97;
+    --color-success-soft: rgb(61 220 151 / 0.12);
+    --color-warning: #f5b83d;
+    --color-warning-soft: rgb(245 184 61 / 0.12);
+
+    --shadow-card: 0 1px 1px rgb(0 0 0 / 0.3), 0 2px 10px -2px rgb(0 0 0 / 0.4);
+    --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.7);
+    --shadow-float: 0 2px 6px rgb(0 0 0 / 0.4), 0 24px 56px -18px rgb(0 0 0 / 0.8);
+    --shadow-glow: 0 1px 2px rgb(92 200 236 / 0.2), 0 8px 24px -8px rgb(92 200 236 / 0.45);
+
+    --glass-chrome: rgb(32 34 40 / 0.62);
+    --glass-strong: rgb(30 32 38 / 0.72);
+    --glass-soft: rgb(30 32 38 / 0.48);
+    --glass-sheen: rgb(255 255 255 / 0.06);
+    --glass-edge: rgb(255 255 255 / 0.1);
+    --glass-line: rgb(255 255 255 / 0.08);
+    --ambient-1: rgb(92 200 236 / 0.13);
+    --ambient-2: rgb(79 209 193 / 0.08);
+    --ambient-3: rgb(99 102 241 / 0.08);
+    --scrim: rgb(0 0 0 / 0.5);
+  }
 }
 
 @layer base {
-  :root {
-    color-scheme: dark;
-  }
   html {
+    overflow-x: clip;
     -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + 2rem);
   }
   body {
     background: var(--color-bg);
     color: var(--color-fg);
     font-family: var(--font-sans);
-    line-height: 1.65;
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: -0.006em;
+    font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.022em;
     text-wrap: balance;
   }
+  h1 { letter-spacing: -0.032em; line-height: 1.06; }
+  p { text-wrap: pretty; }
   ::selection {
-    background: rgb(34 211 238 / 0.28);
+    background: var(--color-accent-soft);
+    color: var(--color-fg);
   }
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
   img, video {
     max-width: 100%;
   }
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary {
+    cursor: pointer;
+  }
+}
+
+/* ---------- Glass materials ---------- */
+
+@utility glass-chrome {
+  background: linear-gradient(180deg, var(--glass-sheen), transparent 60%), var(--glass-chrome);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-panel);
+}
+
+@utility glass-panel {
+  background: linear-gradient(180deg, var(--glass-sheen), transparent 45%), var(--glass-strong);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-panel);
+}
+
+@utility glass-card {
+  background: linear-gradient(180deg, var(--glass-sheen), transparent 35%), var(--glass-soft);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-card);
+}
+
+@utility glass-float {
+  background: linear-gradient(180deg, var(--glass-sheen), transparent 60%), var(--glass-chrome);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-float);
+}
+
+/* Near-opaque glass for modal sheets: content inside must stay perfectly legible. */
+@utility glass-sheet {
+  background: linear-gradient(180deg, var(--glass-sheen), transparent 40%), color-mix(in oklab, var(--color-surface) 90%, transparent);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid var(--glass-line);
+  box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-float);
+}
+
+/* Opaque surface for dense UI (tables, long forms) where translucency hurts legibility. */
+@utility surface-solid {
+  background: var(--color-surface);
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--shadow-card);
+}
+
+/* Without backdrop-filter, translucent glass reads as washed out: fall back to solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-chrome, .glass-panel, .glass-float, .glass-sheet { background: var(--color-surface); }
+  .glass-card { background: var(--color-surface); }
+}
+
+/* Tactile press/hover response for anything clickable that isn't a Button. */
+@utility pressable {
+  transition-property: transform, box-shadow, background-color, border-color, color, opacity;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-spring);
+  &:active { transform: scale(0.98); transition-duration: 90ms; }
+}
+
+/* Cards that lift a little under the pointer (pointer devices only). */
+@utility lift {
+  transition-property: transform, box-shadow, background-color, border-color;
+  transition-duration: var(--duration-slow);
+  transition-timing-function: var(--ease-spring);
+  @media (hover: hover) {
+    &:hover { transform: translateY(-3px); box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-panel); }
+  }
+  &:active { transform: translateY(-1px) scale(0.99); transition-duration: 120ms; }
 }
 
 @layer components {
   .container-page {
     width: 100%;
-    max-width: 76rem;
+    max-width: 75rem;
     margin-inline: auto;
-    padding-inline: max(1rem, env(safe-area-inset-left));
+    padding-inline: max(1.25rem, env(safe-area-inset-left));
   }
   @media (min-width: 640px) {
-    .container-page { padding-inline: 1.5rem; }
+    .container-page { padding-inline: 2rem; }
   }
+
+  /* Small section label above headings. */
   .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: -0.004em;
+    color: var(--color-accent);
+  }
+  /* Meta label: quiet uppercase used in sidebars and fact lists. */
+  .label-caps {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-accent-2);
+    color: var(--color-subtle);
   }
   .text-gradient {
-    background: linear-gradient(120deg, var(--color-accent), var(--color-accent-2));
+    background: linear-gradient(180deg, var(--color-fg) 35%, color-mix(in oklab, var(--color-fg) 62%, var(--color-accent)));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
+
+  /* Fixed ambient light behind everything. Rendered once in the root layout. */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background:
+      radial-gradient(60rem 38rem at 12% -8%, var(--ambient-1), transparent 70%),
+      radial-gradient(48rem 34rem at 96% 12%, var(--ambient-2), transparent 70%),
+      radial-gradient(56rem 40rem at 50% 108%, var(--ambient-3), transparent 70%);
+  }
+  .ambient::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background:
+      radial-gradient(28rem 22rem at 30% 35%, var(--ambient-1), transparent 70%),
+      radial-gradient(24rem 20rem at 72% 58%, var(--ambient-2), transparent 70%);
+    filter: blur(40px);
+    opacity: 0.8;
+    animation: ambient-drift 48s var(--ease-out-soft) infinite alternate;
+  }
+
   /* Long-form content rendered from the safe Markdown renderer. */
   .prose-site {
     color: var(--color-muted);
-    font-size: 1.02rem;
-    max-width: 70ch;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    max-width: 68ch;
   }
   .prose-site > * + * { margin-top: 1em; }
-  .prose-site h2 { color: var(--color-fg); font-size: 1.4rem; margin-top: 1.8em; font-weight: 600; }
-  .prose-site h3 { color: var(--color-fg); font-size: 1.15rem; margin-top: 1.5em; font-weight: 600; }
-  .prose-site h4 { color: var(--color-fg); font-size: 1rem; margin-top: 1.3em; font-weight: 600; }
-  .prose-site strong { color: var(--color-fg); }
-  .prose-site a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+  .prose-site h2 { color: var(--color-fg); font-size: 1.375rem; margin-top: 2em; }
+  .prose-site h3 { color: var(--color-fg); font-size: 1.125rem; margin-top: 1.6em; }
+  .prose-site h4 { color: var(--color-fg); font-size: 1rem; margin-top: 1.4em; }
+  .prose-site strong { color: var(--color-fg); font-weight: 600; }
+  .prose-site a { color: var(--color-accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
   .prose-site ul { list-style: disc; padding-left: 1.25rem; }
   .prose-site ol { list-style: decimal; padding-left: 1.25rem; }
-  .prose-site li + li { margin-top: 0.35em; }
-  .prose-site code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-surface-2); padding: 0.1em 0.35em; border-radius: 6px; color: var(--color-fg); }
-  .bg-grid {
-    background-image:
-      linear-gradient(to right, rgb(148 178 190 / 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(148 178 190 / 0.06) 1px, transparent 1px);
-    background-size: 44px 44px;
-    mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 75%);
+  .prose-site li + li { margin-top: 0.4em; }
+  .prose-site li::marker { color: var(--color-subtle); }
+  .prose-site blockquote { border-left: 2px solid var(--color-border-strong); padding-left: 1rem; color: var(--color-fg); }
+  .prose-site code { font-family: var(--font-mono); font-size: 0.88em; background: var(--color-surface-3); padding: 0.1em 0.4em; border-radius: 6px; color: var(--color-fg); }
+  .prose-site pre { background: var(--color-surface-2); border: 1px solid var(--glass-line); border-radius: var(--radius-control); padding: 1rem; overflow-x: auto; }
+  .prose-site pre code { background: transparent; padding: 0; }
+
+  /* Hairline divider that fades at both ends. */
+  .hairline {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(90deg, transparent, var(--color-border-strong) 20%, var(--color-border-strong) 80%, transparent);
   }
+
+  /* Native <details> accordion with an animated height where supported. */
+  .disclosure::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size var(--duration-base) var(--ease-spring), content-visibility var(--duration-base) allow-discrete;
+  }
+  .disclosure[open]::details-content { block-size: auto; }
 }
+
+/* Safe-area helpers for the floating mobile chrome. */
+@utility pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ---------- Motion ---------- */
+
+@keyframes ambient-drift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to { transform: translate3d(3%, 3%, 0) scale(1.08); }
+}
+@keyframes shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes pop-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } }
+@keyframes pop-out { to { opacity: 0; transform: translateY(4px) scale(0.97); } }
+@keyframes sheet-in { from { transform: translateY(100%); } }
+@keyframes sheet-out { to { transform: translateY(100%); } }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-6px) scale(0.98); } }
+@keyframes step-in { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } }
+@keyframes check-in { from { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.12); } }
+@keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes breathe { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+.page-enter { animation: page-enter 420ms var(--ease-spring) both; }
+
+/* Overlays & sheets (Radix sets data-state; exit animations delay unmount). */
+.anim-overlay[data-state="open"] { animation: fade-in 220ms var(--ease-out-soft); }
+.anim-overlay[data-state="closed"] { animation: fade-out 180ms ease-in forwards; }
+.anim-pop[data-state="open"] { animation: pop-in 320ms var(--ease-spring); }
+.anim-pop[data-state="closed"] { animation: pop-out 160ms ease-in forwards; }
+.anim-drop[data-state="open"] { animation: drop-in 320ms var(--ease-spring); }
+.anim-drop[data-state="closed"] { animation: fade-out 160ms ease-in forwards; }
+.anim-sheet[data-state="open"] { animation: sheet-in 420ms var(--ease-spring); }
+.anim-sheet[data-state="closed"] { animation: sheet-out 240ms cubic-bezier(0.4, 0, 1, 1) forwards; }
+/* Dialogs become bottom sheets on small screens. */
+@media (max-width: 639px) {
+  .anim-pop[data-state="open"] { animation: sheet-in 420ms var(--ease-spring); }
+  .anim-pop[data-state="closed"] { animation: sheet-out 240ms cubic-bezier(0.4, 0, 1, 1) forwards; }
+}
+
+.marquee-track { animation: marquee 45s linear infinite; width: max-content; }
+
+/*
+ * Reveal on scroll. Content is visible by default (no JS, crawlers, reduced motion).
+ * RevealObserver sets html[data-reveal] once it is running, then marks elements
+ * data-shown as they enter the viewport. Groups ([data-reveal="group"]) stagger children.
+ */
+html[data-reveal] [data-reveal="item"]:not([data-shown]),
+html[data-reveal] [data-reveal="group"]:not([data-shown]) > * {
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  filter: blur(6px);
+}
+[data-reveal="item"], [data-reveal="group"] > * {
+  transition:
+    opacity 600ms var(--ease-out-soft),
+    transform 700ms var(--ease-spring),
+    filter 600ms var(--ease-out-soft);
+}
+[data-reveal="group"] > :nth-child(2) { transition-delay: 60ms; }
+[data-reveal="group"] > :nth-child(3) { transition-delay: 120ms; }
+[data-reveal="group"] > :nth-child(4) { transition-delay: 180ms; }
+[data-reveal="group"] > :nth-child(5) { transition-delay: 220ms; }
+[data-reveal="group"] > :nth-child(n + 6) { transition-delay: 260ms; }
+
+/* Skip rendering work for off-screen sections until they approach the viewport. */
+.cv-auto { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
 }
 
-/* Media kit / print: light, ink-friendly output for future PDF generation. */
+/* Media kit / print: ink-friendly output for PDF generation. */
 @media print {
   :root { color-scheme: light; }
   body { background: #fff !important; color: #111 !important; }
-  .no-print { display: none !important; }
+  .ambient, .no-print { display: none !important; }
   .print-break { break-before: page; }
   .print-avoid { break-inside: avoid; }
   a { color: #111 !important; text-decoration: none !important; }
+  .glass-chrome, .glass-panel, .glass-card, .glass-float { backdrop-filter: none !important; background: #fff !important; box-shadow: none !important; }
   .print-plain, .print-plain * {
     background: transparent !important;
     color: #111 !important;
     border-color: #ccc !important;
     box-shadow: none !important;
   }
-}
-
-@keyframes loader {
-  0% { transform: translateX(-110%); }
-  100% { transform: translateX(330%); }
-}
-
-/* ---------- Motion (all disabled by prefers-reduced-motion above) ---------- */
-@keyframes agent-flow { to { stroke-dashoffset: -64; } }
-.agent-flow { animation: agent-flow 1.6s linear infinite; }
-@keyframes agent-pulse { 0%, 100% { opacity: 0.55; transform: scale(0.92); } 50% { opacity: 1; transform: scale(1.05); } }
-.agent-pulse { transform-box: fill-box; transform-origin: center; animation: agent-pulse 2.8s ease-in-out infinite; }
-@keyframes agent-log { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-.agent-log { opacity: 0; animation: agent-log 0.5s ease-out forwards; }
-
-@keyframes marquee { to { transform: translateX(-50%); } }
-.marquee-track { animation: marquee 38s linear infinite; width: max-content; }
-
-@keyframes aurora { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(4%, -3%, 0) scale(1.08); } }
-.aurora { animation: aurora 18s ease-in-out infinite; }
-
-/* Scroll-reveal without JavaScript where scroll-driven animations are supported. */
-@supports (animation-timeline: view()) {
-  @keyframes reveal { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
-  .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% cover 22%; }
-}
-
-/* Skip rendering work for off-screen sections until they approach the viewport. */
-.cv-auto { content-visibility: auto; contain-intrinsic-size: auto 900px; }
-
-/* Gradient hairline border for highlighted cards. */
-.glow-border { position: relative; }
-.glow-border::before {
-  content: ""; position: absolute; inset: 0; padding: 1px; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(135deg, rgb(34 211 238 / 0.55), transparent 40%, transparent 60%, rgb(45 212 191 / 0.45));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
 }
