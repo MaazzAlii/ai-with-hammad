@@ -14,6 +14,7 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
       { href: "/admin/social", label: "Social platforms", icon: "social", permission: "cms.read" },
       { href: "/admin/testimonials", label: "Testimonials", icon: "testimonials", permission: "cms.read" },
       { href: "/admin/faqs", label: "FAQs", icon: "faqs", permission: "cms.read" },
+      { href: "/admin/links", label: "Link in bio", icon: "links", permission: "cms.read" },
       { href: "/admin/sponsorship", label: "Sponsorship", icon: "sponsorship", permission: "cms.read" },
       { href: "/admin/media", label: "Media library", icon: "media", permission: "cms.read" },
     ],
