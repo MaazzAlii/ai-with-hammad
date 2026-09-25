@@ -596,6 +596,29 @@ export const faqs = pgTable("faqs", {
   deletedAt: ts("deleted_at"),
 });
 
+/** Link-in-bio links shown on /links (clicks are counted through /go/<id>). */
+export const bioLinkKinds = ["link", "social", "affiliate", "sponsor"] as const;
+export type BioLinkKind = (typeof bioLinkKinds)[number];
+
+export const bioLinks = pgTable("bio_links", {
+  id: id(),
+  title: text("title").notNull(),
+  url: text("url").notNull(),
+  description: text("description").notNull().default(""),
+  kind: text("kind").$type<BioLinkKind>().notNull().default("link"),
+  icon: text("icon").notNull().default(""),
+  teamMemberId: uuid("team_member_id").references(() => teamMembers.id, { onDelete: "set null" }),
+  isFeatured: boolean("is_featured").notNull().default(false),
+  isPublished: boolean("is_published").notNull().default(true),
+  startsAt: ts("starts_at"),
+  endsAt: ts("ends_at"),
+  clickCount: integer("click_count").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+  deletedAt: ts("deleted_at"),
+});
+
 // ---------------------------------------------------------------------------
 // Site
 // ---------------------------------------------------------------------------
@@ -694,4 +717,5 @@ export const publicTables = {
   messages,
   testimonials,
   faqs,
+  bioLinks,
 };
