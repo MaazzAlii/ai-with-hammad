@@ -20,19 +20,19 @@ export default async function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "radial-gradient(circle at 80% 0%, rgba(34,211,238,0.25), transparent 55%), #05090e",
-          color: "#e8f1f2",
+          background: "radial-gradient(circle at 12% 0%, rgba(10,108,158,0.22), transparent 55%), radial-gradient(circle at 95% 20%, rgba(14,124,116,0.16), transparent 50%), #f2f3f6",
+          color: "#0f1115",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 14, border: "2px solid rgba(34,211,238,0.5)", display: "flex", alignItems: "center", justifyContent: "center", color: "#22d3ee", fontSize: 28 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 14, background: "#0a6c9e", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffffff", fontSize: 28, fontWeight: 600 }}>
             {general.siteName.replace(/^AI\s+with\s+/i, "").charAt(0).toUpperCase()}
           </div>
-          <div style={{ fontSize: 34, fontWeight: 700 }}>{general.siteName}</div>
+          <div style={{ fontSize: 34, fontWeight: 600 }}>{general.siteName}</div>
         </div>
-        <div style={{ fontSize: 64, fontWeight: 700, lineHeight: 1.1, maxWidth: 950 }}>{general.tagline}</div>
-        <div style={{ fontSize: 26, color: "#9bb1ba" }}>AI engineering · Automation · Agentic systems</div>
+        <div style={{ fontSize: 68, fontWeight: 600, lineHeight: 1.08, letterSpacing: -2, maxWidth: 980 }}>{general.tagline}</div>
+        <div style={{ fontSize: 26, color: "#4d5562" }}>AI engineering · Automation · Agentic systems</div>
       </div>
     ),
     size,
