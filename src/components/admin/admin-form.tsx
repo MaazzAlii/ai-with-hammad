@@ -73,7 +73,7 @@ export function AdminForm({
         <fieldset disabled={disabled || pending} className="contents">
           {children}
         </fieldset>
-        <div className={compact ? "mt-4 flex flex-wrap items-center justify-end gap-3" : "sticky bottom-0 z-10 -mx-4 mt-8 flex flex-wrap items-center justify-end gap-3 border-t border-border bg-bg/90 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-card sm:border sm:px-5"}>
+        <div className={compact ? "mt-4 flex flex-wrap items-center justify-end gap-3" : "glass-chrome sticky bottom-3 z-10 mt-8 flex flex-wrap items-center justify-end gap-3 rounded-[1.25rem] px-4 py-3 sm:rounded-full sm:py-2 sm:pr-2 sm:pl-5"}>
           {footer}
           {!disabled ? (
             <Button type="submit" disabled={pending}>
