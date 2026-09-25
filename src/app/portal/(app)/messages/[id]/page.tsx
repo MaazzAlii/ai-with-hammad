@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AutoRefresh } from "@/components/portal/auto-refresh";
 import { Composer } from "@/components/portal/composer";
 import { ThreadView } from "@/components/portal/thread-view";
+import { Breadcrumb } from "@/components/site/section";
+import { Badge } from "@/components/ui/badge";
 import { markClientThreadRead, sendClientMessage } from "@/server/actions/portal";
 import { requireClient } from "@/server/auth/client-session";
 import { getThread } from "@/server/dal/portal";
@@ -20,15 +21,13 @@ export default async function PortalThreadPage(props: PageProps<"/portal/message
   await markClientThreadRead(id);
   return (
     <div className="mx-auto max-w-3xl">
-      <nav aria-label="Breadcrumb" className="mb-2 text-sm text-subtle">
-        <Link href="/portal" className="hover:text-fg">Conversations</Link>
-      </nav>
-      <h1 className="text-2xl font-semibold">{data.thread.subject}</h1>
-      <p className="mt-1 text-sm text-subtle capitalize">{data.thread.status}</p>
+      <Breadcrumb href="/portal" label="Conversations" current={data.thread.subject} />
+      <h1 className="text-[1.75rem] sm:text-[2rem]">{data.thread.subject}</h1>
+      <Badge className="mt-3 capitalize">{data.thread.status}</Badge>
       <div className="mt-8">
         <ThreadView messages={data.messages} viewer="client" teamLabel={general.siteName} />
       </div>
-      <div className="mt-8 rounded-card border border-border bg-surface/60 p-4">
+      <div className="glass-panel sticky bottom-[max(1rem,env(safe-area-inset-bottom))] mt-8 rounded-[1.5rem] p-3 sm:bottom-6 sm:p-4">
         <Composer action={sendClientMessage.bind(null, id)} placeholder="Reply to the team…" />
       </div>
       <AutoRefresh intervalMs={15000} />
