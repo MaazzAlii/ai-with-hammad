@@ -1,13 +1,12 @@
-import { ExternalLink } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ContentCard } from "@/components/site/content-card";
 import { JsonLd } from "@/components/site/json-ld";
 import { Markdown } from "@/components/site/markdown";
 import { MediaImage } from "@/components/site/media-image";
-import { Section, SectionHeading } from "@/components/site/section";
+import { Breadcrumb, Section, SectionHeading } from "@/components/site/section";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { buttonVariants } from "@/components/ui/button";
 import { breadcrumbLd, creativeWorkLd, videoObjectLd } from "@/lib/jsonld";
@@ -49,44 +48,44 @@ export default async function ContentItemPage(props: PageProps<"/content/[slug]"
   const description = markdownToText(item.description) || item.title;
   return (
     <article>
-      <div className="container-page py-12 sm:py-16">
-        <nav aria-label="Breadcrumb" className="mb-6 text-sm text-subtle">
-          <Link href="/content" className="hover:text-fg">Content</Link> <span aria-hidden>/</span> <span className="text-muted">{item.title}</span>
-        </nav>
+      <div className="container-page pt-12 pb-14 sm:pt-20 sm:pb-20">
+        <Breadcrumb href="/content" label="Content" current={item.title} />
         <p className="eyebrow mb-3">{PLATFORM_LABELS[item.platform]}{item.category ? ` · ${item.category}` : ""}</p>
-        <h1 className="max-w-4xl text-3xl font-semibold sm:text-4xl">{item.title}</h1>
-        {item.publishedDate ? <p className="mt-3 text-sm text-subtle">Published <time dateTime={item.publishedDate}>{formatDate(item.publishedDate)}</time></p> : null}
-        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <h1 className="max-w-4xl text-[2.25rem] sm:text-5xl">{item.title}</h1>
+        {item.publishedDate ? <p className="mt-4 text-sm text-subtle">Published <time dateTime={item.publishedDate}>{formatDate(item.publishedDate)}</time></p> : null}
+        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-14">
           <div>
             {item.embed ? (
               <VideoEmbed embed={item.embed} title={item.title} posterUrl={item.thumbnail?.url} />
             ) : item.thumbnail ? (
-              <MediaImage media={item.thumbnail} priority />
+              <MediaImage media={item.thumbnail} priority className="shadow-panel" />
             ) : null}
           </div>
           <div>
             {stats.length ? (
-              <dl className="mb-6 grid grid-cols-2 gap-px overflow-hidden rounded-card border border-border bg-border">
-                {stats.map(([label, v]) => (
-                  <div key={label} className="bg-surface p-4">
-                    <dd className="font-mono text-2xl text-accent">{formatCompactNumber(v)}</dd>
-                    <dt className="text-xs text-muted">{label}</dt>
-                  </div>
-                ))}
-                <p className="col-span-2 bg-surface px-4 py-2 text-xs text-subtle">Metrics as of {formatDate(m!.capturedAt)}</p>
-              </dl>
+              <div className="mb-8">
+                <dl className="glass-panel grid grid-cols-2 gap-px overflow-hidden rounded-card bg-(--glass-line)">
+                  {stats.map(([label, v]) => (
+                    <div key={label} className="flex flex-col-reverse bg-surface/70 px-5 py-4 dark:bg-bg/40">
+                      <dt className="mt-1 text-xs text-muted">{label}</dt>
+                      <dd className="text-2xl font-semibold tracking-tight text-fg tabular-nums">{formatCompactNumber(v)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-2.5 px-1 text-xs text-subtle">Metrics as of {formatDate(m!.capturedAt)}</p>
+              </div>
             ) : null}
             <Markdown source={item.description} />
-            <a href={item.url} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "secondary", className: "mt-6" })}>
-              View on {PLATFORM_LABELS[item.platform]} <ExternalLink aria-hidden />
+            <a href={item.url} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "secondary", className: "mt-8" })}>
+              View on {PLATFORM_LABELS[item.platform]} <ArrowUpRight aria-hidden />
             </a>
           </div>
         </div>
       </div>
       {more.length ? (
-        <Section className="border-t border-border" aria-labelledby="more-content">
+        <Section aria-labelledby="more-content">
           <SectionHeading id="more-content" eyebrow="More" title={`More on ${PLATFORM_LABELS[item.platform]}`} />
-          <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{more.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}</ul>
+          <ul data-reveal="group" className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{more.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}</ul>
         </Section>
       ) : null}
       <JsonLd
