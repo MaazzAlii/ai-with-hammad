@@ -1,15 +1,27 @@
+import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-export function Card({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card"
-      className={cn("rounded-card border border-border bg-surface/80 shadow-card", className)}
-      {...props}
-    />
-  );
+/**
+ * Surfaces of the glass hierarchy:
+ *  - card   secondary, repeated surfaces (lists, grids)
+ *  - panel  primary surfaces that deserve more presence (forms, CTAs)
+ *  - solid  dense content where translucency would hurt legibility
+ */
+export const cardVariants = cva("rounded-card", {
+  variants: {
+    tone: {
+      card: "glass-card",
+      panel: "glass-panel",
+      solid: "surface-solid",
+    },
+  },
+  defaultVariants: { tone: "card" },
+});
+
+export function Card({ className, tone, ...props }: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
+  return <div data-slot="card" className={cn(cardVariants({ tone }), className)} {...props} />;
 }
 
 export function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -17,7 +29,7 @@ export function CardHeader({ className, ...props }: React.ComponentProps<"div">)
 }
 
 export function CardTitle({ className, ...props }: React.ComponentProps<"h3">) {
-  return <h3 className={cn("font-display text-base font-semibold text-fg", className)} {...props} />;
+  return <h3 className={cn("text-base font-semibold text-fg", className)} {...props} />;
 }
 
 export function CardDescription({ className, ...props }: React.ComponentProps<"p">) {
