@@ -35,7 +35,7 @@ export async function proxy(request: NextRequest) {
 
   if (pathname.startsWith("/admin") && !signedIn) {
     const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
+    loginUrl.pathname = "/kasayhobro";
     loginUrl.search = "";
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
@@ -50,5 +50,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login", "/auth/:path*", "/portal/:path*"],
+  matcher: ["/admin/:path*", "/kasayhobro", "/auth/:path*", "/portal/:path*"],
 };

@@ -16,5 +16,5 @@ export async function POST(request: NextRequest) {
   await supabase.auth.signOut();
   const actor = staff ?? client;
   if (actor) await audit(actor, { action: "auth.logout", entityType: "auth", summary: client ? "Client signed out" : "Signed out" });
-  return NextResponse.redirect(new URL(client ? "/portal/login" : "/login", request.url), { status: 303 });
+  return NextResponse.redirect(new URL(client ? "/portal/login" : "/kasayhobro", request.url), { status: 303 });
 }

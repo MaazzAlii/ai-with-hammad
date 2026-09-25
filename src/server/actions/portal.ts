@@ -41,7 +41,7 @@ export async function clientSignIn(_prev: ActionResult | null, formData: FormDat
   const [p] = await getDb().select({ kind: profiles.kind, isActive: profiles.isActive, clientId: profiles.clientId }).from(profiles).where(eq(profiles.id, data.user.id));
   if (p?.kind !== "client" || !p.isActive || !p.clientId) {
     await supabase.auth.signOut({ scope: "local" });
-    return fail(p?.kind === "staff" ? "Team members sign in at /login." : "Your client account is not active. Please contact us.");
+    return fail(p?.kind === "staff" ? "This account is for staff members." : "Your client account is not active. Please contact us.");
   }
   await getDb().update(profiles).set({ lastSignInAt: new Date() }).where(eq(profiles.id, data.user.id));
   await audit({ id: data.user.id, email: parsed.data.email }, { action: "auth.client_login", entityType: "auth", summary: "Client signed in", ipHash: meta.ipHash });

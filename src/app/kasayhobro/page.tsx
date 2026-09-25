@@ -12,7 +12,7 @@ import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Sign in", ...NOINDEX };
 
-export default async function LoginPage(props: PageProps<"/login">) {
+export default async function LoginPage(props: PageProps<"/kasayhobro">) {
   const sp = await props.searchParams;
   const staff = await getCurrentStaff();
   if (staff?.isActive) redirect(safeNextPath(typeof sp.next === "string" ? sp.next : undefined));

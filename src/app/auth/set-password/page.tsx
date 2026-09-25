@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Set password", ...NOINDEX };
 export default async function SetPasswordPage() {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/login?error=link");
+  if (!data.user) redirect("/kasayhobro?error=link");
   return (
     <main className="grid min-h-dvh place-items-center px-4">
       <div className="w-full max-w-sm">

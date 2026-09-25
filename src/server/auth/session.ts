@@ -76,8 +76,8 @@ export async function authorize(permission: Permission): Promise<Staff> {
 /** For admin pages/layouts: redirects instead of throwing. */
 export async function requireStaff(): Promise<Staff> {
   const staff = await getCurrentStaff();
-  if (!staff) redirect("/login");
-  if (!staff.isActive || !staff.permissions.has("cms.read")) redirect("/login?error=inactive");
+  if (!staff) redirect("/kasayhobro");
+  if (!staff.isActive || !staff.permissions.has("cms.read")) redirect("/kasayhobro?error=inactive");
   return staff;
 }
 
