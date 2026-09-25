@@ -1,3 +1,4 @@
+import { PlaySquare } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -31,7 +32,7 @@ export default async function ContentPage(props: PageProps<"/content">) {
   const available = [...new Set(all.map((i) => i.platform))];
   const highPerforming = platform ? [] : groupContent(all, "high-performing", 3);
   const chip = (active: boolean) =>
-    cn("inline-flex min-h-9 items-center rounded-full border px-3.5 text-sm", active ? "border-accent bg-accent-soft text-accent" : "border-border-strong text-muted hover:text-fg");
+    cn("pressable inline-flex min-h-9 items-center rounded-full px-3.5 text-sm whitespace-nowrap", active ? "bg-fg font-medium text-bg shadow-card" : "bg-fg/[0.05] text-muted hover:bg-fg/[0.08] hover:text-fg");
   return (
     <>
       <PageHeader eyebrow="Creator" title="Content" description="We teach what we build: tutorials, walkthroughs and honest experiments with AI tools." />
@@ -42,17 +43,17 @@ export default async function ContentPage(props: PageProps<"/content">) {
         </Section>
       ) : null}
       {highPerforming.length ? (
-        <Section className="border-t border-border" aria-labelledby="top-title">
+        <Section aria-labelledby="top-title">
           <SectionHeading id="top-title" eyebrow="Top performing" title="Audience favourites" />
-          <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {highPerforming.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}
           </ul>
         </Section>
       ) : null}
-      <Section className="border-t border-border" aria-labelledby="all-content">
+      <Section aria-labelledby="all-content">
         <SectionHeading id="all-content" eyebrow="Library" title={platform ? `${PLATFORM_LABELS[platform]} content` : "All content"} />
         {available.length > 1 ? (
-          <nav aria-label="Filter by platform" className="mb-8 flex flex-wrap gap-2">
+          <nav aria-label="Filter by platform" className="-mx-5 mb-10 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
             <Link href="/content" className={chip(!platform)} aria-current={!platform ? "true" : undefined}>All</Link>
             {available.map((p) => (
               <Link key={p} href={`/content?platform=${p}`} className={chip(platform === p)} aria-current={platform === p ? "true" : undefined}>{PLATFORM_LABELS[p]}</Link>
@@ -60,11 +61,11 @@ export default async function ContentPage(props: PageProps<"/content">) {
           </nav>
         ) : null}
         {items.length ? (
-          <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}
           </ul>
         ) : (
-          <EmptyState title="New content is on the way" />
+          <EmptyState title="New content is on the way" icon={<PlaySquare />} />
         )}
       </Section>
       <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Content", path: "/content" }])} />
