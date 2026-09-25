@@ -24,7 +24,7 @@ export default async function UsersPage() {
         {users.map((u) => {
           const editable = canManage && u.id !== staff.id && canManageRole(staff.role, u.role, u.role);
           return (
-            <li key={u.id} className="rounded-card border border-border bg-surface">
+            <li key={u.id} className="surface-solid rounded-card">
               <details>
                 <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 p-4">
                   <span className="min-w-0">
