@@ -13,14 +13,14 @@ export function ThreadView({ messages, viewer, teamLabel = "AI With Hamad team" 
           <li key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
             <div
               className={cn(
-                "max-w-[85%] rounded-card border px-4 py-3 sm:max-w-[70%]",
-                mine ? "rounded-br-md border-accent/30 bg-accent-soft" : "rounded-bl-md border-border bg-surface",
+                "max-w-[85%] rounded-[1.35rem] px-4 py-3 motion-safe:animate-[step-in_320ms_var(--ease-spring)] sm:max-w-[70%]",
+                mine ? "rounded-br-md bg-accent text-accent-fg shadow-card" : "glass-card rounded-bl-md",
               )}
             >
-              <p className="mb-1 text-xs text-subtle">
-                <span className="font-medium text-muted">{who}</span> · <time dateTime={m.createdAt.toISOString()}>{formatDate(m.createdAt, { hour: "2-digit", minute: "2-digit" })}</time>
+              <p className={cn("mb-1 text-xs", mine ? "text-accent-fg/75" : "text-subtle")}>
+                <span className={cn("font-medium", mine ? "text-accent-fg" : "text-muted")}>{who}</span> · <time dateTime={m.createdAt.toISOString()}>{formatDate(m.createdAt, { hour: "2-digit", minute: "2-digit" })}</time>
               </p>
-              <p className="text-sm break-words whitespace-pre-wrap text-fg">{m.body}</p>
+              <p className={cn("text-[0.9375rem] leading-relaxed break-words whitespace-pre-wrap", mine ? "text-accent-fg" : "text-fg")}>{m.body}</p>
             </div>
           </li>
         );
