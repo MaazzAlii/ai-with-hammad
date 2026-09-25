@@ -4,26 +4,40 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Capsule buttons with a tactile response: a slight scale-up on hover
+ * (pointer devices only) and a press-down on :active.
+ */
 export const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-button font-display text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-200 ease-out-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
+  [
+    "relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-button text-sm font-medium tracking-[-0.01em] select-none",
+    "transition-[transform,background-color,border-color,box-shadow,color,opacity] duration-(--duration-base) ease-spring",
+    "[@media(hover:hover)]:hover:scale-[1.015] active:scale-[0.97] active:duration-75",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+    "disabled:pointer-events-none disabled:opacity-45 [&_svg]:size-4 [&_svg]:shrink-0",
+  ],
   {
     variants: {
       variant: {
-        primary:
-          "bg-linear-to-br from-accent to-accent-2 text-accent-fg shadow-glow hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgb(34_211_238/0.4)]",
-        secondary: "border border-border-strong bg-surface-2 text-fg hover:border-accent/50 hover:bg-surface-3",
-        ghost: "text-muted hover:bg-surface-2 hover:text-fg",
-        outline: "border border-border-strong text-fg hover:border-accent/60 hover:text-accent",
-        danger: "bg-danger/90 text-white hover:bg-danger",
-        link: "h-auto px-0 text-accent underline-offset-4 hover:underline",
+        primary: [
+          "bg-accent text-accent-fg shadow-glow",
+          "bg-[linear-gradient(180deg,rgb(255_255_255/0.16),transparent_55%)] inset-shadow-[0_1px_0_rgb(255_255_255/0.28)]",
+          "hover:bg-[color-mix(in_oklab,var(--color-accent)_90%,var(--color-fg))]",
+        ],
+        secondary: "glass-panel text-fg shadow-card hover:bg-surface",
+        ghost: "text-muted hover:bg-fg/[0.05] hover:text-fg",
+        outline: "border border-border-strong bg-transparent text-fg hover:border-fg/25 hover:bg-surface/60",
+        danger: "bg-danger text-white shadow-card inset-shadow-[0_1px_0_rgb(255_255_255/0.22)] hover:bg-[color-mix(in_oklab,var(--color-danger)_88%,black)]",
+        link: "h-auto rounded-md px-0 text-accent hover:underline hover:scale-100 active:scale-100 underline-offset-4",
       },
       size: {
-        sm: "h-9 px-3 text-[0.82rem]",
-        md: "h-10 px-4",
-        lg: "h-12 px-6 text-[0.95rem]",
+        sm: "h-9 px-3.5 text-[0.8125rem]",
+        md: "h-10 px-4.5",
+        lg: "h-12 px-6 text-[0.9375rem]",
         icon: "size-10",
       },
     },
+    compoundVariants: [{ variant: "link", className: "h-auto px-0" }],
     defaultVariants: { variant: "primary", size: "md" },
   },
 );
