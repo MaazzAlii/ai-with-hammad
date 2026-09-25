@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { track } from "@vercel/analytics";
@@ -9,9 +8,11 @@ import type { z } from "zod";
 
 import { Captcha } from "@/components/forms/captcha";
 import { Field, Honeypot } from "@/components/forms/field";
+import { FormSuccess } from "@/components/forms/form-success";
 import { Button } from "@/components/ui/button";
 import { Input, NativeSelect, Textarea } from "@/components/ui/input";
 import { Alert } from "@/components/ui/misc";
+import { Spinner } from "@/components/ui/spinner";
 import { contactInquirySchema } from "@/lib/validation/inquiry";
 import { submitContactInquiry } from "@/server/actions/inquiries-public";
 
@@ -72,14 +73,11 @@ export function ContactForm({
 
   if (done) {
     return (
-      <div role="status" className="rounded-card border border-success/30 bg-success-soft p-8 text-center">
-        <CheckCircle2 aria-hidden className="mx-auto size-10 text-success" />
-        <p className="mt-4 font-display text-lg font-semibold">Message sent</p>
-        <p className="mt-2 text-muted">{done}</p>
-        <Button variant="secondary" className="mt-6" onClick={() => setDone(null)}>
+      <FormSuccess title="Message sent" message={done}>
+        <Button variant="secondary" className="mt-7" onClick={() => setDone(null)}>
           Send another message
         </Button>
-      </div>
+      </FormSuccess>
     );
   }
 
@@ -141,11 +139,12 @@ export function ContactForm({
         <Captcha resetKey={captchaKey} error={captchaError} idPrefix="contact-hp-captcha" />
       </div>
       <Honeypot register={{ id: "contact-hp", name: "website_url_confirm" }} />
-      <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-subtle">
-          We use your details only to reply. See our <a href="/privacy-policy" className="underline hover:text-fg">privacy policy</a>.
+      <div className="flex flex-col-reverse gap-4 border-t border-(--glass-line) pt-5 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs leading-relaxed text-subtle">
+          We only use your details to reply. See our <a href="/privacy-policy" className="underline underline-offset-2 hover:text-fg">privacy policy</a>.
         </p>
-        <Button type="submit" size="lg" disabled={pending}>
+        <Button type="submit" size="lg" disabled={pending} className="w-full sm:w-auto">
+          {pending ? <Spinner /> : null}
           {pending ? "Sending…" : "Send message"}
         </Button>
       </div>
