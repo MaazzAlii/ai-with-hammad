@@ -9,7 +9,7 @@ export function VideoPlayer({ src, poster, title, mimeType, className }: { src: 
       playsInline
       poster={poster ?? undefined}
       aria-label={title}
-      className={cn("aspect-video w-full rounded-media border border-border bg-surface-2 object-contain", className)}
+      className={cn("aspect-video w-full rounded-media bg-black object-contain shadow-panel", className)}
     >
       <source src={src} type={mimeType} />
       Your browser does not support embedded video. <a href={src}>Download the video</a>.
