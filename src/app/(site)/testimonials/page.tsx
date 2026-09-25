@@ -1,3 +1,4 @@
+import { MessageSquareQuote } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -29,14 +30,17 @@ export default async function TestimonialsPage() {
     <>
       <PageHeader eyebrow="Client feedback" title="Testimonials" description="Every testimonial here was submitted by a client (or given to us directly) and published with their permission.">
         {avg ? (
-          <p className="mt-6 flex items-center gap-3 text-muted">
-            <Stars rating={avg} className="scale-125 origin-left" /> <span className="ml-4">{avg.toFixed(1)} / 5 from {items.length} review{items.length === 1 ? "" : "s"}</span>
+          <p className="glass-card mt-8 inline-flex items-center gap-3 rounded-full py-2 pr-4 pl-3 text-sm text-muted">
+            <Stars rating={avg} />
+            <span>
+              <span className="font-semibold text-fg tabular-nums">{avg.toFixed(1)}</span> out of 5 from {items.length} review{items.length === 1 ? "" : "s"}
+            </span>
           </p>
         ) : null}
       </PageHeader>
       <Section>
-        {items.length ? <TestimonialGrid items={items} /> : <EmptyState title="Testimonials coming soon">We publish client feedback after projects are delivered.</EmptyState>}
-        <div className="mt-12 flex flex-wrap items-center gap-3">
+        {items.length ? <TestimonialGrid items={items} /> : <EmptyState title="Testimonials coming soon" icon={<MessageSquareQuote />}>We publish client feedback after projects are delivered.</EmptyState>}
+        <div className="mt-14 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <Link href="/contact" className={buttonVariants({ size: "lg" })}>Start a project</Link>
           <Link href="/portal/login" className={buttonVariants({ size: "lg", variant: "ghost" })}>Client? Leave feedback</Link>
         </div>
