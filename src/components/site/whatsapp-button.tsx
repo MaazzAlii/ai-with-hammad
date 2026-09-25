@@ -1,6 +1,9 @@
 import { MessageCircle } from "lucide-react";
 
-/** Floating click-to-chat button (plain link: no third-party script, no JS). */
+/**
+ * Floating click-to-chat control (plain link: no third-party script, no JS).
+ * On phones it floats above the tab bar.
+ */
 export function WhatsAppButton({ href }: { href: string }) {
   return (
     <a
@@ -8,10 +11,12 @@ export function WhatsAppButton({ href }: { href: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
-      className="no-print fixed right-4 bottom-4 z-40 inline-flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-3 text-sm font-semibold text-[#03240f] shadow-[0_10px_30px_-8px_rgb(37_211_102/0.6)] transition-transform hover:-translate-y-0.5 sm:right-6 sm:bottom-6"
+      className="no-print glass-float pressable group fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 inline-flex h-12 items-center gap-2 rounded-full px-3.5 text-sm font-medium text-fg hover:scale-[1.03] lg:right-6 lg:bottom-6"
     >
-      <MessageCircle aria-hidden className="size-5" />
-      <span className="hidden sm:inline">WhatsApp</span>
+      <span className="grid size-8 place-items-center rounded-full bg-whatsapp text-whatsapp-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]">
+        <MessageCircle aria-hidden className="size-[1.05rem]" strokeWidth={2} />
+      </span>
+      <span className="hidden pr-1 sm:inline">WhatsApp</span>
     </a>
   );
 }
