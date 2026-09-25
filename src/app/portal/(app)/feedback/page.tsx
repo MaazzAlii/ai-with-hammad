@@ -16,11 +16,11 @@ export default async function FeedbackPage() {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div>
-        <h1 className="text-2xl font-semibold">How did we do?</h1>
-        <p className="mt-2 max-w-xl text-sm text-muted">Your rating helps us improve. If you allow it, we may show your testimonial on our website after review.</p>
+        <h1 className="text-[1.75rem] sm:text-[2rem]">How did we do?</h1>
+        <p className="mt-3 max-w-xl text-[0.9375rem] leading-relaxed text-muted">Your rating helps us improve. If you allow it, we may show your testimonial on our website after review.</p>
         <div className="mt-6">
           <AdminForm action={submitTestimonial} submitLabel="Send feedback" compact>
-            <div className="grid gap-5 rounded-card border border-border bg-surface/60 p-5 sm:p-6">
+            <div className="glass-panel grid gap-5 rounded-[1.5rem] p-5 sm:p-7">
               <StarRatingInput />
               <TextAreaField name="quote" label="Your testimonial" rows={6} required placeholder="What did we build, and what changed for your team?" />
               <div className="grid gap-5 sm:grid-cols-3">
@@ -34,11 +34,11 @@ export default async function FeedbackPage() {
         </div>
       </div>
       <aside>
-        <h2 className="mb-3 font-semibold">Your submissions</h2>
+        <h2 className="label-caps mb-3">Your submissions</h2>
         {mine.length ? (
           <ul className="space-y-3">
             {mine.map((t) => (
-              <li key={t.id} className="rounded-card border border-border bg-surface/60 p-4 text-sm">
+              <li key={t.id} className="glass-card rounded-card p-4 text-sm">
                 <Stars rating={t.rating} />
                 <p className="mt-2 line-clamp-3 text-muted">{t.quote}</p>
                 <p className="mt-2 text-xs text-subtle">{formatDate(t.createdAt)} · {t.isPublished ? "Published on the website" : STATUS[t.status]}</p>
