@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { track } from "@vercel/analytics";
@@ -9,9 +8,11 @@ import type { z } from "zod";
 
 import { Captcha } from "@/components/forms/captcha";
 import { Field, Honeypot } from "@/components/forms/field";
+import { FormSuccess } from "@/components/forms/form-success";
 import { Button } from "@/components/ui/button";
 import { Input, NativeSelect, Textarea } from "@/components/ui/input";
 import { Alert } from "@/components/ui/misc";
+import { Spinner } from "@/components/ui/spinner";
 import type { ContentPlatform } from "@/db/schema";
 import { sponsorshipInquirySchema } from "@/lib/validation/inquiry";
 import { submitSponsorshipInquiry } from "@/server/actions/inquiries-public";
@@ -71,13 +72,7 @@ export function SponsorshipForm({ packages }: { packages: { id: string; name: st
   });
 
   if (done) {
-    return (
-      <div role="status" className="rounded-card border border-success/30 bg-success-soft p-8 text-center">
-        <CheckCircle2 aria-hidden className="mx-auto size-10 text-success" />
-        <p className="mt-4 font-display text-lg font-semibold">Inquiry sent</p>
-        <p className="mt-2 text-muted">{done}</p>
-      </div>
-    );
+    return <FormSuccess title="Inquiry sent" message={done} />;
   }
 
   return (
@@ -112,10 +107,10 @@ export function SponsorshipForm({ packages }: { packages: { id: string; name: st
         </Field>
       ) : null}
       <fieldset className="sm:col-span-2">
-        <legend className="text-sm font-medium text-fg">Platforms of interest</legend>
+        <legend className="text-[0.8125rem] font-medium text-fg">Platforms of interest</legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {PLATFORM_OPTIONS.map((p) => (
-            <label key={p.value} className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-control border border-border-strong px-3 text-sm has-checked:border-accent has-checked:bg-accent-soft">
+            <label key={p.value} className="pressable inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full bg-fg/[0.045] px-3.5 text-sm shadow-[inset_0_0_0_1px_var(--glass-line)] hover:bg-fg/[0.07] has-checked:bg-accent-soft has-checked:text-accent has-checked:shadow-[inset_0_0_0_1px_var(--color-accent)] has-focus-visible:outline-2 has-focus-visible:outline-accent">
               <input type="checkbox" value={p.value} className="accent-[var(--color-accent)]" {...register("platforms")} />
               {p.label}
             </label>
@@ -138,8 +133,9 @@ export function SponsorshipForm({ packages }: { packages: { id: string; name: st
         <Captcha resetKey={captchaKey} error={captchaError} idPrefix="sponsor-hp-captcha" />
       </div>
       <Honeypot register={{ id: "sponsor-hp", name: "website_url_confirm" }} />
-      <div className="flex justify-end sm:col-span-2">
-        <Button type="submit" size="lg" disabled={pending}>
+      <div className="flex justify-end border-t border-(--glass-line) pt-5 sm:col-span-2">
+        <Button type="submit" size="lg" disabled={pending} className="w-full sm:w-auto">
+          {pending ? <Spinner /> : null}
           {pending ? "Sending…" : "Send inquiry"}
         </Button>
       </div>
