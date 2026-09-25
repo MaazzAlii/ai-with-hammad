@@ -3,12 +3,17 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { Spinner } from "@/components/ui/spinner";
+
+import { monogram } from "./logo";
+
 /**
- * Branded loading overlay during client-side navigations.
+ * Branded loading indicator during client-side navigations.
  *
  * Deliberately NOT a route-level loading.tsx: a Suspense boundary above pages
  * that call notFound() makes Next.js stream a 200 status ("soft 404"), which is
- * bad for SEO. This overlay appears only when a navigation takes > 250 ms.
+ * bad for SEO. A glass capsule drops in below the header only when a navigation
+ * takes > 250 ms; the page stays visible and interactive underneath.
  */
 export function NavigationLoader({ siteName, logoUrl }: { siteName: string; logoUrl: string | null }) {
   const pathname = usePathname();
@@ -47,24 +52,19 @@ export function NavigationLoader({ siteName, logoUrl }: { siteName: string; logo
   }, [pending]);
 
   if (!visible) return null;
-  const initial = siteName.replace(/^AI\s+with\s+/i, "").charAt(0).toUpperCase() || "A";
   return (
-    <div role="status" aria-live="polite" className="fixed inset-0 z-[60] grid place-items-center bg-bg/85 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-5">
-        <div className="relative grid size-20 place-items-center">
-          <span aria-hidden className="absolute inset-0 rounded-3xl border border-accent/30 motion-safe:animate-ping [animation-duration:1.8s]" />
-          <span aria-hidden className="absolute inset-0 rounded-3xl bg-linear-to-br from-accent/25 to-accent-2/10 blur-xl" />
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- tiny logo, already cached
-            <img src={logoUrl} alt="" width={64} height={64} className="relative size-16 rounded-2xl object-contain" />
-          ) : (
-            <span className="relative grid size-16 place-items-center rounded-2xl border border-accent/40 bg-accent-soft font-mono text-2xl font-semibold text-accent shadow-glow">{initial}</span>
-          )}
-        </div>
-        <p className="font-display text-lg font-semibold tracking-tight text-fg">{siteName}</p>
-        <div aria-hidden className="h-1 w-40 overflow-hidden rounded-full bg-surface-3">
-          <div className="h-full w-1/3 rounded-full bg-linear-to-r from-accent to-accent-2 motion-safe:animate-[loader_1.1s_ease-in-out_infinite]" />
-        </div>
+    <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 top-[calc(var(--header-h)+max(0.75rem,env(safe-area-inset-top))+0.75rem)] z-[60] flex justify-center">
+      <div className="glass-float flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 motion-safe:animate-[drop-in_320ms_var(--ease-spring)]">
+        {logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- tiny logo, already cached
+          <img src={logoUrl} alt="" width={28} height={28} className="size-7 rounded-[0.5rem] object-contain" />
+        ) : (
+          <span aria-hidden className="grid size-7 place-items-center rounded-[0.5rem] bg-accent text-xs font-semibold text-accent-fg">
+            {monogram(siteName)}
+          </span>
+        )}
+        <span className="text-sm font-medium text-fg">{siteName}</span>
+        <Spinner className="text-muted" />
         <span className="sr-only">Loading…</span>
       </div>
     </div>
