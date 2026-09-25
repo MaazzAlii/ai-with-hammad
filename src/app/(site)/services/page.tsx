@@ -1,3 +1,4 @@
+import { BriefcaseBusiness } from "lucide-react";
 import type { Metadata } from "next";
 
 import { JsonLd } from "@/components/site/json-ld";
@@ -24,10 +25,10 @@ export default async function ServicesPage() {
   const features = await getServiceFeatureTitles(services.map((s) => s.id));
   return (
     <>
-      <PageHeader eyebrow="Services" title="What we build" description="Scoped, engineered engagements — from a single automated workflow to agentic systems running core operations." />
+      <PageHeader eyebrow="Services" title="What we build" description="Scoped engagements — from one automated workflow to agent systems that run part of your operations." />
       <Section>
         {services.length ? (
-          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
             {services.map((s) => (
               <li key={s.id}>
                 <ServiceCard service={s} features={features.get(s.id)} />
@@ -35,7 +36,7 @@ export default async function ServicesPage() {
             ))}
           </ul>
         ) : (
-          <EmptyState title="Services are being updated">Please check back soon or contact us directly.</EmptyState>
+          <EmptyState title="Services are being updated" icon={<BriefcaseBusiness />}>Check back soon, or contact us directly — we are happy to talk it through.</EmptyState>
         )}
       </Section>
       <JsonLd
