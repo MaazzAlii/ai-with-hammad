@@ -27,7 +27,10 @@ export const settingsSchemas = {
   home: z.object({
     heroEyebrow: z.string().max(80).default(""),
     heroTitle: z.string().max(140).default("We build AI systems that do real work."),
-    heroSubtitle: z.string().max(300).default(""),
+    heroSubtitle: z
+      .string()
+      .max(300)
+      .default("We design and ship AI agents, workflow automations and integrations around the tools your team already uses — with a person in the loop where it matters."),
     heroMediaId: z.uuid().nullable().default(null),
     primaryCtaLabel: z.string().max(40).default("Start a project"),
     primaryCtaHref: z.string().max(200).default("/contact"),
