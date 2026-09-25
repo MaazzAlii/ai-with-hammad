@@ -35,42 +35,42 @@ export default async function MediaKitPage() {
   const top = groupContent(content, "high-performing", 6).length ? groupContent(content, "high-performing", 6) : groupContent(content, "featured", 6);
   return (
     <div className="print-plain">
-      <header className="border-b border-border">
-        <div className="container-page flex flex-col gap-6 py-14 sm:flex-row sm:items-end sm:justify-between sm:py-20">
+      <header>
+        <div className="container-page flex flex-col gap-6 pt-12 pb-4 sm:flex-row sm:items-end sm:justify-between sm:pt-20 sm:pb-8">
           <div>
             <p className="eyebrow mb-3">Media kit · {new Date().getUTCFullYear()}</p>
-            <h1 className="text-4xl font-semibold sm:text-5xl">{general.siteName}</h1>
-            <p className="mt-3 max-w-2xl text-lg text-muted">{general.tagline}</p>
+            <h1 className="text-[2.5rem] sm:text-6xl">{general.siteName}</h1>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted sm:text-xl">{general.tagline}</p>
           </div>
           <PrintButton />
         </div>
       </header>
       <Section aria-labelledby="mk-about">
-        <div className="grid gap-8 md:grid-cols-[1fr_1.4fr]">
+        <div data-reveal="item" className="grid gap-6 md:grid-cols-[1fr_1.4fr] md:gap-16">
           <div>
             <p className="eyebrow mb-3">About</p>
-            <h2 id="mk-about" className="text-2xl font-semibold">Brand</h2>
+            <h2 id="mk-about" className="text-[1.75rem] sm:text-[2.25rem]">Brand</h2>
             {media.logo ? <p className="mt-2 text-sm text-subtle">Logo available on request.</p> : null}
           </div>
-          <div className="space-y-4 text-muted">
-            <p className="text-lg">{general.description}</p>
+          <div className="space-y-4 leading-relaxed text-muted md:pt-9">
+            <p className="text-lg sm:text-xl">{general.description}</p>
             {s.intro ? <p>{s.intro}</p> : null}
           </div>
         </div>
       </Section>
-      {hasAudienceData(s, platforms) ? <Section className="border-t border-border"><AudienceBlock s={s} platforms={platforms} /></Section> : null}
-      {platforms.length ? <Section className="border-t border-border print-break"><PlatformsBlock platforms={platforms} /></Section> : null}
-      {s.contentCategories.length ? <Section className="border-t border-border"><CategoriesBlock categories={s.contentCategories} /></Section> : null}
-      {top.length ? <Section className="border-t border-border"><TopContentBlock items={top} title="Top-performing content" /></Section> : null}
-      {partners.length ? <Section className="border-t border-border print-break"><PartnersBlock partners={partners} /></Section> : null}
-      {s.formats.length || packages.length ? <Section className="border-t border-border"><FormatsBlock formats={s.formats} packages={packages} ratesNotice={s.ratesNotice} /></Section> : null}
-      <Section className="border-t border-border" aria-labelledby="mk-contact">
-        <div className="rounded-card border border-border bg-surface p-8">
-          <h2 id="mk-contact" className="text-2xl font-semibold">Contact</h2>
+      {hasAudienceData(s, platforms) ? <Section><AudienceBlock s={s} platforms={platforms} /></Section> : null}
+      {platforms.length ? <Section className="print-break"><PlatformsBlock platforms={platforms} /></Section> : null}
+      {s.contentCategories.length ? <Section><CategoriesBlock categories={s.contentCategories} /></Section> : null}
+      {top.length ? <Section><TopContentBlock items={top} title="Top-performing content" /></Section> : null}
+      {partners.length ? <Section className="print-break"><PartnersBlock partners={partners} /></Section> : null}
+      {s.formats.length || packages.length ? <Section><FormatsBlock formats={s.formats} packages={packages} ratesNotice={s.ratesNotice} /></Section> : null}
+      <Section aria-labelledby="mk-contact">
+        <div className="glass-panel rounded-[2rem] p-8 sm:p-10">
+          <h2 id="mk-contact" className="text-2xl sm:text-[2rem]">Contact</h2>
           <p className="mt-2 text-muted">{s.ratesNotice}</p>
-          <div className="mt-6 flex flex-wrap items-center gap-4">
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
             <Link href="/sponsorship#inquiry" className={buttonVariants({ size: "lg", className: "no-print" })}>Send a partnership inquiry</Link>
-            {general.contactEmail ? <a href={`mailto:${general.contactEmail}`} className="text-accent">{general.contactEmail}</a> : null}
+            {general.contactEmail ? <a href={`mailto:${general.contactEmail}`} className="font-medium text-accent hover:underline">{general.contactEmail}</a> : null}
           </div>
         </div>
       </Section>
