@@ -60,16 +60,16 @@ export default async function InquiryPage(props: PageProps<"/admin/inquiries/[ki
       />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="space-y-6">
-          <section className="rounded-card border border-border bg-surface/60 p-5 sm:p-6">
+          <section className="glass-card rounded-card p-5 sm:p-6">
             <dl className="grid gap-4 sm:grid-cols-2">
               {fields.filter(([, v]) => v).map(([k, v]) => (
                 <div key={k}>
-                  <dt className="text-xs tracking-wide text-subtle uppercase">{k}</dt>
+                  <dt className="label-caps">{k}</dt>
                   <dd className="mt-0.5 break-words">{k === "Email" ? <a href={`mailto:${v}`} className="text-accent hover:underline">{v}</a> : v}</dd>
                 </div>
               ))}
             </dl>
-            <h2 className="mt-6 text-xs tracking-wide text-subtle uppercase">Message</h2>
+            <h2 className="mt-6 label-caps">Message</h2>
             {/* Rendered as plain text: React escapes it; whitespace preserved. */}
             <p className="mt-1 whitespace-pre-wrap break-words">{r.message}</p>
           </section>
@@ -78,7 +78,7 @@ export default async function InquiryPage(props: PageProps<"/admin/inquiries/[ki
             {data.notes.length ? (
               <ul className="mb-4 space-y-3">
                 {data.notes.map((n) => (
-                  <li key={n.id} className="rounded-card border border-border bg-surface/60 p-4">
+                  <li key={n.id} className="glass-card rounded-card p-4">
                     <p className="whitespace-pre-wrap text-sm">{n.body}</p>
                     <p className="mt-2 text-xs text-subtle">{n.authorName || n.authorEmail || "Former user"} · {formatDate(n.createdAt, { hour: "2-digit", minute: "2-digit" })}</p>
                   </li>
