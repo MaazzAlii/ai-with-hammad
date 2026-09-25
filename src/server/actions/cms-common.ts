@@ -4,7 +4,7 @@ import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { getDb } from "@/db";
-import { contentItems, faqs, navigationItems, projects, services, socialPlatforms, sponsorshipPackages, sponsorshipPartners, teamMembers, testimonials } from "@/db/schema";
+import { bioLinks, contentItems, faqs, navigationItems, projects, services, socialPlatforms, sponsorshipPackages, sponsorshipPartners, teamMembers, testimonials } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import type { Permission } from "@/lib/permissions";
 
@@ -25,6 +25,7 @@ const ENTITIES = {
   navigation: { table: navigationItems, label: "navigation item", perm: "navigation", flags: ["isVisible"], softDelete: false },
   testimonials: { table: testimonials, label: "testimonial", perm: "testimonials", flags: ["isFeatured"], softDelete: true },
   faqs: { table: faqs, label: "faq", perm: "faqs", flags: ["isPublished"], softDelete: true },
+  links: { table: bioLinks, label: "link", perm: "links", flags: ["isPublished", "isFeatured"], softDelete: true },
 } as const;
 
 type EntityKey = keyof typeof ENTITIES;
@@ -35,6 +36,7 @@ function perm(entity: EntityKey, kind: "publish" | "delete" | "write"): Permissi
   if (base === "navigation") return "navigation.write";
   if (base === "testimonials") return "testimonials.moderate";
   if (base === "faqs") return "faqs.write";
+  if (base === "links") return "links.write";
   return `${base}.${kind}` as Permission;
 }
 
