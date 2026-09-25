@@ -45,7 +45,7 @@ export function RepeaterField({
       <legend className="text-sm font-medium">{label}</legend>
       <input type="hidden" name={name} value={JSON.stringify(rows.filter((r) => Object.values(r).some((v) => v.trim())))} />
       {rows.map((row, i) => (
-        <div key={i} className="flex flex-col gap-2 rounded-control border border-border bg-surface-2/50 p-3 sm:flex-row sm:items-start">
+        <div key={i} className="flex flex-col gap-2 rounded-card bg-fg/[0.03] p-3 shadow-[inset_0_0_0_1px_var(--glass-line)] sm:flex-row sm:items-start">
           <div className="grid flex-1 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">
             {columns.map((c) => (
               <div key={c.key} className="flex flex-col gap-1">
