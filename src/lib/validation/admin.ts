@@ -293,3 +293,38 @@ export const userUpdateSchema = z.object({
 });
 
 export const reorderSchema = z.object({ ids: z.array(z.uuid()).min(1).max(500) });
+
+/* ------------------------------ link-in-bio ------------------------------ */
+
+export const BIO_LINK_ICONS = ["", "website", "youtube", "tiktok", "instagram", "linkedin", "x", "github", "facebook", "whatsapp", "email", "newsletter", "shop", "calendar"] as const;
+
+const bioLinkUrl = z
+  .string()
+  .trim()
+  .max(500)
+  .refine((v) => {
+    if (/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(v)) return true;
+    try {
+      const u = new URL(v);
+      return u.protocol === "https:" && !u.username && !u.password;
+    } catch {
+      return false;
+    }
+  }, "Use a full https:// link or mailto:name@example.com");
+
+const optDateTime = z.preprocess(emptyToNull, z.coerce.date().nullable()).optional().default(null);
+
+export const bioLinkSchema = z
+  .object({
+    title: title(80),
+    url: bioLinkUrl,
+    description: optText(160),
+    kind: z.enum(["link", "social", "affiliate", "sponsor"]).default("link"),
+    icon: z.enum(BIO_LINK_ICONS).default(""),
+    teamMemberId: z.preprocess(emptyToNull, z.uuid().nullable()).optional().default(null),
+    startsAt: optDateTime,
+    endsAt: optDateTime,
+    isFeatured: checkbox,
+    isPublished: checkbox,
+  })
+  .refine((v) => !v.startsAt || !v.endsAt || v.endsAt > v.startsAt, { message: "End must be after start", path: ["endsAt"] });
