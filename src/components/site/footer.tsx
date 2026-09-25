@@ -1,9 +1,12 @@
+import { ArrowUpRight, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
 
 import type { MediaDTO } from "@/server/dal/public/media";
 import type { NavLink } from "@/server/dal/public/site";
 
 import { Logo } from "./logo";
+
+const linkClass = "text-muted transition-colors duration-(--duration-fast) hover:text-fg";
 
 export function SiteFooter({
   siteName,
@@ -30,68 +33,89 @@ export function SiteFooter({
 }) {
   const year = new Date().getUTCFullYear();
   return (
-    <footer className="border-t border-border bg-surface/40">
-      <div className="container-page grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="lg:col-span-2">
-          <Logo name={siteName} logo={logo} />
-          <p className="mt-3 max-w-sm text-sm text-muted">{tagline}</p>
-          <ul className="mt-4 space-y-1.5 text-sm">
-            {email ? (
-              <li>
-                <a href={`mailto:${email}`} className="text-accent hover:underline">{email}</a>
-              </li>
-            ) : null}
-            {phone ? (
-              <li>
-                <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="text-muted hover:text-fg">{phone}</a>
-              </li>
-            ) : null}
-            {whatsapp ? (
-              <li>
-                <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="text-success hover:underline">WhatsApp</a>
-              </li>
-            ) : null}
-            {location ? <li className="text-subtle">{location}</li> : null}
-          </ul>
-        </div>
-        <nav aria-label="Footer">
-          <h2 className="eyebrow mb-3">Explore</h2>
-          <ul className="space-y-2 text-sm">
-            {links.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} className="text-muted hover:text-fg" {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        {social.length ? (
+    <footer className="no-print pb-safe">
+      <div className="container-page">
+        <hr className="hairline" />
+        <div className="grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr] lg:py-20">
           <div>
-            <h2 className="eyebrow mb-3">Follow</h2>
-            <ul className="space-y-2 text-sm">
-              {social.map((s) => (
-                <li key={s.url}>
-                  <a href={s.url} target="_blank" rel="noopener noreferrer me" className="text-muted capitalize hover:text-fg">
-                    {s.platform}
+            <Logo name={siteName} logo={logo} />
+            {tagline ? <p className="mt-4 max-w-xs text-[0.9375rem] leading-relaxed text-muted">{tagline}</p> : null}
+            <ul className="mt-6 space-y-2.5 text-sm">
+              {email ? (
+                <li>
+                  <a href={`mailto:${email}`} className={`inline-flex items-center gap-2 ${linkClass}`}>
+                    <Mail aria-hidden className="size-4 text-subtle" strokeWidth={1.75} /> {email}
                   </a>
                 </li>
-              ))}
+              ) : null}
+              {phone ? (
+                <li>
+                  <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className={`inline-flex items-center gap-2 ${linkClass}`}>
+                    <Phone aria-hidden className="size-4 text-subtle" strokeWidth={1.75} /> {phone}
+                  </a>
+                </li>
+              ) : null}
+              {whatsapp ? (
+                <li>
+                  <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-2 ${linkClass}`}>
+                    <MessageCircle aria-hidden className="size-4 text-subtle" strokeWidth={1.75} /> WhatsApp
+                  </a>
+                </li>
+              ) : null}
+              {location ? (
+                <li className="inline-flex items-center gap-2 text-subtle">
+                  <MapPin aria-hidden className="size-4" strokeWidth={1.75} /> {location}
+                </li>
+              ) : null}
             </ul>
           </div>
-        ) : null}
-      </div>
-      <div className="border-t border-border">
-        <div className="container-page flex flex-col gap-3 py-6 text-xs text-subtle sm:flex-row sm:items-center sm:justify-between">
+          <nav aria-label="Footer">
+            <h2 className="label-caps mb-4">Explore</h2>
+            <ul className="space-y-2.5 text-sm">
+              {links.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className={linkClass} {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/links" className={linkClass}>
+                  All our links
+                </Link>
+              </li>
+              <li>
+                <Link href="/portal/login" className={linkClass}>
+                  Client portal
+                </Link>
+              </li>
+            </ul>
+          </nav>
+          {social.length ? (
+            <div>
+              <h2 className="label-caps mb-4">Follow</h2>
+              <ul className="space-y-2.5 text-sm">
+                {social.map((s) => (
+                  <li key={s.url}>
+                    <a href={s.url} target="_blank" rel="noopener noreferrer me" className={`group inline-flex items-center gap-1 capitalize ${linkClass}`}>
+                      {s.platform}
+                      <ArrowUpRight aria-hidden className="size-3.5 opacity-0 transition-[opacity,translate] duration-(--duration-base) ease-spring group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex flex-col gap-3 border-t border-(--glass-line) py-6 text-xs text-subtle sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {year} {siteName}
           </p>
-          <Link href="/portal/login" className="hover:text-fg">Client portal</Link>
           <nav aria-label="Legal">
             <ul className="flex flex-wrap gap-x-5 gap-y-2">
               {legal.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="hover:text-fg">
+                  <Link href={l.href} className="transition-colors hover:text-fg">
                     {l.label}
                   </Link>
                 </li>
