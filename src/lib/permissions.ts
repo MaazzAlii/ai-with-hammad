@@ -41,6 +41,7 @@ export const PERMISSIONS = [
   "messages.write",
   "testimonials.moderate",
   "faqs.write",
+  "links.write",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -80,6 +81,7 @@ const MANAGER: Permission[] = [
   "messages.write",
   "testimonials.moderate",
   "faqs.write",
+  "links.write",
 ];
 
 export const DEFAULT_ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
@@ -99,6 +101,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "messages.read",
     "messages.write",
     "faqs.write",
+    "links.write",
   ],
   viewer: ["cms.read"],
 };
