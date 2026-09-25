@@ -1,3 +1,4 @@
+import { Users } from "lucide-react";
 import type { Metadata } from "next";
 
 import { JsonLd } from "@/components/site/json-ld";
@@ -22,7 +23,7 @@ export default async function TeamPage() {
       <PageHeader eyebrow="People" title="The team" description="The people who design, build and operate our systems — and make our content." />
       <Section>
         {team.length ? (
-          <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {team.map((m) => (
               <li key={m.id}>
                 <TeamCard member={m} />
@@ -30,7 +31,7 @@ export default async function TeamPage() {
             ))}
           </ul>
         ) : (
-          <EmptyState title="Team profiles coming soon" />
+          <EmptyState title="Team profiles coming soon" icon={<Users />} />
         )}
       </Section>
       <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Team", path: "/team" }])} />
