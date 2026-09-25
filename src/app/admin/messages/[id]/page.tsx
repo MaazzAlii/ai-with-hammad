@@ -48,7 +48,7 @@ export default async function AdminThreadPage(props: PageProps<"/admin/messages/
       <div className="mx-auto max-w-3xl">
         <ThreadView messages={data.messages} viewer="staff" />
         {canWrite ? (
-          <div className="mt-8 rounded-card border border-border bg-surface/60 p-4">
+          <div className="mt-8 glass-card rounded-card p-4">
             <Composer action={staffReply.bind(null, id)} placeholder={`Reply to ${data.thread.companyName}…`} />
           </div>
         ) : null}
