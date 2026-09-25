@@ -1,83 +1,102 @@
-# Design system
+# Design system — Liquid Glass
 
-Carried over from the original AI With Hammad page (near-black canvas, cyan/teal accent,
-Sora/Manrope/JetBrains Mono) and formalised as tokens in `src/app/globals.css` (Tailwind v4 `@theme`).
+A calm, iOS-inspired interface: a neutral canvas, soft ambient light, and translucent glass
+surfaces in a clear hierarchy. Tokens live in `src/app/globals.css` (Tailwind v4 `@theme` + utilities);
+components consume them — never hard-coded colours.
 
 ## Brand
 
-- Name is a CMS setting (`Settings → General → Site name`, default **AI With Hamad**). The original
-  site used "Hammad" — confirm the preferred spelling and change it in one place.
-- Logo: monogram fallback (`src/components/site/logo.tsx`) until a logo is uploaded in Settings.
+- Name is a CMS setting (`Settings → General → Site name`, default **AI With Hamad**).
+- Logo: app-icon style monogram (`LogoMark` in `src/components/site/logo.tsx`) until a logo is uploaded.
 - Voice: specific, calm, technical. Describe what was built and measured. No superlatives, no
   unverifiable numbers, no "10x", no ranking promises.
 
-## Colour tokens
+## Colour
 
-| Token | Value | Use |
+Light is the default; dark follows `prefers-color-scheme`. Both palettes are checked for WCAG AA in
+`tests/unit/contrast.test.ts` (dark overrides sit after the `/* dark */` marker in `globals.css`).
+
+| Token | Light | Dark | Use |
+| --- | --- | --- | --- |
+| `bg` | `#f2f3f6` | `#0b0c0f` | canvas |
+| `surface` / `-2` / `-3` | `#fff` / `#f6f7f9` / `#eceef2` | `#15171b` / `#1b1d22` / `#24272d` | solid surfaces, fills |
+| `fg` / `muted` / `subtle` | `#0f1115` / `#4d5562` / `#646b77` | `#f3f4f6` / `#aab0ba` / `#8a919c` | text hierarchy |
+| `accent` / `accent-2` | `#0a6c9e` / `#0e7c74` | `#5cc8ec` / `#4fd1c1` | primary CTA, active state, links |
+| `danger` / `success` / `warning` | status | status | alerts, badges |
+| `whatsapp` | `#25d366` | — | WhatsApp controls only |
+
+Accent is reserved for the primary action, the current selection and links. Everything else is neutral.
+
+## Glass hierarchy
+
+Not everything is glass. Layers, back to front:
+
+| Layer | Utility | Used for |
 | --- | --- | --- |
-| `bg` | `#05090e` | page background |
-| `surface` / `surface-2` / `surface-3` | `#0b131b` / `#111c26` / `#172532` | cards, inputs, hovers |
-| `border` / `border-strong` | `#1e2e3b` / `#2b4050` | dividers, control borders |
-| `fg` | `#e8f1f2` | primary text (17.4:1 on bg) |
-| `muted` | `#9bb1ba` | secondary text (8.9:1) |
-| `subtle` | `#7d949e` | meta text (6.3:1) |
-| `accent` / `accent-2` | `#22d3ee` / `#2dd4bf` | CTAs, links, highlights |
-| `accent-fg` | `#03181c` | text on accent |
-| `danger` / `success` / `warning` | `#f87171` / `#34d399` / `#fbbf24` | status |
+| Canvas | `bg-bg` | page background |
+| Ambient light | `.ambient` (root layout) | fixed, blurred light sources that drift very slowly |
+| Chrome | `glass-chrome` | floating header, tab bar, admin sidebar, save bar |
+| Panel | `glass-panel` | primary surfaces: hero visual, forms, closing CTAs, sticky asides |
+| Card | `glass-card` | repeated secondary surfaces: service/value/testimonial cards, lists |
+| Float | `glass-float` | small floating controls over media (badges, play, lightbox arrows) |
+| Sheet | `glass-sheet` | dialogs and bottom sheets (near-opaque, content must stay legible) |
+| Solid | `surface-solid` | tables and dense UI |
 
-All pairs used for text are checked ≥ 4.5:1 in `tests/unit/contrast.test.ts`.
+Each material combines translucency, backdrop blur + saturation, a hairline (`--glass-line`), an inner
+top highlight (`--glass-edge`) and a soft top sheen. Without `backdrop-filter` support they fall back to solid.
+`Card` exposes the materials as `tone="card" | "panel" | "solid"`.
 
 ## Typography
 
-- Display: **Sora** (headings, buttons). Body: **Manrope**. Labels/code/metrics: **JetBrains Mono**.
-- Self-hosted variable fonts via `next/font/local` (no external requests).
-- Scale: h1 `text-3xl → sm:text-5xl` (hero `text-4xl → sm:text-6xl`), h2 `text-2xl → sm:text-3xl`, body 16px/1.65, meta 12–14px.
-- `.eyebrow` = mono, 0.72rem, 0.16em tracking, uppercase, teal.
+- System stack first (SF Pro on Apple devices), **Inter** (self-hosted variable) elsewhere; JetBrains Mono for code only.
+- Hierarchy through size, weight (400/500/600 — rarely bold), opacity and spacing.
+- Headings: tight tracking (`-0.022em`, h1 `-0.032em`), `text-wrap: balance`. Body 16px/1.6, `text-wrap: pretty`.
+- `.eyebrow` = small semibold accent label above headings; `.label-caps` = quiet uppercase meta label.
 
-## Radius (consistent, not everywhere-round)
+## Shape, depth & spacing
 
 | Token | Size | Elements |
 | --- | --- | --- |
-| `rounded-control` | 10px | inputs, selects, small chips, thumbnails |
-| `rounded-button` | 12px | buttons |
-| `rounded-card` | 16px | cards, panels, forms, alerts |
-| `rounded-media` | 20px | all images, galleries, video, embeds |
-| `rounded-full` | — | pills/badges, avatars |
+| `rounded-control` | 12px | inputs, selects, chips, thumbnails |
+| `rounded-button` | full | buttons are capsules |
+| `rounded-card` | 24px | cards, panels, sheets (large panels go to 28–32px) |
+| `rounded-media` | 18px | images, video, galleries |
 
-## Spacing & layout
+Radii are concentric: inner elements are smaller than their container. Shadows: `shadow-card`,
+`shadow-panel`, `shadow-float`, `shadow-glow` (primary CTA only). Container `container-page` (max 75rem,
+20px gutters → 32px ≥ 640px); sections are separated by space (`py-14 sm:py-20`), not rules.
 
-- Container `container-page`: max 76rem, 16px gutters (24px ≥ 640px).
-- Sections: `py-14 sm:py-20`, separated by `border-t border-border`.
-- Grids: 1 → 2 (sm) → 3 (lg) columns for cards; 2 → 4 for team.
+## Motion
 
-## Elevation & motion
+Tokens: `--ease-spring` (iOS sheet curve), `--ease-out-soft`, `--ease-snap`; durations 160/260/480ms.
 
-- Subtle borders first; `shadow-card` for panels; `shadow-glow` only on primary CTAs.
-- Transitions 200–500ms `ease-out-soft`; hover lift ≤ 4px, image zoom ≤ 1.03. Disabled under reduced motion.
+- **Buttons**: scale 1.015 on hover (pointer devices), 0.97 on press. `pressable` / `lift` give other
+  elements the same tactile response.
+- **Reveal on scroll**: `data-reveal="item"` or `data-reveal="group"` (children stagger). Driven by
+  `RevealObserver`; content is visible without JavaScript and under reduced motion.
+- **Page transitions**: `template.tsx` (site, portal, admin) fades each page in with a short blur/translate.
+- **Overlays**: `.anim-overlay`, `.anim-pop` (dialog; becomes a bottom sheet on phones), `.anim-sheet`.
+- **Navigation**: the header capsule thickens on scroll; the desktop nav's selection pill glides between items.
+- Everything is disabled under `prefers-reduced-motion: reduce`.
 
-### Motion & "AI engineer" visuals (v2)
+## Navigation
 
-- **Agent pipeline** (`agent-visual.tsx`): an SVG of input → agent → tools → output, with animated dashed flows (`agent-flow`),
-  pulsing nodes (`agent-pulse`) and a staggered run log (`agent-log`). Decorative.
-- **Aurora** hero background (`aurora`): blurred gradient blobs, GPU transforms only.
-- **Tech marquee** (`marquee`): the tech-stack list from Admin → Settings, duplicated for a seamless loop; pauses on hover.
-- **Reveal on scroll** (`.reveal`): CSS scroll-driven animation (`animation-timeline: view()`), inside `@supports` —
-  no JavaScript; unsupported browsers just show the content.
-- **Lazy rendering** (`.cv-auto`): `content-visibility: auto` on below-the-fold sections.
-- **Navigation loader**: logo + agency name from settings, shown only for slow navigations.
-- All of the above are disabled under `prefers-reduced-motion: reduce`.
+- Desktop: one floating capsule — logo, segmented nav (`NavLinks`), primary CTA.
+- Phones/tablets: the same floating capsule with logo, compact CTA and a menu button that drops a glass panel
+  down from the top (`MobileMenu`, Radix dialog). Icons are matched to CMS links by path (`nav-icons.ts`).
+- Client portal: segmented control in the header (under it on phones). Admin: floating glass sidebar (sheet on phones).
+- Link in bio (`/links`): standalone page without site chrome.
 
 ## Components
 
 Primitives (`src/components/ui`): Button (primary/secondary/ghost/outline/danger/link; sm/md/lg/icon),
-Input/Textarea/NativeSelect/Label, Card, Badge, Dialog, Switch, Alert, Table, Skeleton, Separator.
-Site: Section/PageHeader/SectionHeading/EmptyState, MediaImage, ProjectCard, ServiceCard, TeamCard,
-ContentCard, PlatformCards, MediaGallery (lightbox), VideoEmbed (facade), VideoPlayer, JsonLd, Markdown.
-Admin: AdminForm + fields, RepeaterField, MediaField/MediaPicker/MediaUploader, SortableList,
-EntityRow/FlagToggle, ActionButton (confirm), ProjectMediaEditor.
+Input/Textarea/NativeSelect/Label, Card (tones), Badge (default/glass/accent/success/warning/danger),
+Dialog (modal → sheet), Switch (iOS proportions), Spinner, Alert (with icon), Table, Skeleton (shimmer), Separator.
+Site: Section/SectionHeading/PageHeader/Breadcrumb/ViewAllLink/EmptyState, MediaImage/MediaPlaceholder,
+ProjectCard, ServiceCard, TeamCard, ContentCard, PlatformCards, TestimonialGrid, FaqList, MediaGallery,
+VideoEmbed (facade), VideoPlayer, AgentVisual, AuthShell, FormSuccess, BrandIcon (Simple Icons, monochrome), MobileMenu.
 
 ## Print (media kit)
 
-`@media print` switches to black-on-white, hides `.no-print`, avoids breaking `.print-avoid` blocks and
-starts `.print-break` sections on new pages — `/media-kit` can be saved as a PDF from the browser today
-and rendered server-side later.
+`@media print` switches to black-on-white, drops glass and the ambient layer, hides `.no-print`,
+avoids breaking `.print-avoid` blocks and starts `.print-break` sections on new pages.
