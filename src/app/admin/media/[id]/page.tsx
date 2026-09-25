@@ -60,7 +60,7 @@ export default async function MediaDetailPage(props: PageProps<"/admin/media/[id
       />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-6">
-          <div className="overflow-hidden rounded-card border border-border bg-surface-2">
+          <div className="overflow-hidden surface-solid rounded-card bg-surface-2">
             {media.kind === "image" && media.url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={media.url} alt={media.altText} className="mx-auto max-h-[60vh] w-auto" />
@@ -79,7 +79,7 @@ export default async function MediaDetailPage(props: PageProps<"/admin/media/[id
           </AdminForm>
         </div>
         <div className="space-y-6">
-          <section className="rounded-card border border-border bg-surface/60 p-5">
+          <section className="glass-card rounded-card p-5">
             <h2 className="font-semibold">Metadata</h2>
             <dl className="mt-3 space-y-2 text-sm">
               {meta.map(([k, v]) => (
@@ -87,12 +87,12 @@ export default async function MediaDetailPage(props: PageProps<"/admin/media/[id
               ))}
             </dl>
           </section>
-          <section className="rounded-card border border-border bg-surface/60 p-5">
+          <section className="glass-card rounded-card p-5">
             <h2 className="font-semibold">Used in</h2>
             {usage.length ? <ul className="mt-2 space-y-1 text-sm text-muted">{usage.map((u) => <li key={u}>{u}</li>)}</ul> : <p className="mt-2 text-sm text-muted">Not used anywhere.</p>}
           </section>
           {can(staff, "media.update") && isBucketId(media.bucket) ? (
-            <section className="rounded-card border border-border bg-surface/60 p-5">
+            <section className="glass-card rounded-card p-5">
               <h2 className="mb-3 font-semibold">Replace file</h2>
               <p className="mb-3 text-xs text-subtle">Keeps this record (and every place it is used) but swaps the file. Must be the same kind of file.</p>
               <MediaLibraryUploader replaceId={id} buckets={[media.bucket]} defaultBucket={media.bucket} />
