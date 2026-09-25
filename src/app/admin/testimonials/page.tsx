@@ -50,7 +50,7 @@ export default async function TestimonialsAdminPage(props: PageProps<"/admin/tes
       {list.length ? (
         <ul className="space-y-3">
           {list.map(({ t, clientName }) => (
-            <li key={t.id} className="rounded-card border border-border bg-surface/60 p-5">
+            <li key={t.id} className="glass-card rounded-card p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <Stars rating={t.rating} />
