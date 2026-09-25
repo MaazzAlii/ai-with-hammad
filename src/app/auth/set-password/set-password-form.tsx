@@ -20,7 +20,7 @@ export function SetPasswordForm() {
       <Field id="confirm" label="Confirm password" error={err?.fieldErrors?.confirm?.[0]}>
         <Input name="confirm" type="password" autoComplete="new-password" required />
       </Field>
-      <Button type="submit" className="w-full" disabled={pending}>{pending ? "Saving…" : "Save password"}</Button>
+      <Button type="submit" size="lg" className="w-full" disabled={pending}>{pending ? "Saving…" : "Save password"}</Button>
     </form>
   );
 }
