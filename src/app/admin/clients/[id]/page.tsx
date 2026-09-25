@@ -31,7 +31,7 @@ export default async function ClientDetailPage(props: PageProps<"/admin/clients/
             <section>
               <h2 className="mb-3 font-semibold">Conversations</h2>
               {threads.length ? (
-                <ul className="divide-y divide-border rounded-card border border-border bg-surface/60">
+                <ul className="divide-y divide-(--glass-line) glass-card rounded-card">
                   {threads.map((t) => (
                     <li key={t.id}>
                       <Link href={`/admin/messages/${t.id}`} className="flex justify-between gap-3 px-4 py-3 hover:bg-surface-2">
@@ -56,7 +56,7 @@ export default async function ClientDetailPage(props: PageProps<"/admin/clients/
           ) : null}
         </div>
         <aside className="space-y-6">
-          <section className="rounded-card border border-border bg-surface/60 p-5">
+          <section className="glass-card rounded-card p-5">
             <h2 className="font-semibold">Portal users</h2>
             {data.users.length ? (
               <ul className="mt-3 space-y-3">
