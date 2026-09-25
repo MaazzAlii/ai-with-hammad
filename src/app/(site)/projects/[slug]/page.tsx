@@ -1,4 +1,4 @@
-import { ArrowRight, Code2, ExternalLink, FileText } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Code2, FileText, Link2 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,7 +8,7 @@ import { Markdown } from "@/components/site/markdown";
 import { MediaGallery } from "@/components/site/media-gallery";
 import { MediaImage } from "@/components/site/media-image";
 import { ProjectCard } from "@/components/site/project-card";
-import { Section, SectionHeading } from "@/components/site/section";
+import { Breadcrumb, PageHeader, Section, SectionHeading } from "@/components/site/section";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { VideoPlayer } from "@/components/site/video-player";
 import { Badge } from "@/components/ui/badge";
@@ -98,19 +98,21 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
 
   return (
     <article>
-      <header className="relative overflow-hidden border-b border-border">
-        <div aria-hidden className="bg-grid absolute inset-0" />
-        <div className="container-page relative py-12 sm:py-16">
-          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-subtle">
-            <Link href="/projects" className="hover:text-fg">Projects</Link> <span aria-hidden>/</span> <span className="text-muted">{project.title}</span>
-          </nav>
-          {project.category ? <p className="eyebrow mb-3">{project.category}</p> : null}
-          <h1 className="max-w-4xl text-3xl font-semibold sm:text-5xl">{project.title}</h1>
-          {project.subtitle || project.summary ? <p className="mt-4 max-w-3xl text-muted sm:text-lg">{project.subtitle || project.summary}</p> : null}
-          <div className="mt-6 flex flex-wrap gap-3">
+      <PageHeader
+        title={project.title}
+        description={project.subtitle || project.summary || undefined}
+        breadcrumb={
+          <>
+            <Breadcrumb href="/projects" label="Projects" current={project.title} />
+            {project.category ? <p className="eyebrow mb-3">{project.category}</p> : null}
+          </>
+        }
+      >
+        {project.projectUrl || project.repositoryUrl ? (
+          <div className="mt-8 flex flex-wrap gap-2.5">
             {project.projectUrl ? (
               <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "secondary" })}>
-                Visit project <ExternalLink aria-hidden />
+                Visit project <ArrowUpRight aria-hidden />
               </a>
             ) : null}
             {project.repositoryUrl ? (
@@ -119,15 +121,21 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
               </a>
             ) : null}
           </div>
-          {project.cover ? <MediaImage media={project.cover} alt={project.cover.alt || project.title} priority className="mt-10" sizes="(min-width: 1280px) 1200px, 100vw" /> : null}
+        ) : null}
+      </PageHeader>
+      {project.cover ? (
+        <div className="container-page mt-8 sm:mt-10">
+          <div className="glass-panel rounded-[1.75rem] p-1.5 sm:p-2">
+            <MediaImage media={project.cover} alt={project.cover.alt || project.title} priority className="rounded-[1.35rem]" sizes="(min-width: 1280px) 1200px, 100vw" />
+          </div>
         </div>
-      </header>
+      ) : null}
 
-      <div className="container-page grid gap-12 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="min-w-0 space-y-14">
+      <div className="container-page grid gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-16">
+        <div className="min-w-0 space-y-16">
           {sections.map(([key, label]) => (
-            <section key={key} aria-labelledby={`sec-${key}`}>
-              <h2 id={`sec-${key}`} className="mb-4 text-2xl font-semibold">{label}</h2>
+            <section key={key} aria-labelledby={`sec-${key}`} data-reveal="item">
+              <h2 id={`sec-${key}`} className="mb-4 text-[1.625rem]">{label}</h2>
               <Markdown source={project[key]} />
               {key === "architecture" && diagrams.length ? <div className="mt-8"><MediaGallery images={toGallery(diagrams)} /></div> : null}
             </section>
@@ -135,10 +143,10 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
 
           {project.features.length ? (
             <section aria-labelledby="sec-features">
-              <h2 id="sec-features" className="mb-6 text-2xl font-semibold">Key features</h2>
-              <ul className="grid gap-4 sm:grid-cols-2">
+              <h2 id="sec-features" className="mb-6 text-[1.625rem]">Key features</h2>
+              <ul data-reveal="group" className="grid gap-4 sm:grid-cols-2">
                 {project.features.map((f) => (
-                  <li key={f.title} className="rounded-card border border-border bg-surface/60 p-5">
+                  <li key={f.title} className="glass-card rounded-card p-6">
                     <h3 className="font-semibold text-fg">{f.title}</h3>
                     {f.description ? <p className="mt-2 text-sm text-muted">{f.description}</p> : null}
                   </li>
@@ -149,12 +157,12 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
 
           {project.metrics.length ? (
             <section aria-labelledby="sec-metrics">
-              <h2 id="sec-metrics" className="mb-6 text-2xl font-semibold">Outcomes</h2>
-              <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <h2 id="sec-metrics" className="mb-6 text-[1.625rem]">Outcomes</h2>
+              <dl data-reveal="group" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {project.metrics.map((m) => (
-                  <div key={m.label} className="flex flex-col-reverse rounded-card border border-border bg-surface p-6">
-                    <dt className="mt-2 text-sm font-medium text-fg">{m.label}{m.description ? <span className="mt-1 block text-xs font-normal text-muted">{m.description}</span> : null}</dt>
-                    <dd className="font-mono text-3xl text-accent">{m.value}</dd>
+                  <div key={m.label} className="glass-panel flex flex-col-reverse rounded-card p-6">
+                    <dt className="mt-3 text-sm font-medium text-fg">{m.label}{m.description ? <span className="mt-1 block text-xs font-normal text-muted">{m.description}</span> : null}</dt>
+                    <dd className="text-[2.25rem] leading-none font-semibold tracking-tight text-fg tabular-nums">{m.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -163,7 +171,7 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
 
           {videos.length ? (
             <section aria-labelledby="sec-video" className="space-y-8">
-              <h2 id="sec-video" className="text-2xl font-semibold">Video</h2>
+              <h2 id="sec-video" className="text-[1.625rem]">Video</h2>
               {videos.map((v, i) => (
                 <figure key={i}>
                   {v.kind === "embed" ? (
@@ -179,27 +187,30 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
 
           {screenshots.length ? (
             <section aria-labelledby="sec-gallery">
-              <h2 id="sec-gallery" className="mb-6 text-2xl font-semibold">Screenshots</h2>
+              <h2 id="sec-gallery" className="mb-6 text-[1.625rem]">Screenshots</h2>
               <MediaGallery images={toGallery(screenshots)} />
             </section>
           ) : null}
 
           {docs.length ? (
             <section aria-labelledby="sec-docs">
-              <h2 id="sec-docs" className="mb-4 text-2xl font-semibold">Resources</h2>
-              <ul className="space-y-2">
+              <h2 id="sec-docs" className="mb-4 text-[1.625rem]">Resources</h2>
+              <ul className="glass-card overflow-hidden rounded-card">
                 {docs.map((d, i) => (
-                  <li key={i}>
+                  <li key={i} className="border-b border-(--glass-line) last:border-b-0">
                     <a
                       href={d.kind === "document" ? d.media.url : d.kind === "link" ? d.url : "#"}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-accent hover:underline"
+                      className="group flex min-h-13 items-center gap-3 px-5 py-3 transition-colors hover:bg-fg/[0.03]"
                     >
-                      {d.kind === "document" ? <FileText aria-hidden className="size-4" /> : <ExternalLink aria-hidden className="size-4" />}
-                      {d.title || (d.kind === "link" ? d.url : "Document")}
+                      <span className="grid size-8 shrink-0 place-items-center rounded-[0.6rem] bg-accent-soft text-accent">{d.kind === "document" ? <FileText aria-hidden className="size-4" /> : <Link2 aria-hidden className="size-4" />}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-medium text-fg">{d.title || (d.kind === "link" ? d.url : "Document")}</span>
+                        {d.caption ? <span className="block truncate text-sm text-muted">{d.caption}</span> : null}
+                      </span>
+                      <ArrowUpRight aria-hidden className="size-4 text-subtle transition-transform duration-(--duration-base) ease-spring group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </a>
-                    {d.caption ? <p className="text-sm text-muted">{d.caption}</p> : null}
                   </li>
                 ))}
               </ul>
@@ -207,24 +218,24 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
           ) : null}
         </div>
 
-        <aside className="space-y-8 lg:sticky lg:top-24 lg:h-fit" aria-label="Project details">
+        <aside className="space-y-8 lg:sticky lg:top-[calc(var(--header-h)+2rem)] lg:h-fit" aria-label="Project details">
           {facts.length ? (
-            <dl className="space-y-3 rounded-card border border-border bg-surface/60 p-5 text-sm">
+            <dl className="glass-card divide-y divide-(--glass-line) rounded-card text-sm">
               {facts.map(([k, v]) => (
-                <div key={k}>
-                  <dt className="text-xs tracking-wide text-subtle uppercase">{k}</dt>
-                  <dd className="text-fg">{v}</dd>
+                <div key={k} className="flex items-baseline justify-between gap-4 px-5 py-3.5">
+                  <dt className="text-muted">{k}</dt>
+                  <dd className="text-right font-medium text-fg">{v}</dd>
                 </div>
               ))}
             </dl>
           ) : null}
           {techs.length ? (
             <div>
-              <h2 className="eyebrow mb-3">Technology</h2>
+              <h2 className="label-caps mb-3">Technology</h2>
               <ul className="flex flex-wrap gap-1.5">
                 {techs.map((t) => (
                   <li key={t.slug}>
-                    <Link href={`/projects?tech=${t.slug}`}><Badge className="hover:border-accent/50 hover:text-fg">{t.label}</Badge></Link>
+                    <Link href={`/projects?tech=${t.slug}`} className="pressable inline-block rounded-full"><Badge className="hover:bg-fg/10 hover:text-fg">{t.label}</Badge></Link>
                   </li>
                 ))}
               </ul>
@@ -232,30 +243,30 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
           ) : null}
           {topics.length ? (
             <div>
-              <h2 className="eyebrow mb-3">Topics</h2>
+              <h2 className="label-caps mb-3">Topics</h2>
               <ul className="flex flex-wrap gap-1.5">{topics.map((t) => <li key={t.slug}><Badge>{t.label}</Badge></li>)}</ul>
             </div>
           ) : null}
           {project.services.length ? (
             <div>
-              <h2 className="eyebrow mb-3">Services</h2>
+              <h2 className="label-caps mb-3">Services</h2>
               <ul className="space-y-1 text-sm">
                 {project.services.map((s) => (
-                  <li key={s.slug}><Link href={`/services/${s.slug}`} className="text-muted hover:text-fg">{s.title}</Link></li>
+                  <li key={s.slug}><Link href={`/services/${s.slug}`} className="text-muted transition-colors hover:text-fg">{s.title}</Link></li>
                 ))}
               </ul>
             </div>
           ) : null}
           {project.team.length ? (
             <div>
-              <h2 className="eyebrow mb-3">Team</h2>
+              <h2 className="label-caps mb-3">Team</h2>
               <ul className="space-y-3">
                 {project.team.map((m) => (
                   <li key={m.slug}>
                     <Link href={`/team/${m.slug}`} className="group flex items-center gap-3">
-                      {m.photo ? <MediaImage media={m.photo} alt="" ratio="1/1" rounded={false} className="size-10 shrink-0 rounded-full" sizes="40px" /> : <span aria-hidden className="grid size-10 place-items-center rounded-full bg-surface-3 text-sm">{m.name.charAt(0)}</span>}
+                      {m.photo ? <MediaImage media={m.photo} alt="" ratio="1/1" rounded={false} className="size-10 shrink-0 rounded-full" sizes="40px" /> : <span aria-hidden className="grid size-10 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent">{m.name.charAt(0)}</span>}
                       <span>
-                        <span className="block text-sm font-medium text-fg group-hover:text-accent">{m.name}</span>
+                        <span className="block text-sm font-medium text-fg transition-colors group-hover:text-accent">{m.name}</span>
                         <span className="block text-xs text-muted">{m.roleOnProject || m.roleTitle}</span>
                       </span>
                     </Link>
@@ -268,21 +279,21 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
       </div>
 
       {related.length ? (
-        <Section className="border-t border-border" aria-labelledby="related">
+        <Section aria-labelledby="related">
           <SectionHeading id="related" eyebrow="More work" title="Related projects" />
-          <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((p) => <li key={p.id}><ProjectCard project={p} /></li>)}
           </ul>
         </Section>
       ) : null}
 
-      <Section className="border-t border-border">
-        <div className="flex flex-col items-start gap-4 rounded-card border border-border bg-surface p-8 sm:flex-row sm:items-center sm:justify-between">
+      <Section>
+        <div data-reveal="item" className="glass-panel flex flex-col items-start gap-6 rounded-[2rem] p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
           <div>
-            <h2 className="text-xl font-semibold">Need something similar?</h2>
-            <p className="mt-1 text-muted">Tell us about your process and we&apos;ll outline an approach.</p>
+            <h2 className="text-2xl">Need something similar?</h2>
+            <p className="mt-2 text-muted">Tell us about your process and we&apos;ll outline an approach.</p>
           </div>
-          <Link href="/contact" className={buttonVariants({ size: "lg" })}>Start a project <ArrowRight aria-hidden /></Link>
+          <Link href="/contact" className={buttonVariants({ size: "lg", className: "group/btn shrink-0" })}>Start a project <ArrowRight aria-hidden className="transition-transform duration-(--duration-base) ease-spring group-hover/btn:translate-x-0.5" /></Link>
         </div>
       </Section>
 
