@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AdminPageHeader } from "@/components/admin/page-header";
+import { Badge } from "@/components/ui/badge";
 import { Alert } from "@/components/ui/misc";
 import { formatBytes, formatDate } from "@/lib/utils";
 import { can, requireStaff } from "@/server/auth/session";
@@ -12,15 +13,15 @@ export const metadata = { title: "Dashboard" };
 function Stat({ label, value, sub, href }: { label: string; value: number | string; sub?: string; href?: string }) {
   const body = (
     <>
-      <p className="text-xs tracking-wide text-subtle uppercase">{label}</p>
-      <p className="mt-2 font-mono text-3xl text-fg">{value}</p>
-      {sub ? <p className="mt-1 text-xs text-muted">{sub}</p> : null}
+      <p className="text-sm text-muted">{label}</p>
+      <p className="mt-2 text-[2rem] leading-none font-semibold tracking-tight text-fg tabular-nums">{value}</p>
+      {sub ? <p className="mt-2 text-xs text-subtle">{sub}</p> : null}
     </>
   );
   return href ? (
-    <Link href={href} className="rounded-card border border-border bg-surface/60 p-5 transition-colors hover:border-accent/40">{body}</Link>
+    <Link href={href} className="glass-card lift rounded-card p-5">{body}</Link>
   ) : (
-    <div className="rounded-card border border-border bg-surface/60 p-5">{body}</div>
+    <div className="glass-card rounded-card p-5">{body}</div>
   );
 }
 
@@ -55,13 +56,13 @@ export default async function DashboardPage(props: PageProps<"/admin">) {
       </div>
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         {can(staff, "inquiries.read") ? (
-          <section className="rounded-card border border-border bg-surface/60 p-5">
+          <section className="glass-card rounded-card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold">Latest inquiries</h2>
+              <h2 className="font-semibold tracking-tight">Latest inquiries</h2>
               <Link href="/admin/inquiries" className="text-sm text-accent hover:underline">All</Link>
             </div>
             {inquiries.length ? (
-              <ul className="mt-4 divide-y divide-border">
+              <ul className="mt-4 divide-y divide-(--glass-line)">
                 {inquiries.map((i) => (
                   <li key={i.id}>
                     <Link href={`/admin/inquiries/${i.kind}/${i.id}`} className="flex items-center justify-between gap-3 py-3 hover:text-accent">
@@ -69,7 +70,7 @@ export default async function DashboardPage(props: PageProps<"/admin">) {
                         <span className="block truncate text-sm font-medium">{i.name}{i.company ? ` · ${i.company}` : ""}</span>
                         <span className="text-xs text-subtle capitalize">{i.kind} · {formatDate(i.createdAt)}</span>
                       </span>
-                      <span className="shrink-0 rounded-full border border-border-strong px-2 py-0.5 text-xs capitalize">{i.status}</span>
+                      <Badge className="shrink-0 capitalize">{i.status}</Badge>
                     </Link>
                   </li>
                 ))}
@@ -78,9 +79,9 @@ export default async function DashboardPage(props: PageProps<"/admin">) {
           </section>
         ) : null}
         {can(staff, "audit.read") ? (
-          <section className="rounded-card border border-border bg-surface/60 p-5">
+          <section className="glass-card rounded-card p-5">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold">Recent activity</h2>
+              <h2 className="font-semibold tracking-tight">Recent activity</h2>
               <Link href="/admin/audit" className="text-sm text-accent hover:underline">Audit log</Link>
             </div>
             {activity.length ? (
