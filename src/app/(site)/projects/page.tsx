@@ -1,3 +1,4 @@
+import { FolderKanban } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -25,8 +26,8 @@ export async function generateMetadata(props: PageProps<"/projects">): Promise<M
 
 function chip(active: boolean) {
   return cn(
-    "inline-flex min-h-9 items-center rounded-full border px-3.5 text-sm transition-colors",
-    active ? "border-accent bg-accent-soft text-accent" : "border-border-strong text-muted hover:border-accent/50 hover:text-fg",
+    "pressable inline-flex min-h-9 items-center rounded-full px-3.5 text-sm whitespace-nowrap",
+    active ? "bg-fg font-medium text-bg shadow-card" : "bg-fg/[0.05] text-muted hover:bg-fg/[0.08] hover:text-fg",
   );
 }
 
@@ -47,10 +48,10 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
       <PageHeader eyebrow="Work" title="Projects & case studies" description="Real systems we've designed and built — with the problem, the approach, the architecture and what changed." />
       <Section>
         {facets.categories.length || facets.technologies.length ? (
-          <nav aria-label="Filter projects" className="mb-10 space-y-4">
+          <nav aria-label="Filter projects" className="mb-12 space-y-3">
             {facets.categories.length ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="mr-1 text-xs tracking-wide text-subtle uppercase">Category</span>
+              <div className="-mx-5 flex items-center gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
+                <span className="label-caps mr-1 shrink-0">Category</span>
                 <Link href={qs({ tech })} className={chip(!category)} aria-current={!category ? "true" : undefined}>All</Link>
                 {facets.categories.map((c) => (
                   <Link key={c} href={qs({ category: c, tech })} className={chip(category === c)} aria-current={category === c ? "true" : undefined}>
@@ -60,8 +61,8 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
               </div>
             ) : null}
             {facets.technologies.length ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="mr-1 text-xs tracking-wide text-subtle uppercase">Technology</span>
+              <div className="-mx-5 flex items-center gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
+                <span className="label-caps mr-1 shrink-0">Technology</span>
                 <Link href={qs({ category })} className={chip(!tech)} aria-current={!tech ? "true" : undefined}>All</Link>
                 {facets.technologies.map((t) => (
                   <Link key={t.slug} href={qs({ category, tech: t.slug })} className={chip(tech === t.slug)} aria-current={tech === t.slug ? "true" : undefined}>
@@ -76,7 +77,7 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
           {projects.length} project{projects.length === 1 ? "" : "s"} shown
         </p>
         {projects.length ? (
-          <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p, i) => (
               <li key={p.id}>
                 <ProjectCard project={p} priority={i < 2} headingLevel={2} />
@@ -84,8 +85,8 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
             ))}
           </ul>
         ) : (
-          <EmptyState title={category || tech ? "No projects match these filters" : "Case studies coming soon"}>
-            {category || tech ? <Link href="/projects" className="text-accent underline">Clear filters</Link> : "We're preparing detailed write-ups of our work."}
+          <EmptyState title={category || tech ? "No projects match these filters" : "Case studies coming soon"} icon={<FolderKanban />}>
+            {category || tech ? <Link href="/projects" className="font-medium text-accent hover:underline">Clear filters</Link> : "We're preparing detailed write-ups of our work."}
           </EmptyState>
         )}
       </Section>
