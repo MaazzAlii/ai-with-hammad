@@ -28,7 +28,7 @@ export default async function InboxPage(props: PageProps<"/admin/messages">) {
         {tab("Closed", "/admin/messages?status=closed", status === "closed")}
       </nav>
       {threads.length ? (
-        <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-surface/60">
+        <ul className="divide-y divide-(--glass-line) overflow-hidden glass-card rounded-card">
           {threads.map((t) => (
             <li key={t.id}>
               <Link href={`/admin/messages/${t.id}`} className="flex items-start justify-between gap-4 px-5 py-4 hover:bg-surface-2">
