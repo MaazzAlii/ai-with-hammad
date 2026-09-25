@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { publicEnv } from "@/lib/env";
 import { getPublicSettings } from "@/server/dal/public/site";
 
-import { fontBody, fontDisplay, fontMono } from "./fonts";
+import { fontMono, fontSans } from "./fonts";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,8 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#05090e",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f3f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0c0f" },
+  ],
+  colorScheme: "light dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -31,8 +34,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}>
-      <body className="min-h-dvh overflow-x-clip">{children}</body>
+    <html lang="en" className={`${fontSans.variable} ${fontMono.variable}`}>
+      <body className="min-h-dvh overflow-x-clip">
+        <div aria-hidden className="ambient" />
+        {children}
+      </body>
     </html>
   );
 }
