@@ -20,7 +20,7 @@ export function PackageForm({ action, pkg, canWrite, canPublish }: { action: For
           <legend className="text-sm font-medium">Platforms</legend>
           <div className="mt-2 flex flex-wrap gap-2">
             {contentPlatform.enumValues.map((p) => (
-              <label key={p} className="inline-flex min-h-10 items-center gap-2 rounded-control border border-border-strong px-3 text-sm has-checked:border-accent has-checked:bg-accent-soft">
+              <label key={p} className="inline-flex min-h-10 items-center gap-2 pressable rounded-full bg-fg/[0.045] px-3.5 text-sm shadow-[inset_0_0_0_1px_var(--glass-line)] hover:bg-fg/[0.07] has-checked:bg-accent-soft has-checked:text-accent has-checked:shadow-[inset_0_0_0_1px_var(--color-accent)]">
                 <input type="checkbox" name="platforms[]" value={p} defaultChecked={pkg?.platforms.includes(p)} className="accent-[var(--color-accent)]" />
                 {PLATFORM_LABELS[p]}
               </label>
