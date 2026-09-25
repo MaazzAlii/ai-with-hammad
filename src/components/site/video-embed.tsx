@@ -18,7 +18,7 @@ export function VideoEmbed({ embed, title, posterUrl, className }: { embed: Embe
   const src = `${embed.embedUrl}${embed.embedUrl.includes("?") ? "&" : "?"}autoplay=1`;
   return (
     <div
-      className={cn("relative mx-auto w-full overflow-hidden rounded-media border border-border bg-surface-2", embed.aspect === "portrait" && "max-w-sm", className)}
+      className={cn("relative mx-auto w-full overflow-hidden rounded-media bg-black shadow-panel", embed.aspect === "portrait" && "max-w-sm", className)}
       style={{ aspectRatio: aspect }}
     >
       {active ? (
@@ -32,13 +32,15 @@ export function VideoEmbed({ embed, title, posterUrl, className }: { embed: Embe
           loading="lazy"
         />
       ) : (
-        <button type="button" onClick={() => setActive(true)} className="group absolute inset-0 size-full cursor-pointer" aria-label={`Play video: ${title}`}>
-          {poster ? <Image src={poster} alt="" fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover opacity-80 transition-opacity group-hover:opacity-100" /> : null}
-          <span className="absolute inset-0 bg-linear-to-t from-bg/70 to-transparent" />
-          <span className="absolute top-1/2 left-1/2 grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-accent text-accent-fg shadow-glow transition-transform group-hover:scale-110">
-            <Play aria-hidden className="ml-1 size-7 fill-current" />
+        <button type="button" onClick={() => setActive(true)} className="group absolute inset-0 size-full" aria-label={`Play video: ${title}`}>
+          {poster ? (
+            <Image src={poster} alt="" fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover transition-transform duration-700 ease-out-soft group-hover:scale-[1.02]" />
+          ) : null}
+          <span className="absolute inset-0 bg-linear-to-t from-black/60 via-black/5 to-transparent" />
+          <span className="absolute top-1/2 left-1/2 grid size-16 -translate-1/2 place-items-center rounded-full bg-white/25 text-white shadow-float ring-1 ring-white/40 backdrop-blur-xl backdrop-saturate-150 transition-transform duration-(--duration-slow) ease-spring group-hover:scale-110 group-active:scale-95">
+            <Play aria-hidden className="ml-1 size-6 fill-current" />
           </span>
-          <span className="absolute bottom-3 left-4 right-4 truncate text-left text-sm font-medium text-fg">{title}</span>
+          <span className="absolute right-4 bottom-3.5 left-4 truncate text-left text-sm font-medium text-white">{title}</span>
         </button>
       )}
     </div>
