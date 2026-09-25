@@ -44,7 +44,7 @@ function MathChallenge({ resetKey, error, idPrefix }: { resetKey: unknown; error
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={id} className="flex items-center gap-2">
-        <ShieldCheck aria-hidden className="size-4 text-accent-2" />
+        <ShieldCheck aria-hidden className="size-4 text-subtle" />
         <span data-testid="captcha-question">{challenge?.question ?? (failed ? "Security check unavailable — please retry" : "Loading security question…")}</span>
       </Label>
       <div className="flex gap-2">
@@ -60,7 +60,7 @@ function MathChallenge({ resetKey, error, idPrefix }: { resetKey: unknown; error
           className={cn("max-w-32", !challenge && "opacity-60")}
           disabled={!challenge}
         />
-        <button type="button" onClick={() => void load()} className="grid size-10 place-items-center rounded-control border border-border-strong text-muted hover:text-fg" aria-label="New security question">
+        <button type="button" onClick={() => void load()} className="pressable grid size-11 shrink-0 place-items-center rounded-full bg-fg/[0.05] text-muted hover:bg-fg/[0.08] hover:text-fg" aria-label="New security question">
           <RefreshCw aria-hidden className="size-4" />
         </button>
       </div>
@@ -85,7 +85,7 @@ function TurnstileWidget({ resetKey, error }: { resetKey: unknown; error?: strin
       window.turnstile.reset(widgetId.current);
       return;
     }
-    widgetId.current = window.turnstile.render(ref.current, { sitekey: SITE_KEY, theme: "dark", callback: (t: string) => setToken(t), "expired-callback": () => setToken("") });
+    widgetId.current = window.turnstile.render(ref.current, { sitekey: SITE_KEY, theme: "auto", callback: (t: string) => setToken(t), "expired-callback": () => setToken("") });
   }, [ready, resetKey]);
   return (
     <div className="flex flex-col gap-1.5">
