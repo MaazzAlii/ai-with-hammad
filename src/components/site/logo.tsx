@@ -30,9 +30,9 @@ export function LogoMark({ name, logo, className }: { name: string; logo?: Media
 
 export function Logo({ name, logo }: { name: string; logo?: MediaDTO | null }) {
   return (
-    <span className="flex items-center gap-2.5">
-      <LogoMark name={name} logo={logo} />
-      <span className="text-[0.9375rem] font-semibold tracking-[-0.015em] text-fg">{name}</span>
+    <span className="flex min-w-0 items-center gap-2.5">
+      <LogoMark name={name} logo={logo} className="shrink-0" />
+      <span className="truncate text-[0.9375rem] font-semibold tracking-[-0.015em] whitespace-nowrap text-fg">{name}</span>
     </span>
   );
 }
