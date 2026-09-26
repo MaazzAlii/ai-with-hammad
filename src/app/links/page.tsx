@@ -9,6 +9,7 @@ import { RevealObserver } from "@/components/site/reveal-observer";
 import { initials } from "@/components/site/team-card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { getLinkPage, type BioLinkDTO } from "@/server/dal/public/links";
@@ -74,6 +75,7 @@ export default async function LinksPage() {
   const empty = !data.featured.length && !data.links.length && !data.partners.length && !data.socials.length && !data.people.length;
   return (
     <main className="page-enter mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pt-[max(2.5rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
+      <ThemeToggle className="glass-card fixed top-[max(1rem,env(safe-area-inset-top))] right-4 z-10" />
       <header className="flex flex-col items-center text-center">
         <LogoMark name={general.siteName} logo={media.logo} className="size-20 rounded-[1.4rem] text-3xl shadow-panel" />
         <h1 className="mt-5 text-[1.75rem]">{general.siteName}</h1>
