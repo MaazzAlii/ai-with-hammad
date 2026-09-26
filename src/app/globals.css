@@ -81,46 +81,51 @@
 }
 
 /* dark */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --color-bg: #0b0c0f;
-    --color-surface: #15171b;
-    --color-surface-2: #1b1d22;
-    --color-surface-3: #24272d;
-    --color-border: #2a2d34;
-    --color-border-strong: #3a3e46;
-    --color-fg: #f3f4f6;
-    --color-muted: #aab0ba;
-    --color-subtle: #8a919c;
-    --color-accent: #5cc8ec;
-    --color-accent-2: #4fd1c1;
-    --color-accent-fg: #04121a;
-    --color-accent-soft: rgb(92 200 236 / 0.12);
-    --color-danger: #ff7a6b;
-    --color-danger-soft: rgb(255 122 107 / 0.12);
-    --color-success: #3ddc97;
-    --color-success-soft: rgb(61 220 151 / 0.12);
-    --color-warning: #f5b83d;
-    --color-warning-soft: rgb(245 184 61 / 0.12);
+/*
+ * Dark mode = the studio's original look (near-black canvas, cyan/teal accent), switched on by the
+ * theme toggle (html[data-theme="dark"], set before paint in the root layout). Light is the default.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #05090e;
+  --color-surface: #0b131b;
+  --color-surface-2: #111c26;
+  --color-surface-3: #172532;
+  --color-border: #1e2e3b;
+  --color-border-strong: #2b4050;
+  --color-fg: #e8f1f2;
+  --color-muted: #9bb1ba;
+  --color-subtle: #7d949e;
+  --color-accent: #22d3ee;
+  --color-accent-2: #2dd4bf;
+  --color-accent-fg: #03181c;
+  --color-accent-soft: rgb(34 211 238 / 0.1);
+  --color-danger: #f87171;
+  --color-danger-soft: rgb(248 113 113 / 0.12);
+  --color-success: #34d399;
+  --color-success-soft: rgb(52 211 153 / 0.12);
+  --color-warning: #fbbf24;
+  --color-warning-soft: rgb(251 191 36 / 0.12);
 
-    --shadow-card: 0 1px 1px rgb(0 0 0 / 0.3), 0 2px 10px -2px rgb(0 0 0 / 0.4);
-    --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -16px rgb(0 0 0 / 0.7);
-    --shadow-float: 0 2px 6px rgb(0 0 0 / 0.4), 0 24px 56px -18px rgb(0 0 0 / 0.8);
-    --shadow-glow: 0 1px 2px rgb(92 200 236 / 0.2), 0 8px 24px -8px rgb(92 200 236 / 0.45);
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px -12px rgb(0 0 0 / 0.6);
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.5), 0 18px 44px -16px rgb(0 0 0 / 0.75);
+  --shadow-float: 0 2px 6px rgb(0 0 0 / 0.5), 0 24px 56px -18px rgb(0 0 0 / 0.85);
+  --shadow-glow: 0 0 24px rgb(34 211 238 / 0.28);
 
-    --glass-chrome: rgb(32 34 40 / 0.62);
-    --glass-strong: rgb(30 32 38 / 0.72);
-    --glass-soft: rgb(30 32 38 / 0.48);
-    --glass-sheen: rgb(255 255 255 / 0.06);
-    --glass-edge: rgb(255 255 255 / 0.1);
-    --glass-line: rgb(255 255 255 / 0.08);
-    --ambient-1: rgb(92 200 236 / 0.13);
-    --ambient-2: rgb(79 209 193 / 0.08);
-    --ambient-3: rgb(99 102 241 / 0.08);
-    --scrim: rgb(0 0 0 / 0.5);
-  }
+  --glass-chrome: rgb(11 19 27 / 0.72);
+  --glass-strong: rgb(11 19 27 / 0.74);
+  --glass-soft: rgb(17 28 38 / 0.55);
+  --glass-sheen: rgb(148 178 190 / 0.06);
+  --glass-edge: rgb(148 178 190 / 0.1);
+  --glass-line: rgb(148 178 190 / 0.13);
+  --ambient-1: rgb(34 211 238 / 0.14);
+  --ambient-2: rgb(45 212 191 / 0.1);
+  --ambient-3: rgb(34 211 238 / 0.05);
+  --scrim: rgb(0 0 0 / 0.6);
 }
+
+/* Tailwind `dark:` follows the toggle, not the OS setting. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @layer base {
   html {
@@ -131,6 +136,7 @@
     scroll-padding-top: calc(var(--header-h) + 2rem);
   }
   body {
+    transition: background-color var(--duration-slow) var(--ease-out-soft), color var(--duration-slow) var(--ease-out-soft);
     background: var(--color-bg);
     color: var(--color-fg);
     font-family: var(--font-sans);
@@ -287,6 +293,16 @@
       radial-gradient(60rem 38rem at 12% -8%, var(--ambient-1), transparent 70%),
       radial-gradient(48rem 34rem at 96% 12%, var(--ambient-2), transparent 70%),
       radial-gradient(56rem 40rem at 50% 108%, var(--ambient-3), transparent 70%);
+  }
+  [data-theme="dark"] .ambient::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgb(148 178 190 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(148 178 190 / 0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse at 50% 0%, black 25%, transparent 70%);
   }
   .ambient::before {
     content: "";
