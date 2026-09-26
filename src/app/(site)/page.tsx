@@ -15,6 +15,7 @@ import { TestimonialGrid } from "@/components/site/testimonials";
 import { Stars } from "@/components/portal/star-rating";
 import { buttonVariants } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 import { safeHref } from "@/lib/url-safety";
 import { whatsappLink } from "@/lib/whatsapp";
 import { groupContent, listPublishedContent } from "@/server/dal/public/content";
@@ -37,6 +38,14 @@ export async function generateMetadata(): Promise<Metadata> {
   // The home page uses the full default title (no "· Site" template suffix).
   return { ...meta, title: { absolute: seo.defaultTitle || general.siteName } };
 }
+
+/** Team grid sized to the number of people, so one or two founders don't leave an empty row. */
+const TEAM_GRID: Record<number, string> = {
+  1: "max-w-xs grid-cols-1",
+  2: "max-w-2xl",
+  3: "lg:grid-cols-3",
+  4: "lg:grid-cols-4",
+};
 
 const arrow = "transition-transform duration-(--duration-base) ease-spring group-hover/btn:translate-x-0.5";
 
@@ -216,7 +225,7 @@ export default async function HomePage() {
       {team.length ? (
         <Section aria-labelledby="team-title" className="cv-auto">
           <SectionHeading id="team-title" eyebrow="People" title="The engineers behind the work" action={<ViewAllLink href="/team">Meet the team</ViewAllLink>} />
-          <ul data-reveal="group" className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
+          <ul data-reveal="group" className={cn("grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6", TEAM_GRID[Math.min(team.length, 4)])}>
             {team.slice(0, 4).map((m) => (
               <li key={m.id}>
                 <TeamCard member={m} compact />
@@ -261,10 +270,12 @@ export default async function HomePage() {
       ) : null}
 
       {/* FAQ */}
-      {faqs.length ? (
+      {faqs.length && home.showFaq ? (
         <Section aria-labelledby="faq-title" className="cv-auto">
           <div className="grid gap-2 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-            <SectionHeading id="faq-title" eyebrow="FAQ" title="Common questions" description="Something else on your mind? Ask us on WhatsApp or through the contact form." />
+            <div className="lg:sticky lg:top-[calc(var(--header-h)+2.5rem)] lg:self-start">
+              <SectionHeading id="faq-title" eyebrow="FAQ" title="Common questions" description="Something else on your mind? Ask us on WhatsApp or through the contact form." />
+            </div>
             <FaqList items={faqs.slice(0, 6)} />
           </div>
         </Section>
