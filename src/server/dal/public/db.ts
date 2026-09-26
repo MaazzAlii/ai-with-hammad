@@ -1,8 +1,8 @@
 import "server-only";
 
-import { getDb, isDatabaseConfigured, type Database } from "@/db";
+import { getDb, isDatabaseConfigured, resetDb, type Database } from "@/db";
 
-import { withTimeout } from "../../with-timeout";
+import { TimeoutError, withTimeout } from "../../with-timeout";
 
 let warned = false;
 
@@ -34,6 +34,7 @@ export async function withPublicDb<T>(fallback: T, fn: (db: Database) => Promise
   try {
     return await withTimeout(fn(getDb()), QUERY_TIMEOUT_MS, "Public query");
   } catch (e) {
+    if (e instanceof TimeoutError) resetDb();
     if (IS_BUILD) {
       buildDbUnavailable = true;
       console.warn("[dal] database query failed during build — prerendering with fallback data; ISR will refresh it:", e instanceof Error ? e.message : e);
