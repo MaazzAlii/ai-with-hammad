@@ -40,7 +40,7 @@ export function MobileMenu({ links }: { links: NavLink[] }) {
                 Start a project <ArrowRight aria-hidden />
               </Link>
               <Link href="/portal/login" onClick={() => setOpen(false)} className={buttonVariants({ size: "lg", variant: "secondary", className: "w-full" })}>
-                Client portal
+                Client login
               </Link>
             </div>
           </nav>
