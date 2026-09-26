@@ -2,6 +2,7 @@ import { ArrowUpRight, Pin } from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { Tilt } from "@/components/ui/tilt";
 import type { ProjectCardDTO } from "@/server/dal/public/projects";
 
 import { MediaImage, MediaPlaceholder } from "./media-image";
@@ -10,8 +11,9 @@ export function ProjectCard({ project, priority = false, headingLevel = 3 }: { p
   const H = headingLevel === 2 ? "h2" : "h3";
   const techs = project.tags.filter((t) => t.kind === "technology").slice(0, 3);
   return (
-    <article className="group relative flex h-full flex-col">
+    <article data-tilt-root className="group relative flex h-full flex-col">
       <div className="relative transition-transform duration-(--duration-slow) ease-spring group-active:scale-[0.985]">
+        <Tilt className="rounded-media">
         {project.cover ? (
           <MediaImage
             media={project.cover}
@@ -25,6 +27,7 @@ export function ProjectCard({ project, priority = false, headingLevel = 3 }: { p
         ) : (
           <MediaPlaceholder label={project.title.charAt(0)} ratio="4/3" />
         )}
+        </Tilt>
         {project.isFeatured || project.isPinned ? (
           <div className="absolute top-3 left-3 flex gap-1.5">
             {project.isFeatured ? <Badge variant="glass">Featured</Badge> : null}
