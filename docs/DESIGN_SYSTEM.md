@@ -13,15 +13,20 @@ components consume them — never hard-coded colours.
 
 ## Colour
 
-Light is the default; dark follows `prefers-color-scheme`. Both palettes are checked for WCAG AA in
+Light is the default for everyone. The **theme toggle** (sun/moon button in the navbar, portal, admin, sign-in
+and `/links`) switches to dark, which is the studio's original look: near-black canvas, cyan/teal accent, a faint
+grid texture and the cyan→teal gradient on primary buttons. The choice is saved in `localStorage` and applied
+before first paint (`THEME_BOOT_SCRIPT` in `src/lib/theme.ts`), so there is no flash. Tailwind's `dark:` variant
+follows the toggle (`html[data-theme="dark"]`), not the OS setting. Buttons and icons are identical in both themes;
+only colours change, and every text pair is contrast-tested. Both palettes are checked for WCAG AA in
 `tests/unit/contrast.test.ts` (dark overrides sit after the `/* dark */` marker in `globals.css`).
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
-| `bg` | `#f2f3f6` | `#0b0c0f` | canvas |
-| `surface` / `-2` / `-3` | `#fff` / `#f6f7f9` / `#eceef2` | `#15171b` / `#1b1d22` / `#24272d` | solid surfaces, fills |
-| `fg` / `muted` / `subtle` | `#0f1115` / `#4d5562` / `#646b77` | `#f3f4f6` / `#aab0ba` / `#8a919c` | text hierarchy |
-| `accent` / `accent-2` | `#0a6c9e` / `#0e7c74` | `#5cc8ec` / `#4fd1c1` | primary CTA, active state, links |
+| `bg` | `#f2f3f6` | `#05090e` | canvas |
+| `surface` / `-2` / `-3` | `#fff` / `#f6f7f9` / `#eceef2` | `#0b131b` / `#111c26` / `#172532` | solid surfaces, fills |
+| `fg` / `muted` / `subtle` | `#0f1115` / `#4d5562` / `#646b77` | `#e8f1f2` / `#9bb1ba` / `#7d949e` | text hierarchy |
+| `accent` / `accent-2` | `#0a6c9e` / `#0e7c74` | `#22d3ee` / `#2dd4bf` | primary CTA, active state, links |
 | `danger` / `success` / `warning` | status | status | alerts, badges |
 | `whatsapp` | `#25d366` | — | WhatsApp controls only |
 
