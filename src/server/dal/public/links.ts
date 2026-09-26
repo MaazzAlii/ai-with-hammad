@@ -63,6 +63,7 @@ export const listLiveBioLinks = cache(async (): Promise<BioLinkDTO[]> =>
           console.warn("[links] bio_links table missing — run supabase/migrations/20260926_bio_links.sql");
           return [];
         }
+        console.error("[links] failed to load bio links", e);
         throw e;
       });
     return rows.flatMap((r) => {
