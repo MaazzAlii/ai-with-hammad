@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { MediaDTO } from "@/server/dal/public/media";
 import type { NavLink } from "@/server/dal/public/site";
 
@@ -23,8 +24,9 @@ export function SiteHeader({ siteName, logo, links }: { siteName: string; logo: 
       <nav aria-label="Main" className="hidden lg:block">
         <NavLinks links={links} />
       </nav>
-      <div className="flex shrink-0 items-center gap-1">
-        <Link href="/contact" className={buttonVariants({ size: "sm", className: "group/cta hidden sm:inline-flex" })}>
+      <div className="flex shrink-0 items-center gap-0.5">
+        <ThemeToggle />
+        <Link href="/contact" className={buttonVariants({ size: "sm", className: "group/cta ml-1 hidden sm:inline-flex" })}>
           Start a project
           <ArrowRight aria-hidden className="transition-transform duration-(--duration-base) ease-spring group-hover/cta:translate-x-0.5" />
         </Link>
