@@ -42,6 +42,8 @@ export const settingsSchemas = {
     /** Technologies shown in the "stack we engineer with" strip (tools you actually use). */
     techStack: z.array(z.string().max(40)).max(30).default([]),
     process: z.array(titled).max(8).default([]),
+    /** Show the FAQ section on the homepage (Admin → FAQs or Settings → Homepage). */
+    showFaq: z.boolean().default(true),
   }),
   about: z.object({
     title: z.string().max(120).default("About"),
@@ -82,6 +84,8 @@ export const settingsSchemas = {
     intro: z.string().max(600).default(""),
     budgets: z.array(z.string().max(60)).max(12).default([]),
     timelines: z.array(z.string().max(60)).max(12).default([]),
+    /** Show the FAQ section on the contact page. */
+    showFaq: z.boolean().default(true),
   }),
 } as const;
 
