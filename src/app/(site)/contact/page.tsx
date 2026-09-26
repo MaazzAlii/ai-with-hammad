@@ -91,7 +91,7 @@ export default async function ContactPage(props: PageProps<"/contact">) {
           </aside>
         </div>
       </Section>
-      {faqs.length ? (
+      {faqs.length && contact.showFaq ? (
         <Section aria-labelledby="contact-faq">
           <SectionHeading id="contact-faq" eyebrow="FAQ" title="Common questions" />
           <FaqList items={faqs} />
