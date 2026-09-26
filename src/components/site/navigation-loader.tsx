@@ -3,8 +3,6 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { Spinner } from "@/components/ui/spinner";
-
 import { monogram } from "./logo";
 
 /**
@@ -53,18 +51,23 @@ export function NavigationLoader({ siteName, logoUrl }: { siteName: string; logo
 
   if (!visible) return null;
   return (
-    <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 top-[calc(var(--header-h)+max(0.75rem,env(safe-area-inset-top))+0.75rem)] z-[60] flex justify-center">
-      <div className="glass-float flex items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 motion-safe:animate-[drop-in_320ms_var(--ease-spring)]">
-        {logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- tiny logo, already cached
-          <img src={logoUrl} alt="" width={28} height={28} className="size-7 rounded-[0.5rem] object-contain" />
-        ) : (
-          <span aria-hidden className="grid size-7 place-items-center rounded-[0.5rem] bg-accent text-xs font-semibold text-accent-fg">
-            {monogram(siteName)}
-          </span>
-        )}
-        <span className="text-sm font-medium text-fg">{siteName}</span>
-        <Spinner className="text-muted" />
+    <div role="status" aria-live="polite" className="fixed inset-0 z-[60] grid place-items-center bg-bg/40 backdrop-blur-[3px] motion-safe:animate-[fade-in_200ms_var(--ease-out-soft)]">
+      <div className="glass-sheet flex w-56 flex-col items-center gap-4 rounded-[1.75rem] px-6 py-7 motion-safe:animate-[pop-in_320ms_var(--ease-spring)]">
+        <span className="relative grid size-16 place-items-center">
+          <span aria-hidden className="absolute inset-0 rounded-[1.1rem] bg-accent/25 blur-xl" />
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- tiny logo, already cached
+            <img src={logoUrl} alt="" width={64} height={64} className="relative size-16 rounded-[1.1rem] object-contain" />
+          ) : (
+            <span aria-hidden className="relative grid size-16 place-items-center rounded-[1.1rem] bg-accent text-2xl font-semibold text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.3)]">
+              {monogram(siteName)}
+            </span>
+          )}
+        </span>
+        <p className="text-center text-[0.9375rem] font-semibold tracking-tight text-fg">{siteName}</p>
+        <div aria-hidden className="h-1 w-28 overflow-hidden rounded-full bg-fg/10">
+          <div className="h-full w-1/3 rounded-full bg-accent motion-safe:animate-[loader_1.1s_ease-in-out_infinite]" />
+        </div>
         <span className="sr-only">Loading…</span>
       </div>
     </div>
