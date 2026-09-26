@@ -2,6 +2,7 @@ import { ArrowUpRight, Globe, MapPin } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { BrandIcon } from "@/components/site/brand-icon";
 import { JsonLd } from "@/components/site/json-ld";
 import { Markdown } from "@/components/site/markdown";
 import { MediaImage, MediaPlaceholder } from "@/components/site/media-image";
@@ -10,8 +11,10 @@ import { Breadcrumb, Section, SectionHeading } from "@/components/site/section";
 import { initials } from "@/components/site/team-card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { Tilt } from "@/components/ui/tilt";
 import { breadcrumbLd, personLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
+import { listLiveBioLinks } from "@/server/dal/public/links";
 import { listProjectsForTeamMember } from "@/server/dal/public/projects";
 import { getPublishedTeamMember, listPublishedTeam } from "@/server/dal/public/team";
 
@@ -38,8 +41,14 @@ export default async function TeamMemberPage(props: PageProps<"/team/[slug]">) {
   const { slug } = await props.params;
   const member = await getPublishedTeamMember(slug);
   if (!member) notFound();
-  const projects = await listProjectsForTeamMember(member.id);
-  const sameAs = [...member.links.map((l) => l.url), ...(member.websiteUrl ? [member.websiteUrl] : [])];
+  const [projects, bioLinks] = await Promise.all([listProjectsForTeamMember(member.id), listLiveBioLinks()]);
+  // Socials from the team profile plus "Social profile" links assigned to this person in
+  // Admin → Link in bio — one list, no duplicates.
+  const socials = [
+    ...member.links.map((l) => ({ key: l.platform, label: l.label || l.platform, url: l.url })),
+    ...bioLinks.filter((l) => l.teamMemberId === member.id && l.kind === "social").map((l) => ({ key: l.icon || l.title, label: l.title, url: l.url })),
+  ].filter((s, i, all) => all.findIndex((o) => o.url.replace(/\/$/, "") === s.url.replace(/\/$/, "")) === i);
+  const sameAs = [...socials.map((s) => s.url).filter((u) => u.startsWith("https://")), ...(member.websiteUrl ? [member.websiteUrl] : [])];
   return (
     <>
       <div className="container-page pt-12 pb-14 sm:pt-20 sm:pb-20">
@@ -47,7 +56,9 @@ export default async function TeamMemberPage(props: PageProps<"/team/[slug]">) {
         <div className="grid gap-10 md:grid-cols-[18rem_1fr] lg:gap-16">
           <div className="max-md:max-w-[15rem]">
             {member.photo ? (
-              <MediaImage media={member.photo} alt={member.photo.alt || `Portrait of ${member.name}`} ratio="3/4" priority sizes="(min-width: 768px) 18rem, 15rem" className="shadow-panel" />
+              <Tilt className="rounded-media" max={4}>
+                <MediaImage media={member.photo} alt={member.photo.alt || `Portrait of ${member.name}`} ratio="3/4" priority sizes="(min-width: 768px) 18rem, 15rem" className="shadow-panel" />
+              </Tilt>
             ) : (
               <>
                 {/* No photo yet: a compact monogram on phones instead of a screen-tall empty frame. */}
@@ -75,14 +86,20 @@ export default async function TeamMemberPage(props: PageProps<"/team/[slug]">) {
                 <ul className="flex flex-wrap gap-1.5">{member.skills.map((s) => <li key={s}><Badge>{s}</Badge></li>)}</ul>
               </div>
             ) : null}
-            {member.links.length ? (
+            {socials.length ? (
               <div className="mt-10">
-                <h2 className="label-caps mb-3">Elsewhere</h2>
+                <h2 className="label-caps mb-3">Find {member.name.split(" ")[0]} online</h2>
                 <ul className="flex flex-wrap gap-2">
-                  {member.links.map((l) => (
-                    <li key={l.url}>
-                      <a href={l.url} target="_blank" rel="noopener noreferrer me" className={buttonVariants({ variant: "secondary", size: "sm", className: "capitalize" })}>
-                        {l.label || l.platform} <ArrowUpRight aria-hidden />
+                  {socials.map((s) => (
+                    <li key={s.url}>
+                      <a
+                        href={s.url}
+                        {...(s.url.startsWith("mailto:") ? {} : { target: "_blank", rel: "noopener noreferrer me" })}
+                        className={buttonVariants({ variant: "secondary", size: "sm", className: "group/s capitalize" })}
+                      >
+                        <BrandIcon name={s.key} />
+                        {s.label}
+                        <ArrowUpRight aria-hidden className="opacity-50 transition-[opacity,translate] duration-(--duration-base) ease-spring group-hover/s:translate-x-0.5 group-hover/s:-translate-y-0.5 group-hover/s:opacity-100" />
                       </a>
                     </li>
                   ))}
@@ -95,7 +112,7 @@ export default async function TeamMemberPage(props: PageProps<"/team/[slug]">) {
       {projects.length ? (
         <Section aria-labelledby="member-projects">
           <SectionHeading id="member-projects" eyebrow="Work" title={`Projects with ${member.name.split(" ")[0]}`} />
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p) => <li key={p.id}><ProjectCard project={p} /></li>)}
           </ul>
         </Section>
