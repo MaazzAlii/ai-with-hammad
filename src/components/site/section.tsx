@@ -102,12 +102,13 @@ export function Breadcrumb({ href, label, current }: { href: string; label: stri
   );
 }
 
-export function EmptyState({ title, icon, children }: { title: string; icon?: React.ReactNode; children?: React.ReactNode }) {
+export function EmptyState({ title, icon, children, actions }: { title: string; icon?: React.ReactNode; children?: React.ReactNode; actions?: React.ReactNode }) {
   return (
     <div className="glass-card flex flex-col items-center rounded-card px-6 py-16 text-center">
       {icon ? <span className="mb-5 grid size-12 place-items-center rounded-2xl bg-fg/[0.05] text-subtle [&_svg]:size-6">{icon}</span> : null}
       <p className="text-lg font-semibold tracking-tight text-fg">{title}</p>
       {children ? <div className="mt-2 max-w-sm text-sm leading-relaxed text-muted">{children}</div> : null}
+      {actions ? <div className="mt-7 flex flex-col gap-2.5 sm:flex-row">{actions}</div> : null}
     </div>
   );
 }
