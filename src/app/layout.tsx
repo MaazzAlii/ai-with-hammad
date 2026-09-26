@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 
 import { publicEnv } from "@/lib/env";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import { getPublicSettings } from "@/server/dal/public/site";
 
 import { fontMono, fontSans } from "./fonts";
@@ -22,11 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f2f3f6" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0c0f" },
-  ],
-  colorScheme: "light dark",
+  // Light by default; the theme toggle rewrites this meta tag when dark mode is chosen.
+  themeColor: "#f2f3f6",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -34,7 +33,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fontSans.variable} ${fontMono.variable}`}>
+    <html lang="en" className={`${fontSans.variable} ${fontMono.variable}`} suppressHydrationWarning>
+      <head>
+        <Script id="theme-boot" strategy="beforeInteractive">
+          {THEME_BOOT_SCRIPT}
+        </Script>
+      </head>
       <body className="min-h-dvh overflow-x-clip">
         <div aria-hidden className="ambient" />
         {children}
