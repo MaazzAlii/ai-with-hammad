@@ -83,12 +83,17 @@ export type LinkPageData = {
   links: BioLinkDTO[];
   partners: BioLinkDTO[];
   socials: BioLinkDTO[];
-  people: { member: TeamMemberDTO; links: BioLinkDTO[] }[];
+  /** One card per person who has at least one live link assigned in Admin → Link in bio. */
+  people: { member: TeamMemberDTO; profiles: BioLinkDTO[]; links: BioLinkDTO[] }[];
 };
 
-/** Everything /links renders, grouped. People = featured team members (their profile socials + assigned links). */
+/**
+ * Everything /links renders, grouped. A person's card shows only the links the admin assigned to
+ * them ("Belongs to"): `social` links as the icon row, everything else as rows. Nothing is pulled in
+ * automatically from team profiles, so hiding/unpublishing a link in the admin hides it here.
+ */
 export const getLinkPage = cache(async (): Promise<LinkPageData> => {
-  const [all, team] = await Promise.all([listLiveBioLinks(), listPublishedTeam({ featuredOnly: true })]);
+  const [all, team] = await Promise.all([listLiveBioLinks(), listPublishedTeam()]);
   const general = all.filter((l) => !l.teamMemberId);
   return {
     featured: general.filter((l) => l.isFeatured && l.kind !== "social"),
@@ -96,7 +101,10 @@ export const getLinkPage = cache(async (): Promise<LinkPageData> => {
     partners: general.filter((l) => !l.isFeatured && (l.kind === "affiliate" || l.kind === "sponsor")),
     socials: general.filter((l) => l.kind === "social"),
     people: team
-      .map((member) => ({ member, links: all.filter((l) => l.teamMemberId === member.id) }))
-      .filter((p) => p.links.length || p.member.links.length),
+      .map((member) => {
+        const mine = all.filter((l) => l.teamMemberId === member.id);
+        return { member, profiles: mine.filter((l) => l.kind === "social"), links: mine.filter((l) => l.kind !== "social") };
+      })
+      .filter((p) => p.profiles.length || p.links.length),
   };
 });
