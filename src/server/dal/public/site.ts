@@ -42,12 +42,12 @@ export type NavLink = { label: string; href: string; external: boolean };
 const DEFAULT_NAV: Record<"header" | "footer" | "legal", NavLink[]> = {
   header: [
     { label: "Services", href: "/services", external: false },
-    { label: "Projects", href: "/projects", external: false },
+    { label: "Our work", href: "/projects", external: false },
+    { label: "Tutorials", href: "/content", external: false },
+    { label: "For brands", href: "/sponsorship", external: false },
     { label: "Team", href: "/team", external: false },
-    { label: "Content", href: "/content", external: false },
-    { label: "Sponsorship", href: "/sponsorship", external: false },
     { label: "About", href: "/about", external: false },
-    { label: "Links", href: "/links", external: false },
+    { label: "All links", href: "/links", external: false },
   ],
   footer: [
     { label: "Services", href: "/services", external: false },
@@ -63,7 +63,7 @@ const DEFAULT_NAV: Record<"header" | "footer" | "legal", NavLink[]> = {
   ],
 };
 
-const LINKS_TAB: NavLink = { label: "Links", href: "/links", external: false };
+const LINKS_TAB: NavLink = { label: "All links", href: "/links", external: false };
 
 export const getNavigation = cache(async () => {
   const rows = await withPublicDb(null, (db) =>
