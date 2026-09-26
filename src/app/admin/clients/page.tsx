@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 
 import { AdminPageHeader } from "@/components/admin/page-header";
@@ -22,7 +22,7 @@ export default async function ClientsPage() {
       />
       {rows.length ? (
         <Table>
-          <thead><tr><Th>Client</Th><Th>Contact</Th><Th>Portal users</Th><Th>Open conversations</Th><Th>Status</Th></tr></thead>
+          <thead><tr><Th>Client</Th><Th>Contact</Th><Th>Portal users</Th><Th>Open conversations</Th><Th>Status</Th><Th className="text-right">Actions</Th></tr></thead>
           <tbody>
             {rows.map((c) => (
               <tr key={c.id}>
@@ -31,6 +31,11 @@ export default async function ClientsPage() {
                 <Td>{c.users}</Td>
                 <Td>{c.openThreads}</Td>
                 <Td>{c.isActive ? <span className="text-success">Active</span> : <span className="text-subtle">Inactive</span>}</Td>
+                <Td className="text-right">
+                  <Link href={`/admin/clients/${c.id}`} className={buttonVariants({ variant: "secondary", size: "sm" })}>
+                    <Pencil aria-hidden /> Edit
+                  </Link>
+                </Td>
               </tr>
             ))}
           </tbody>
