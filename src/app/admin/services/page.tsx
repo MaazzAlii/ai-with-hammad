@@ -16,6 +16,7 @@ export default async function ServicesAdminPage() {
   const staff = await requirePagePermission("cms.read");
   const rows = await listServicesAdmin();
   const canPublish = can(staff, "services.publish");
+  const canDelete = can(staff, "services.delete");
   return (
     <>
       <AdminPageHeader title="Services" description="Drag to change the order on the website." actions={can(staff, "services.write") ? <Link href="/admin/services/new" className={buttonVariants()}><Plus /> New service</Link> : null} />
@@ -28,7 +29,7 @@ export default async function ServicesAdminPage() {
           }}
           items={rows.map((s) => ({
             id: s.id,
-            content: <EntityRow href={`/admin/services/${s.id}`} title={s.title} meta={`/services/${s.slug}`} thumb={false} entity="services" id={s.id} canPublish={canPublish} flags={[{ flag: "isPublished", value: s.isPublished, label: "Published", offLabel: "Draft" }, { flag: "isFeatured", value: s.isFeatured, label: "Featured" }]} />,
+            content: <EntityRow href={`/admin/services/${s.id}`} title={s.title} meta={`/services/${s.slug}`} thumb={false} entity="services" id={s.id} canPublish={canPublish} canDelete={canDelete} label="service" flags={[{ flag: "isPublished", value: s.isPublished, label: "Published", offLabel: "Draft" }, { flag: "isFeatured", value: s.isFeatured, label: "Featured" }]} />,
           }))}
         />
       ) : <EmptyState title="No services yet" />}
