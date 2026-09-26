@@ -5,7 +5,9 @@ import { sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { publicEnv, serverEnv } from "@/lib/env";
 
-import { listLiveBioLinks } from "../public/links";
+import { bioLinks } from "@/db/schema";
+
+import { listLiveBioLinks, whyNotLive } from "../public/links";
 import { dashboardStats, pendingTestimonialCount, recentActivity, recentInquiries } from "./dashboard";
 import { unreadThreadCount } from "../portal";
 
@@ -80,6 +82,23 @@ export async function runSystemChecks(): Promise<Check[]> {
   }
 
   checks.push(await timed("Link in bio", "Live links (what /links shows)", async () => `${(await listLiveBioLinks()).length} live link(s)`));
+  // One row per saved link, with the exact reason when it is not showing.
+  const links = await getDb()
+    .select({ title: bioLinks.title, url: bioLinks.url, isPublished: bioLinks.isPublished, deletedAt: bioLinks.deletedAt, startsAt: bioLinks.startsAt, endsAt: bioLinks.endsAt })
+    .from(bioLinks)
+    .catch(() => []);
+  const [{ now }] = await getDb().execute<{ now: string }>(sql`select now()::text as now`).catch(() => [{ now: "unknown" }]);
+  checks.push({ group: "Link in bio", name: "Database clock", ok: true, ms: 0, detail: `${now} (server: ${new Date().toISOString()})` });
+  for (const l of links) {
+    const reason = whyNotLive(l);
+    checks.push({
+      group: "Link in bio",
+      name: `“${l.title}”`,
+      ok: !reason,
+      ms: 0,
+      detail: reason ?? `live · ${l.url}${l.startsAt ? ` · from ${l.startsAt.toISOString()}` : ""}${l.endsAt ? ` · until ${l.endsAt.toISOString()}` : ""}`,
+    });
+  }
 
   const dashboard = await Promise.all([
     timed("Dashboard widgets", "Content & media counts", async () => {
