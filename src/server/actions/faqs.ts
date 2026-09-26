@@ -1,9 +1,9 @@
 "use server";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { faqs } from "@/db/schema";
+import { faqs, siteSettings } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { formDataToObject } from "@/lib/form-data";
 import { faqSchema } from "@/lib/validation/portal";
@@ -30,5 +30,30 @@ export async function saveFaq(id: string | null, _prev: unknown, fd: FormData): 
     await audit(staff, { action: id ? "faq.update" : "faq.create", entityType: "faq", entityId: fid, summary: input.question.slice(0, 80) });
     revalidatePublicSite();
     return ok({ id: fid }, "FAQ saved");
+  });
+}
+
+/**
+ * Show/hide the FAQ section on the homepage and contact page. Merges `showFaq` into the
+ * existing settings JSON so the rest of the homepage/contact settings are untouched.
+ */
+export async function saveFaqVisibility(_prev: unknown, fd: FormData): Promise<ActionResult> {
+  return runAction(async () => {
+    const staff = await authorize("faqs.write");
+    const on = (v: FormDataEntryValue | null) => v === "on";
+    const db = getDb();
+    for (const [key, showFaq] of [["home", on(fd.get("home"))], ["contact", on(fd.get("contact"))]] as const) {
+      const patch = JSON.stringify({ showFaq });
+      await db
+        .insert(siteSettings)
+        .values({ key, value: { showFaq }, updatedBy: staff.id })
+        .onConflictDoUpdate({
+          target: siteSettings.key,
+          set: { value: sql`site_settings.value || ${patch}::jsonb`, updatedBy: staff.id, updatedAt: new Date() },
+        });
+    }
+    await audit(staff, { action: "settings.update", entityType: "settings", entityId: "faq-visibility", summary: "Updated FAQ section visibility" });
+    revalidatePublicSite();
+    return ok(undefined, "FAQ visibility saved");
   });
 }
