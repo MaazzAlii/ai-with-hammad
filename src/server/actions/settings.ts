@@ -22,6 +22,8 @@ const json = (v: unknown) => {
   }
 };
 const lines = (v: unknown) => (typeof v === "string" ? v.split("\n").map((s) => s.trim()).filter(Boolean) : []);
+/** Checkbox/switch value: present ("on") = true, absent = false. */
+const on = (v: unknown) => v === "on" || v === "true" || v === true;
 const nullable = (v: unknown) => (typeof v === "string" && v.trim() === "" ? null : v);
 
 /** Turn flat form fields into the nested settings shape before strict validation. */
@@ -30,7 +32,7 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
     case "general":
       return { ...o, logoMediaId: nullable(o.logoMediaId) };
     case "home":
-      return { ...o, heroMediaId: nullable(o.heroMediaId), capabilities: json(o.capabilities), process: json(o.process), techStack: lines(o.techStack) };
+      return { ...o, heroMediaId: nullable(o.heroMediaId), capabilities: json(o.capabilities), process: json(o.process), techStack: lines(o.techStack), showFaq: on(o.showFaq) };
     case "about":
       return { ...o, values: json(o.values) };
     case "seo":
@@ -49,7 +51,7 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
         totalReach: null,
       };
     case "contact":
-      return { intro: o.intro, budgets: lines(o.budgets), timelines: lines(o.timelines) };
+      return { intro: o.intro, budgets: lines(o.budgets), timelines: lines(o.timelines), showFaq: on(o.showFaq) };
     case "internal.notifications":
       return { inquiryRecipients: lines(o.inquiryRecipients) };
   }
