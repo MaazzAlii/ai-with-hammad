@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+
 /**
  * Centered sign-in surface shared by staff login, client portal login and
  * password setup: one glass panel floating over the ambient background.
@@ -18,7 +20,8 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="page-enter grid min-h-dvh place-items-center px-4 py-12">
+    <main className="page-enter relative grid min-h-dvh place-items-center px-4 py-12">
+      <ThemeToggle className="glass-card absolute top-[max(1rem,env(safe-area-inset-top))] right-4" />
       <div className="w-full max-w-[25rem]">
         <div className="glass-panel rounded-[2rem] p-7 sm:p-9">
           {brand ? (
