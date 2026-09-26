@@ -47,6 +47,7 @@ const DEFAULT_NAV: Record<"header" | "footer" | "legal", NavLink[]> = {
     { label: "Content", href: "/content", external: false },
     { label: "Sponsorship", href: "/sponsorship", external: false },
     { label: "About", href: "/about", external: false },
+    { label: "Links", href: "/links", external: false },
   ],
   footer: [
     { label: "Services", href: "/services", external: false },
@@ -62,20 +63,25 @@ const DEFAULT_NAV: Record<"header" | "footer" | "legal", NavLink[]> = {
   ],
 };
 
+const LINKS_TAB: NavLink = { label: "Links", href: "/links", external: false };
+
 export const getNavigation = cache(async () => {
   const rows = await withPublicDb(null, (db) =>
     db
-      .select({ location: navigationItems.location, label: navigationItems.label, href: navigationItems.href, isExternal: navigationItems.isExternal })
+      .select({ location: navigationItems.location, label: navigationItems.label, href: navigationItems.href, isExternal: navigationItems.isExternal, isVisible: navigationItems.isVisible })
       .from(navigationItems)
-      .where(eq(navigationItems.isVisible, true))
       .orderBy(asc(navigationItems.sortOrder), asc(navigationItems.label)),
   );
   if (!rows) return DEFAULT_NAV;
   const out: Record<"header" | "footer" | "legal", NavLink[]> = { header: [], footer: [], legal: [] };
   for (const r of rows) {
+    if (!r.isVisible) continue;
     const href = safeHref(r.href);
     if (href) out[r.location].push({ label: r.label, href, external: r.isExternal || href.startsWith("https://") });
   }
+  // The link-in-bio page gets a header tab by default. Once a header item for /links exists
+  // (visible or hidden) in Admin → Navigation, that item decides its label, position and visibility.
+  if (!rows.some((r) => r.location === "header" && r.href === "/links")) out.header.push(LINKS_TAB);
   return out;
 });
 
