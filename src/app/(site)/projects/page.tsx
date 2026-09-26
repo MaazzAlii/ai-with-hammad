@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/site/json-ld";
 import { ProjectCard } from "@/components/site/project-card";
 import { EmptyState, PageHeader, Section } from "@/components/site/section";
 import { breadcrumbLd } from "@/lib/jsonld";
+import { buttonVariants } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { getProjectFacets, listPublishedProjects } from "@/server/dal/public/projects";
@@ -85,7 +86,18 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
             ))}
           </ul>
         ) : (
-          <EmptyState title={category || tech ? "No projects match these filters" : "Case studies coming soon"} icon={<FolderKanban />}>
+          <EmptyState
+            title={category || tech ? "No projects match these filters" : "Case studies coming soon"}
+            icon={<FolderKanban />}
+            actions={
+              category || tech ? null : (
+                <>
+                  <Link href="/contact" className={buttonVariants()}>Start a project</Link>
+                  <Link href="/services" className={buttonVariants({ variant: "secondary" })}>What we build</Link>
+                </>
+              )
+            }
+          >
             {category || tech ? <Link href="/projects" className="font-medium text-accent hover:underline">Clear filters</Link> : "We're preparing detailed write-ups of our work."}
           </EmptyState>
         )}
