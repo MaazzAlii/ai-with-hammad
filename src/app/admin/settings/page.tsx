@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { AdminForm } from "@/components/admin/admin-form";
-import { FormSection, TextAreaField, TextField } from "@/components/admin/fields";
+import { FormSection, SwitchField, TextAreaField, TextField } from "@/components/admin/fields";
 import { MediaField } from "@/components/admin/media-picker";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { RepeaterField } from "@/components/admin/repeater";
@@ -104,6 +104,9 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <RepeaterField name="process" label="Process steps" columns={titled} defaultValue={s.home.process} max={8} />
               <TextAreaField name="techStack" label="Tech stack strip" rows={4} defaultValue={s.home.techStack.join("\n")} hint="One technology per line — only tools you actually use. Leave empty to hide." />
             </FormSection>
+            <FormSection title="Sections" className="mt-6">
+              <SwitchField name="showFaq" label="Show the FAQ section on the homepage" defaultChecked={s.home.showFaq} hint="Questions are managed in Admin → FAQs." />
+            </FormSection>
           </AdminForm>
         ) : null}
         {tab === "about" ? (
@@ -157,6 +160,7 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <TextAreaField name="intro" label="Intro" rows={3} defaultValue={s.contact.intro} />
               <TextAreaField name="budgets" label="Budget options" rows={5} defaultValue={s.contact.budgets.join("\n")} hint="One per line. Leave empty to hide the field." />
               <TextAreaField name="timelines" label="Timeline options" rows={4} defaultValue={s.contact.timelines.join("\n")} />
+              <SwitchField name="showFaq" label="Show the FAQ section on the contact page" defaultChecked={s.contact.showFaq} />
             </FormSection>
           </AdminForm>
         ) : null}
