@@ -34,3 +34,20 @@ with headless Microsoft Edge (Playwright). File names end in the scroll position
   password/captcha must be done by a person. The admin layout is now `force-dynamic` (it previously built several
   admin pages as static), which is the most likely cause of "dashboard shows no data".
 - `/admin/links` and `/links` with real links — run `supabase/migrations/20260926_bio_links.sql` first.
+
+## Update — theme toggle and UI fixes (commit `2f55fd3`)
+
+**Staff login URL:** https://ai-with-hammad2.vercel.app/kasayhobro
+
+| Screenshot | What it checks |
+| --- | --- |
+| `admin-login-light-0.png`, `admin-login-dark-0.png` | Staff sign-in at `/kasayhobro`, both themes, theme toggle top-right |
+| `home-dark-toggle-0.png`, `-2700.png` | Dark mode = original cyan look (toggle in navbar); team grid sized to member count |
+| `home-mobile-header-fixed-0.png` | Phone header: name on one line, theme toggle, menu button |
+| `team-profile-mobile-fixed-0.png` | Compact monogram instead of a screen-tall empty photo frame |
+| `breadcrumb-fixed-0.png` | Breadcrumb with separator (dark) |
+
+Fixed in this update: button class-merge bug (hidden-on-phone buttons showed anyway), header name wrapping on
+phones, missing breadcrumb separator, oversized team placeholder on phones, lone team card leaving an empty row,
+FAQ heading alignment. Added: light/dark toggle everywhere (light default), FAQ show/hide switches
+(Admin → FAQs, or Settings → Homepage / Contact).
