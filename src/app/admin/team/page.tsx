@@ -18,6 +18,7 @@ export default async function TeamAdminPage() {
   const rows = await listTeamAdmin();
   const photos = await getMediaMany(rows.map((r) => r.photoMediaId));
   const canPublish = can(staff, "team.publish");
+  const canDelete = can(staff, "team.delete");
   return (
     <>
       <AdminPageHeader title="Team" description="Core team members appear on the homepage." actions={can(staff, "team.write") ? <Link href="/admin/team/new" className={buttonVariants()}><Plus /> New member</Link> : null} />
@@ -30,7 +31,7 @@ export default async function TeamAdminPage() {
           }}
           items={rows.map((m) => ({
             id: m.id,
-            content: <EntityRow href={`/admin/team/${m.id}`} title={m.name} meta={m.roleTitle} thumb={m.photoMediaId ? photos.get(m.photoMediaId) : null} entity="team" id={m.id} canPublish={canPublish} flags={[{ flag: "isPublished", value: m.isPublished, label: "Published", offLabel: "Draft" }, { flag: "isFeatured", value: m.isFeatured, label: "Core team" }]} />,
+            content: <EntityRow href={`/admin/team/${m.id}`} title={m.name} meta={m.roleTitle} thumb={m.photoMediaId ? photos.get(m.photoMediaId) : null} entity="team" id={m.id} canPublish={canPublish} canDelete={canDelete && !m.isLocked} label="team member" flags={[{ flag: "isPublished", value: m.isPublished, label: "Published", offLabel: "Draft" }, { flag: "isFeatured", value: m.isFeatured, label: "Core team" }]} />,
           }))}
         />
       ) : <EmptyState title="No team members yet" />}
