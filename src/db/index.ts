@@ -23,14 +23,29 @@ export function isDatabaseConfigured(): boolean {
  *
  * `prepare: false` keeps it compatible with the Supabase transaction pooler.
  */
+/**
+ * Connections per process. `next build` prerenders pages in several parallel workers and
+ * Vercel runs many function instances, so each keeps a tiny pool (queries queue briefly
+ * instead of exhausting the database's client limit and hanging). DB_POOL_MAX overrides.
+ */
+function poolSize(): number {
+  const override = Number(process.env.DB_POOL_MAX);
+  if (Number.isInteger(override) && override > 0) return override;
+  if (process.env.NEXT_PHASE === "phase-production-build") return 1;
+  return process.env.NODE_ENV === "production" ? 2 : 10;
+}
+
 export function getDb(): Database {
   if (globalForDb.__aiwhDb) return globalForDb.__aiwhDb;
   const url = serverEnv().databaseUrl;
   if (!url) throw new Error("DATABASE_URL is not configured");
   const client = postgres(url, {
     prepare: false,
-    max: process.env.NODE_ENV === "production" ? 5 : 10,
-    idle_timeout: 20,
+    max: poolSize(),
+    // Return idle connections quickly: serverless instances and build workers each hold a
+    // pool, and Supabase's poolers only allow a limited number of clients in total.
+    idle_timeout: 5,
+    max_lifetime: 60 * 5,
     connect_timeout: 10,
   });
   const db = drizzle(client, { schema });
