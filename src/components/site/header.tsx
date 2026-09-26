@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, UserRound } from "lucide-react";
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -26,6 +26,9 @@ export function SiteHeader({ siteName, logo, links }: { siteName: string; logo: 
       </nav>
       <div className="flex shrink-0 items-center gap-0.5">
         <ThemeToggle />
+        <Link href="/portal/login" className={buttonVariants({ variant: "ghost", size: "sm", className: "hidden xl:inline-flex" })}>
+          <UserRound aria-hidden /> Client login
+        </Link>
         <Link href="/contact" className={buttonVariants({ size: "sm", className: "group/cta ml-1 hidden sm:inline-flex" })}>
           Start a project
           <ArrowRight aria-hidden className="transition-transform duration-(--duration-base) ease-spring group-hover/cta:translate-x-0.5" />
