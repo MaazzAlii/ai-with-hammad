@@ -7,8 +7,11 @@ import { formatBytes, formatDate } from "@/lib/utils";
 import { can, requireStaff } from "@/server/auth/session";
 import { dashboardStats, pendingTestimonialCount, recentActivity, recentInquiries } from "@/server/dal/admin/dashboard";
 import { unreadThreadCount } from "@/server/dal/portal";
+import { settle } from "@/server/with-timeout";
 
 export const metadata = { title: "Dashboard" };
+
+const ZERO = { published: 0, drafts: 0 };
 
 function Stat({ label, value, sub, href }: { label: string; value: number | string; sub?: string; href?: string }) {
   const body = (
@@ -28,13 +31,22 @@ function Stat({ label, value, sub, href }: { label: string; value: number | stri
 export default async function DashboardPage(props: PageProps<"/admin">) {
   const staff = await requireStaff();
   const sp = await props.searchParams;
-  const [stats, inquiries, activity, unread, pendingReviews] = await Promise.all([
-    dashboardStats(),
-    can(staff, "inquiries.read") ? recentInquiries() : Promise.resolve([]),
-    can(staff, "audit.read") ? recentActivity() : Promise.resolve([]),
-    can(staff, "messages.read") ? unreadThreadCount() : Promise.resolve(0),
-    pendingTestimonialCount(),
+  // Each widget settles on its own with a time limit: one slow or failing query can
+  // never leave the whole dashboard stuck on its loading skeleton.
+  const emptyStats: Awaited<ReturnType<typeof dashboardStats>> = {
+    content: { projects: ZERO, services: ZERO, team: ZERO, content: ZERO },
+    inquiries: { contact: [], sponsorship: [] },
+    media: [],
+  };
+  const results = await Promise.all([
+    settle(dashboardStats(), emptyStats, "Content & media counts"),
+    settle(can(staff, "inquiries.read") ? recentInquiries() : Promise.resolve([]), [], "Latest inquiries"),
+    settle(can(staff, "audit.read") ? recentActivity() : Promise.resolve([]), [], "Recent activity"),
+    settle(can(staff, "messages.read") ? unreadThreadCount() : Promise.resolve(0), 0, "Unread messages"),
+    settle(pendingTestimonialCount(), 0, "Testimonials to review"),
   ]);
+  const [stats, inquiries, activity, unread, pendingReviews] = [results[0].value, results[1].value, results[2].value, results[3].value, results[4].value];
+  const failures = results.flatMap((r) => (r.error ? [r.error] : []));
   const newCount = [...stats.inquiries.contact, ...stats.inquiries.sponsorship].filter((r) => r.status === "new").reduce((n, r) => n + r.n, 0);
   const openCount = [...stats.inquiries.contact, ...stats.inquiries.sponsorship].filter((r) => ["new", "contacted", "qualified", "proposal"].includes(r.status)).reduce((n, r) => n + r.n, 0);
   const mediaCount = stats.media.reduce((n, m) => n + m.count, 0);
@@ -44,6 +56,15 @@ export default async function DashboardPage(props: PageProps<"/admin">) {
     <>
       <AdminPageHeader title={`Welcome${staff.fullName ? `, ${staff.fullName.split(" ")[0]}` : ""}`} description="Live counts from the database." />
       {sp.denied ? <Alert tone="warning" className="mb-6">You don&apos;t have permission to open that page.</Alert> : null}
+      {failures.length ? (
+        <Alert tone="danger" className="mb-6">
+          <p className="font-medium">Some numbers couldn&apos;t load right now.</p>
+          <ul className="mt-1 list-disc pl-5 text-xs">
+            {failures.map((f) => <li key={f}>{f}</li>)}
+          </ul>
+          {can(staff, "settings.write") ? <Link href="/admin/status" className="mt-2 inline-block text-xs font-medium underline">Open system status</Link> : null}
+        </Alert>
+      ) : null}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {can(staff, "inquiries.read") ? <Stat label="New inquiries" value={newCount} sub={`${openCount} open in pipeline`} href="/admin/inquiries?status=new" /> : null}
         {can(staff, "messages.read") ? <Stat label="Unread client messages" value={unread} href="/admin/messages?unread=1" /> : null}
