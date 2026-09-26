@@ -36,7 +36,7 @@ export function SiteFooter({
     <footer className="no-print pb-safe">
       <div className="container-page">
         <hr className="hairline" />
-        <div className="grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr] lg:py-20">
+        <div className="grid gap-12 py-14 lg:grid-cols-[1fr_1.6fr_auto] lg:gap-16 lg:py-20">
           <div>
             <Logo name={siteName} logo={logo} />
             {tagline ? <p className="mt-4 max-w-xs text-[0.9375rem] leading-relaxed text-muted">{tagline}</p> : null}
@@ -71,7 +71,7 @@ export function SiteFooter({
           </div>
           <nav aria-label="Footer">
             <h2 className="label-caps mb-4">Explore</h2>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm sm:grid-cols-3">
               {links.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className={linkClass} {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
@@ -79,11 +79,13 @@ export function SiteFooter({
                   </Link>
                 </li>
               ))}
+              {links.some((l) => l.href === "/links") ? null : (
               <li>
                 <Link href="/links" className={linkClass}>
-                  All our links
+                  All links
                 </Link>
               </li>
+              )}
               <li>
                 <Link href="/portal/login" className={linkClass}>
                   Client portal
