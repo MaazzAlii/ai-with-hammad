@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Tilt } from "@/components/ui/tilt";
 import type { TeamMemberDTO } from "@/server/dal/public/team";
 
 import { MediaImage, MediaPlaceholder } from "./media-image";
@@ -15,8 +16,8 @@ export function initials(name: string) {
 export function TeamCard({ member, compact = false }: { member: TeamMemberDTO; compact?: boolean }) {
   const ratio = compact ? "1/1" : "4/3";
   return (
-    <article className="group relative">
-      <div className="transition-transform duration-(--duration-slow) ease-spring group-active:scale-[0.985]">
+    <article data-tilt-root className="group relative">
+      <Tilt className="rounded-media transition-transform duration-(--duration-slow) ease-spring group-active:scale-[0.985]">
         {member.photo ? (
           <MediaImage
             media={member.photo}
@@ -29,7 +30,7 @@ export function TeamCard({ member, compact = false }: { member: TeamMemberDTO; c
         ) : (
           <MediaPlaceholder label={initials(member.name)} ratio={ratio} />
         )}
-      </div>
+      </Tilt>
       <h3 className="mt-3.5 text-base font-semibold tracking-tight text-fg">
         <Link href={`/team/${member.slug}`} className="after:absolute after:inset-0 after:rounded-media">
           {member.name}
