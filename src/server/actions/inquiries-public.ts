@@ -89,7 +89,8 @@ export async function submitContactInquiry(raw: unknown): Promise<ActionResult<{
         budget: input.budget,
         timeline: input.timeline,
         message: input.message,
-        sourcePath: "/contact",
+        // The site assistant's "share your details" form reuses this pipeline.
+        sourcePath: (raw as { source?: unknown } | null)?.source === "assistant" ? "/assistant" : "/contact",
         ipHash: meta.ipHash,
         userAgent: meta.userAgent,
       })
