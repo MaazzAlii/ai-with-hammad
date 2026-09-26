@@ -40,6 +40,7 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
     items: [
       { href: "/admin/users", label: "Users", icon: "users", permission: "users.read" },
       { href: "/admin/audit", label: "Audit log", icon: "audit", permission: "audit.read" },
+      { href: "/admin/status", label: "System status", icon: "status", permission: "settings.write" },
     ],
   },
 ];
