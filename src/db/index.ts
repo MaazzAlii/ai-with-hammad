@@ -54,4 +54,16 @@ export function getDb(): Database {
   return db;
 }
 
+/**
+ * Drop the shared client after a timeout. A connection stuck waiting on the database's
+ * pooler would otherwise wedge every later request on this server instance; the next
+ * getDb() call opens a fresh pool.
+ */
+export function resetDb(): void {
+  const client = globalForDb.__aiwhSql;
+  globalForDb.__aiwhSql = undefined;
+  globalForDb.__aiwhDb = undefined;
+  client?.end({ timeout: 0 }).catch(() => {});
+}
+
 export { schema };
