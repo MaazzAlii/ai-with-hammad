@@ -25,3 +25,22 @@ describe("bio link schema", () => {
     expect(bioLinkSchema.parse({ ...base, startsAt: "2026-10-01T10:00", endsAt: "" }).endsAt).toBeNull();
   });
 });
+
+describe("whyNotLive", async () => {
+  const { whyNotLive } = await import("@/server/dal/public/links");
+  const base = { isPublished: true, deletedAt: null, startsAt: null, endsAt: null, url: "mailto:hello@example.com" };
+  const now = new Date("2026-09-26T12:00:00Z");
+
+  it("is live when published, in schedule and the URL is valid", () => {
+    expect(whyNotLive(base, now)).toBeNull();
+    expect(whyNotLive({ ...base, url: "https://example.com" }, now)).toBeNull();
+  });
+
+  it("explains every reason a link is hidden", () => {
+    expect(whyNotLive({ ...base, isPublished: false }, now)).toMatch(/Published is off/);
+    expect(whyNotLive({ ...base, deletedAt: now }, now)).toBe("deleted");
+    expect(whyNotLive({ ...base, startsAt: new Date("2026-09-27T00:00:00Z") }, now)).toMatch(/scheduled/);
+    expect(whyNotLive({ ...base, endsAt: new Date("2026-09-25T00:00:00Z") }, now)).toMatch(/expired/);
+    expect(whyNotLive({ ...base, url: "http://insecure.example" }, now)).toMatch(/URL/);
+  });
+});
