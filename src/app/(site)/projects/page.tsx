@@ -78,7 +78,7 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
           {projects.length} project{projects.length === 1 ? "" : "s"} shown
         </p>
         {projects.length ? (
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p, i) => (
               <li key={p.id}>
                 <ProjectCard project={p} priority={i < 2} headingLevel={2} />
