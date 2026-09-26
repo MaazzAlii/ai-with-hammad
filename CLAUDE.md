@@ -54,7 +54,7 @@ scripts/local            local test stack (Postgres + real GoTrue + storage emul
 
 ## 5. Design system (see `docs/DESIGN_SYSTEM.md`)
 
-"Liquid Glass": light by default with a dark palette via `prefers-color-scheme`; ocean-blue
+"Liquid Glass": light by default; a theme toggle switches to dark (the original near-black/cyan look, `html[data-theme="dark"]`); ocean-blue
 `--color-accent` / teal `--color-accent-2` reserved for primary actions and selection. Glass materials form
 a hierarchy (`glass-chrome` > `glass-panel` > `glass-card`; `glass-float`, `glass-sheet`, `surface-solid`) —
 don't make everything glass. System font (SF Pro) then Inter, self-hosted via `next/font/local`; JetBrains
