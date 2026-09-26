@@ -38,9 +38,9 @@ export default async function NavigationPage() {
                   items={list.map((i) => ({
                     id: i.id,
                     content: (
-                      <details>
+                      <details className="group/row">
                         <summary className="cursor-pointer list-none">
-                          <EntityRow title={i.label} meta={i.href} thumb={false} entity="navigation" id={i.id} canPublish flags={[{ flag: "isVisible", value: i.isVisible, label: "Visible", offLabel: "Hidden" }]} />
+                          <EntityRow title={i.label} meta={i.href} thumb={false} entity="navigation" id={i.id} canPublish inlineEdit label="menu link" flags={[{ flag: "isVisible", value: i.isVisible, label: "Visible", offLabel: "Hidden" }]} />
                         </summary>
                         <div className="border-t border-border p-4">
                           <AdminForm compact action={saveNavItem.bind(null, i.id)} footer={<DeleteEntityButton entity="navigation" id={i.id} redirectTo="/admin/navigation" label="link" />}>
