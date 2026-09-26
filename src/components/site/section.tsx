@@ -93,7 +93,7 @@ export function Breadcrumb({ href, label, current }: { href: string; label: stri
             {label}
           </Link>
         </li>
-        <li aria-hidden className="text-border-strong">/</li>
+        <li aria-hidden className="text-subtle/70">/</li>
         <li aria-current="page" className="min-w-0 truncate text-subtle">
           {current}
         </li>
