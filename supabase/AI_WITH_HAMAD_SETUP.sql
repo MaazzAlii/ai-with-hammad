@@ -1490,6 +1490,11 @@ from (values
 ) as v(location, label, href, sort_order)
 where not exists (select 1 from public.navigation_items);
 
+-- Link in bio in the header navigation (added in v2; only inserted when missing).
+insert into public.navigation_items (location, label, href, sort_order)
+select 'header'::public.nav_location, 'Links', '/links', 70
+where not exists (select 1 from public.navigation_items where location = 'header' and href = '/links');
+
 insert into public.legal_documents (slug, title, body, effective_on) values
   ('privacy-policy', 'Privacy Policy', $md$
 This policy explains what personal information AI With Hamad ("we", "us") collects through this website, why, and what choices you have. **Please review and adapt this text with qualified legal advice for your jurisdiction before relying on it.**
