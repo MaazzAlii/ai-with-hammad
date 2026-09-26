@@ -101,7 +101,7 @@ export default async function LinksPage() {
         </section>
       ) : null}
 
-      {data.people.map(({ member, links }) => (
+      {data.people.map(({ member, profiles, links }) => (
         <section key={member.id} aria-labelledby={`p-${member.id}`} data-reveal="item" className="glass-card mt-8 rounded-[1.75rem] p-4">
           <div className="flex items-center gap-3 px-1">
             {member.photo ? (
@@ -120,9 +120,9 @@ export default async function LinksPage() {
               {member.roleTitle ? <p className="truncate text-sm text-muted">{member.roleTitle}</p> : null}
             </div>
           </div>
-          {member.links.length ? (
+          {profiles.length ? (
             <div className="mt-4">
-              <SocialRow label={`${member.name} on social media`} items={member.links.map((s) => ({ key: s.platform, href: s.url, name: s.label || s.platform }))} />
+              <SocialRow label={`${member.name} on social media`} items={profiles.map((s) => ({ key: s.icon || s.title, href: href(s), name: `${member.name} on ${s.title}` }))} />
             </div>
           ) : null}
           {links.length ? (
