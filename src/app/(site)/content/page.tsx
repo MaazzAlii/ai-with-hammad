@@ -46,7 +46,7 @@ export default async function ContentPage(props: PageProps<"/content">) {
       {highPerforming.length ? (
         <Section aria-labelledby="top-title">
           <SectionHeading id="top-title" eyebrow="Top performing" title="Audience favourites" />
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {highPerforming.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}
           </ul>
         </Section>
@@ -62,7 +62,7 @@ export default async function ContentPage(props: PageProps<"/content">) {
           </nav>
         ) : null}
         {items.length ? (
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}
           </ul>
         ) : (
