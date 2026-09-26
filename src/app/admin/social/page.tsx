@@ -1,4 +1,5 @@
 import { AdminForm } from "@/components/admin/admin-form";
+import { DeleteEntityButton } from "@/components/admin/delete-button";
 import { EntityRow } from "@/components/admin/entity-row";
 import { FormSection, SelectField, SwitchField, TextField } from "@/components/admin/fields";
 import { AdminPageHeader } from "@/components/admin/page-header";
@@ -34,6 +35,7 @@ export default async function SocialAdminPage() {
   const staff = await requirePagePermission("cms.read");
   const rows = await listSocialAdmin();
   const canWrite = can(staff, "content.write");
+  const canDelete = can(staff, "content.delete");
   const canPublish = can(staff, "content.publish");
   return (
     <>
@@ -48,12 +50,12 @@ export default async function SocialAdminPage() {
           items={rows.map((p) => ({
             id: p.id,
             content: (
-              <details className="group">
+              <details className="group/row">
                 <summary className="cursor-pointer list-none">
-                  <EntityRow title={`${PLATFORM_LABELS[p.platform]} · @${p.handle}`} meta={p.followers != null ? `${formatCompactNumber(p.followers)} followers` : undefined} thumb={false} entity="social" id={p.id} canPublish={canPublish} flags={[{ flag: "isActive", value: p.isActive, label: "Visible", offLabel: "Hidden" }]} />
+                  <EntityRow title={`${PLATFORM_LABELS[p.platform]} · @${p.handle}`} meta={p.followers != null ? `${formatCompactNumber(p.followers)} followers` : undefined} thumb={false} entity="social" id={p.id} canPublish={canPublish} inlineEdit label="platform" flags={[{ flag: "isActive", value: p.isActive, label: "Visible", offLabel: "Hidden" }]} />
                 </summary>
                 <div className="border-t border-border p-4">
-                  <AdminForm action={saveSocialPlatform.bind(null, p.id)} disabled={!canWrite} compact>
+                  <AdminForm action={saveSocialPlatform.bind(null, p.id)} disabled={!canWrite} compact footer={canDelete ? <DeleteEntityButton entity="social" id={p.id} label="platform" /> : null}>
                     <PlatformFields p={p} />
                   </AdminForm>
                 </div>
