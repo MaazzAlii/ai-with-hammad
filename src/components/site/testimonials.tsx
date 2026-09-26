@@ -7,7 +7,7 @@ import { MediaImage } from "./media-image";
 export function TestimonialGrid({ items }: { items: TestimonialDTO[] }) {
   if (!items.length) return null;
   return (
-    <ul data-reveal="group" className="columns-1 gap-5 sm:columns-2 lg:columns-3 [&>li]:mb-5">
+    <ul data-reveal="group" className="focus-group columns-1 gap-5 sm:columns-2 lg:columns-3 [&>li]:mb-5">
       {items.map((t) => (
         <li key={t.id} className="break-inside-avoid">
           <figure className="glass-card flex flex-col rounded-card p-6 sm:p-7">
