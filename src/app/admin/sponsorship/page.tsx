@@ -16,6 +16,7 @@ export default async function SponsorshipAdminPage() {
   const [packages, partners] = await Promise.all([listPackagesAdmin(), listPartnersAdmin()]);
   const canWrite = can(staff, "sponsorship.write");
   const canPublish = can(staff, "sponsorship.publish");
+  const canDelete = can(staff, "sponsorship.delete");
   return (
     <>
       <AdminPageHeader title="Sponsorship" description="Public partnership formats and previous partners. Audience data and page copy live in Settings → Sponsorship." />
@@ -32,7 +33,7 @@ export default async function SponsorshipAdminPage() {
               "use server";
               return reorder("packages", ids);
             }}
-            items={packages.map((p) => ({ id: p.id, content: <EntityRow href={`/admin/sponsorship/packages/${p.id}`} title={p.name} meta={p.summary} thumb={false} entity="packages" id={p.id} canPublish={canPublish} flags={[{ flag: "isPublished", value: p.isPublished, label: "Published", offLabel: "Draft" }]} /> }))}
+            items={packages.map((p) => ({ id: p.id, content: <EntityRow href={`/admin/sponsorship/packages/${p.id}`} title={p.name} meta={p.summary} thumb={false} entity="packages" id={p.id} canPublish={canPublish} canDelete={canDelete} label="package" flags={[{ flag: "isPublished", value: p.isPublished, label: "Published", offLabel: "Draft" }]} /> }))}
           />
         ) : <p className="text-sm text-muted">No packages. The sponsorship page falls back to the formats in Settings.</p>}
       </section>
@@ -48,7 +49,7 @@ export default async function SponsorshipAdminPage() {
               "use server";
               return reorder("partners", ids);
             }}
-            items={partners.map((p) => ({ id: p.id, content: <EntityRow href={`/admin/sponsorship/partners/${p.id}`} title={p.name} meta={p.campaignSummary} thumb={false} entity="partners" id={p.id} canPublish={canPublish} flags={[{ flag: "isPublished", value: p.isPublished, label: "Published", offLabel: "Draft" }]} /> }))}
+            items={partners.map((p) => ({ id: p.id, content: <EntityRow href={`/admin/sponsorship/partners/${p.id}`} title={p.name} meta={p.campaignSummary} thumb={false} entity="partners" id={p.id} canPublish={canPublish} canDelete={canDelete} label="partner" flags={[{ flag: "isPublished", value: p.isPublished, label: "Published", offLabel: "Draft" }]} /> }))}
           />
         ) : <p className="text-sm text-muted">No partners yet.</p>}
       </section>
