@@ -80,7 +80,7 @@ export default async function LinksPage() {
       <header className="flex flex-col items-center text-center">
         <LogoMark name={general.siteName} logo={media.logo} className="size-20 rounded-[1.4rem] text-3xl shadow-panel" />
         <h1 className="mt-5 text-[1.75rem]">{general.siteName}</h1>
-        {general.tagline ? <p className="mt-2 max-w-sm text-[0.9375rem] leading-relaxed text-muted">{general.tagline}</p> : null}
+        <p className="mt-2 max-w-sm text-[0.9375rem] leading-relaxed text-muted">Every channel, video and tool we recommend — in one place.</p>
         <div className="mt-5">
           <SocialRow label="Social profiles" items={data.socials.map((s) => ({ key: s.icon || s.title, href: href(s), name: s.title }))} />
         </div>
