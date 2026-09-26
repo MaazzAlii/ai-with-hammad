@@ -1,11 +1,11 @@
 import { count, eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import { Toaster } from "sonner";
 
 import { ADMIN_NAV } from "@/components/admin/nav";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { getDb } from "@/db";
 import { contactInquiries, sponsorshipInquiries } from "@/db/schema";
+import { AppToaster } from "@/components/ui/app-toaster";
 import { NOINDEX } from "@/lib/seo";
 import { requireStaff } from "@/server/auth/session";
 import { unreadThreadCount } from "@/server/dal/portal";
@@ -34,7 +34,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <main id="main" className="min-w-0 flex-1 px-4 py-8 sm:px-8 lg:py-10">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
-      <Toaster theme="system" position="top-center" richColors closeButton toastOptions={{ className: "!rounded-2xl" }} />
+      <AppToaster />
     </div>
   );
 }
