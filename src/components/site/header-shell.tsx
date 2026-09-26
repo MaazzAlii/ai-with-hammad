@@ -24,10 +24,10 @@ export function HeaderShell({ children }: { children: React.ReactNode }) {
         <div
           data-scrolled={scrolled ? "" : undefined}
           className={cn(
-            "pointer-events-auto mx-auto flex h-(--header-h) max-w-5xl items-center justify-between gap-3 rounded-full pr-2 pl-2",
+            "pointer-events-auto mx-auto flex h-(--header-h) max-w-6xl items-center justify-between gap-3 rounded-full pr-2 pl-2",
             "glass-chrome transition-[background-color,box-shadow,max-width,translate] duration-(--duration-slow) ease-spring",
             "not-data-scrolled:bg-(--glass-soft) not-data-scrolled:shadow-[inset_0_1px_0_var(--glass-edge)]",
-            "data-scrolled:max-w-[60rem]",
+            "xl:data-scrolled:max-w-[70rem]",
           )}
         >
           {children}
