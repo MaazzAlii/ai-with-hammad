@@ -4,9 +4,11 @@ import { AdminForm } from "@/components/admin/admin-form";
 import { FormSection, SwitchField, TextAreaField, TextField } from "@/components/admin/fields";
 import { MediaField } from "@/components/admin/media-picker";
 import { AdminPageHeader } from "@/components/admin/page-header";
+import { Alert } from "@/components/ui/misc";
 import { RepeaterField } from "@/components/admin/repeater";
 import { getDb } from "@/db";
 import { siteSettings } from "@/db/schema";
+import { serverEnv } from "@/lib/env";
 import { parseSettings, type Settings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { saveSettings } from "@/server/actions/settings";
@@ -23,6 +25,7 @@ const TABS = [
   ["social", "Social links"],
   ["sponsorship", "Sponsorship & audience"],
   ["contact", "Contact form"],
+  ["assistant", "Assistant"],
   ["notifications", "Notifications"],
 ] as const;
 
@@ -43,6 +46,7 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
     social: parseSettings("social", byKey.get("social")),
     sponsorship: parseSettings("sponsorship", byKey.get("sponsorship")),
     contact: parseSettings("contact", byKey.get("contact")),
+    assistant: parseSettings("assistant", byKey.get("assistant")),
   };
   const recipients = ((byKey.get("internal.notifications") as { inquiryRecipients?: string[] } | undefined)?.inquiryRecipients ?? []).join("\n");
   const media = await getMediaMany([s.general.logoMediaId, s.seo.ogImageMediaId, s.home.heroMediaId]);
@@ -161,6 +165,29 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <TextAreaField name="budgets" label="Budget options" rows={5} defaultValue={s.contact.budgets.join("\n")} hint="One per line. Leave empty to hide the field." />
               <TextAreaField name="timelines" label="Timeline options" rows={4} defaultValue={s.contact.timelines.join("\n")} />
               <SwitchField name="showFaq" label="Show the FAQ section on the contact page" defaultChecked={s.contact.showFaq} />
+            </FormSection>
+          </AdminForm>
+        ) : null}
+        {tab === "assistant" ? (
+          <AdminForm action={saveSettings.bind(null, "assistant")}>
+            <FormSection
+              title="Site assistant (chat + voice)"
+              description="The “Ask us” button on every page. It answers only from your published services, work, FAQs and team, and turns interested visitors into inquiries."
+            >
+              {serverEnv().mistralApiKey ? (
+                <Alert tone="success">Mistral is connected (model: {serverEnv().mistralModel}).</Alert>
+              ) : (
+                <Alert tone="warning">Not connected: add MISTRAL_API_KEY in Vercel → Environment Variables and redeploy. The button stays hidden until then.</Alert>
+              )}
+              <SwitchField name="enabled" label="Show the assistant on the website" defaultChecked={s.assistant.enabled} />
+              <TextAreaField name="greeting" label="Greeting" rows={2} defaultValue={s.assistant.greeting} hint="The first message visitors see." />
+              <TextAreaField
+                name="instructions"
+                label="Extra instructions (private)"
+                rows={5}
+                defaultValue={s.assistant.instructions}
+                hint="House rules the assistant follows, never shown to visitors. e.g. “Never quote prices — offer a free call.” “We reply within one working day.”"
+              />
             </FormSection>
           </AdminForm>
         ) : null}
