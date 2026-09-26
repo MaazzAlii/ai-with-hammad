@@ -22,7 +22,7 @@ export const metadata = { title: "Link in bio" };
 
 const KINDS: { value: (typeof bioLinkKinds)[number]; label: string }[] = [
   { value: "link", label: "Link" },
-  { value: "social", label: "Social profile (icon row)" },
+  { value: "social", label: "Social profile (icon)" },
   { value: "affiliate", label: "Affiliate (labelled)" },
   { value: "sponsor", label: "Sponsored (labelled)" },
 ];
@@ -106,7 +106,7 @@ export default async function LinksAdminPage() {
           items={rows.map((l) => ({
             id: l.id,
             content: (
-              <details>
+              <details className="group/row">
                 <summary className="cursor-pointer list-none">
                   <EntityRow
                     title={l.title}
@@ -115,6 +115,8 @@ export default async function LinksAdminPage() {
                     entity="links"
                     id={l.id}
                     canPublish={canWrite}
+                    inlineEdit
+                    label="link"
                     flags={[
                       { flag: "isPublished", value: l.isPublished, label: "Published", offLabel: "Hidden" },
                       { flag: "isFeatured", value: l.isFeatured, label: "Featured", offLabel: "Not featured" },
@@ -143,7 +145,10 @@ export default async function LinksAdminPage() {
       {canWrite && !migrationMissing ? (
         <div className="mt-8 max-w-3xl">
           <AdminForm action={saveBioLink.bind(null, null)} submitLabel="Add link" compact>
-            <FormSection title="Add link" description="Social profiles show as an icon row; affiliate and sponsored links are labelled for visitors.">
+            <FormSection
+              title="Add link"
+              description="Brand links go in the main list. To add Hammadullah's or Maaz's profiles, pick Type “Social profile” and Belongs to that person — only links you add here are shown, and switching Published off hides one. Affiliate and sponsored links are labelled for visitors."
+            >
               <LinkFields people={people} />
             </FormSection>
           </AdminForm>
