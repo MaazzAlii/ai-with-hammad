@@ -24,6 +24,7 @@ export async function settle<T>(promise: Promise<T>, fallback: T, label: string,
   try {
     return { value: await withTimeout(promise, ms, label), error: null };
   } catch (e) {
+    if (e instanceof TimeoutError) (await import("@/db")).resetDb();
     const message = e instanceof Error ? e.message : String(e);
     console.error(`[${label}]`, e);
     return { value: fallback, error: `${label}: ${message}` };
