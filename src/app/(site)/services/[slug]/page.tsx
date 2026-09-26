@@ -81,7 +81,7 @@ export default async function ServicePage(props: PageProps<"/services/[slug]">) 
       {projects.length ? (
         <Section aria-labelledby="related-work">
           <SectionHeading id="related-work" eyebrow="Related work" title={`${service.title} projects`} />
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p) => (
               <li key={p.id}>
                 <ProjectCard project={p} />
