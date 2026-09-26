@@ -2,12 +2,13 @@ import { Suspense } from "react";
 import { MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Toaster } from "sonner";
 
 import { PortalNav } from "@/components/portal/portal-nav";
 import { LogoMark } from "@/components/site/logo";
 import { NavigationLoader } from "@/components/site/navigation-loader";
 import { buttonVariants } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { AppToaster } from "@/components/ui/app-toaster";
 import { NOINDEX } from "@/lib/seo";
 import { whatsappLink } from "@/lib/whatsapp";
 import { requireClient } from "@/server/auth/client-session";
@@ -33,6 +34,7 @@ export default async function PortalLayout({ children }: { children: React.React
             </Link>
             <PortalNav className="hidden sm:block" />
             <div className="flex items-center gap-1">
+              <ThemeToggle />
               {wa ? (
                 <a href={wa} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "ghost", size: "sm", className: "hidden md:inline-flex" })}>
                   <MessageCircle aria-hidden /> WhatsApp
@@ -57,7 +59,7 @@ export default async function PortalLayout({ children }: { children: React.React
       <Suspense fallback={null}>
         <NavigationLoader siteName={general.siteName} logoUrl={media.logo?.url ?? null} />
       </Suspense>
-      <Toaster theme="system" position="top-center" richColors closeButton toastOptions={{ className: "!rounded-2xl" }} />
+      <AppToaster />
     </div>
   );
 }
