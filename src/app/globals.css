@@ -454,3 +454,8 @@ html[data-reveal] [data-reveal="group"]:not([data-shown]) > * {
     box-shadow: none !important;
   }
 }
+
+@keyframes loader {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(330%); }
+}
