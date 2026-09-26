@@ -10,7 +10,7 @@ import { safeHref } from "@/lib/url-safety";
 import { withPublicDb } from "./db";
 import { loadPublicMedia, type MediaDTO } from "./media";
 
-const PUBLIC_KEYS: SettingsKey[] = ["general", "home", "about", "seo", "social", "sponsorship", "contact"];
+const PUBLIC_KEYS: SettingsKey[] = ["general", "home", "about", "seo", "social", "sponsorship", "contact", "assistant"];
 
 export type PublicSettings = { [K in SettingsKey]: Settings<K> };
 
