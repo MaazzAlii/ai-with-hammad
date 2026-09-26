@@ -15,7 +15,7 @@ import { bioLinks, teamMembers, type bioLinkKinds } from "@/db/schema";
 import { BIO_LINK_ICONS } from "@/lib/validation/admin";
 import { reorder } from "@/server/actions/cms-common";
 import { saveBioLink } from "@/server/actions/links";
-import { isMissingTable } from "@/server/dal/public/links";
+import { isMissingTable, whyNotLive } from "@/server/dal/public/links";
 import { can, requirePagePermission } from "@/server/auth/session";
 
 export const metadata = { title: "Link in bio" };
@@ -110,7 +110,7 @@ export default async function LinksAdminPage() {
                 <summary className="cursor-pointer list-none">
                   <EntityRow
                     title={l.title}
-                    meta={[l.kind, l.teamMemberId ? nameOf.get(l.teamMemberId) : null, `${l.clickCount} clicks`, l.url].filter(Boolean).join(" · ")}
+                    meta={[whyNotLive(l) ? `⚠ Not on /links: ${whyNotLive(l)}` : "Live on /links", l.kind, l.teamMemberId ? nameOf.get(l.teamMemberId) : null, `${l.clickCount} clicks`, l.url].filter(Boolean).join(" · ")}
                     thumb={false}
                     entity="links"
                     id={l.id}
