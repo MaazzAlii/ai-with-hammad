@@ -21,7 +21,7 @@ export function SiteHeader({ siteName, logo, links }: { siteName: string; logo: 
       <Link href="/" className="pressable min-w-0 rounded-full py-1 pr-2 pl-1.5" aria-label={`${siteName} — home`}>
         <Logo name={siteName} logo={logo} />
       </Link>
-      <nav aria-label="Main" className="hidden lg:block">
+      <nav aria-label="Main" className="hidden xl:block">
         <NavLinks links={links} />
       </nav>
       <div className="flex shrink-0 items-center gap-0.5">
