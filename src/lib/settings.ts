@@ -80,6 +80,13 @@ export const settingsSchemas = {
     ratesNotice: z.string().max(200).default("Partnership rates are available upon request."),
     totalReach: nonNegativeInt.nullable().default(null),
   }),
+  /** Site assistant (chat + voice). The key lives in the MISTRAL_API_KEY env var. */
+  assistant: z.object({
+    enabled: z.boolean().default(true),
+    greeting: z.string().max(300).default("Hi! Ask me about our services, our work or how to start a project — type, or tap the mic to talk."),
+    /** Extra rules for the assistant, e.g. "Never quote prices — offer a call instead." Server-side only. */
+    instructions: z.string().max(2000).default(""),
+  }),
   contact: z.object({
     intro: z.string().max(600).default(""),
     budgets: z.array(z.string().max(60)).max(12).default([]),
