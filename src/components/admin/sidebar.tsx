@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Activity,
   Briefcase,
   Building2,
   HelpCircle,
@@ -54,6 +55,7 @@ const ICONS: Record<string, LucideIcon> = {
   testimonials: Quote,
   faqs: HelpCircle,
   links: Link2,
+  status: Activity,
 };
 
 export function AdminSidebar({ groups, user, newInquiries, unreadMessages = 0 }: { groups: { group: string; items: AdminNavItem[] }[]; user: { email: string; role: string }; newInquiries: number; unreadMessages?: number }) {
