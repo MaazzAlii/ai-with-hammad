@@ -32,7 +32,7 @@ export default async function AboutPage() {
       {about.values.length ? (
         <Section aria-labelledby="values-title">
           <SectionHeading id="values-title" eyebrow="Principles" title="How we work" />
-          <ul data-reveal="group" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {about.values.map((v) => (
               <li key={v.title} className="glass-card rounded-card p-6 sm:p-7">
                 <h3 className="text-base font-semibold tracking-tight text-fg">{v.title}</h3>
@@ -45,7 +45,7 @@ export default async function AboutPage() {
       {team.length ? (
         <Section aria-labelledby="about-team">
           <SectionHeading id="about-team" eyebrow="People" title="The team" action={<ViewAllLink href="/team">Full team</ViewAllLink>} />
-          <ul data-reveal="group" className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
+          <ul data-reveal="group" className="focus-group grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 lg:grid-cols-4">
             {team.slice(0, 4).map((m) => (
               <li key={m.id}>
                 <TeamCard member={m} compact />
