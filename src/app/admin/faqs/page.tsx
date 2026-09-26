@@ -9,18 +9,27 @@ import { SortableList } from "@/components/admin/sortable-list";
 import { getDb } from "@/db";
 import { faqs } from "@/db/schema";
 import { reorder } from "@/server/actions/cms-common";
-import { saveFaq } from "@/server/actions/faqs";
+import { saveFaq, saveFaqVisibility } from "@/server/actions/faqs";
 import { can, requirePagePermission } from "@/server/auth/session";
+import { getPublicSettings } from "@/server/dal/public/site";
 
 export const metadata = { title: "FAQs" };
 
 export default async function FaqsPage() {
   const staff = await requirePagePermission("cms.read");
-  const rows = await getDb().select().from(faqs).where(isNull(faqs.deletedAt)).orderBy(asc(faqs.sortOrder));
+  const [rows, settings] = await Promise.all([getDb().select().from(faqs).where(isNull(faqs.deletedAt)).orderBy(asc(faqs.sortOrder)), getPublicSettings()]);
   const canWrite = can(staff, "faqs.write");
   return (
     <>
-      <AdminPageHeader title="FAQs" description="Shown on the homepage and contact page. Drag to reorder." />
+      <AdminPageHeader title="FAQs" description="Shown on the homepage and contact page as a click-to-open accordion. Drag to reorder." />
+      <div className="mb-8 max-w-3xl">
+        <AdminForm action={saveFaqVisibility} disabled={!canWrite} submitLabel="Save visibility" compact>
+          <FormSection title="Where FAQs appear" description="Turn the whole FAQ section off without deleting any questions.">
+            <SwitchField name="home" label="Homepage" defaultChecked={settings.home.showFaq} />
+            <SwitchField name="contact" label="Contact page" defaultChecked={settings.contact.showFaq} />
+          </FormSection>
+        </AdminForm>
+      </div>
       {rows.length ? (
         <SortableList
           disabled={!canWrite}
