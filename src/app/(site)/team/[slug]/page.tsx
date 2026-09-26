@@ -45,11 +45,17 @@ export default async function TeamMemberPage(props: PageProps<"/team/[slug]">) {
       <div className="container-page pt-12 pb-14 sm:pt-20 sm:pb-20">
         <Breadcrumb href="/team" label="Team" current={member.name} />
         <div className="grid gap-10 md:grid-cols-[18rem_1fr] lg:gap-16">
-          <div>
+          <div className="max-md:max-w-[15rem]">
             {member.photo ? (
-              <MediaImage media={member.photo} alt={member.photo.alt || `Portrait of ${member.name}`} ratio="3/4" priority sizes="(min-width: 768px) 18rem, 100vw" className="shadow-panel" />
+              <MediaImage media={member.photo} alt={member.photo.alt || `Portrait of ${member.name}`} ratio="3/4" priority sizes="(min-width: 768px) 18rem, 15rem" className="shadow-panel" />
             ) : (
-              <MediaPlaceholder label={initials(member.name)} ratio="3/4" />
+              <>
+                {/* No photo yet: a compact monogram on phones instead of a screen-tall empty frame. */}
+                <span aria-hidden className="grid size-24 place-items-center rounded-full bg-accent-soft text-3xl font-semibold text-accent md:hidden">
+                  {initials(member.name)}
+                </span>
+                <MediaPlaceholder label={initials(member.name)} ratio="3/4" className="hidden md:grid" />
+              </>
             )}
           </div>
           <div>
