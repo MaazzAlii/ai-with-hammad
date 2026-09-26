@@ -144,7 +144,7 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
           {project.features.length ? (
             <section aria-labelledby="sec-features">
               <h2 id="sec-features" className="mb-6 text-[1.625rem]">Key features</h2>
-              <ul data-reveal="group" className="grid gap-4 sm:grid-cols-2">
+              <ul data-reveal="group" className="focus-group grid gap-4 sm:grid-cols-2">
                 {project.features.map((f) => (
                   <li key={f.title} className="glass-card rounded-card p-6">
                     <h3 className="font-semibold text-fg">{f.title}</h3>
@@ -281,7 +281,7 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
       {related.length ? (
         <Section aria-labelledby="related">
           <SectionHeading id="related" eyebrow="More work" title="Related projects" />
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((p) => <li key={p.id}><ProjectCard project={p} /></li>)}
           </ul>
         </Section>
