@@ -2,12 +2,14 @@ import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
+import { Assistant } from "@/components/site/assistant/assistant";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { JsonLd } from "@/components/site/json-ld";
 import { NavigationLoader } from "@/components/site/navigation-loader";
 import { RevealObserver } from "@/components/site/reveal-observer";
 import { WhatsAppButton } from "@/components/site/whatsapp-button";
+import { serverEnv } from "@/lib/env";
 import { organizationLd, websiteLd } from "@/lib/jsonld";
 import { whatsappLink } from "@/lib/whatsapp";
 import { getNavigation, getPublicSettings, getSiteMedia } from "@/server/dal/public/site";
@@ -41,6 +43,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         location={general.location}
       />
       {wa ? <WhatsAppButton href={wa} /> : null}
+      {settings.assistant.enabled && serverEnv().mistralApiKey ? (
+        <Assistant greeting={settings.assistant.greeting} siteName={general.siteName} hasWhatsapp={Boolean(wa)} />
+      ) : null}
       <RevealObserver />
       <Suspense fallback={null}>
         <NavigationLoader siteName={general.siteName} logoUrl={media.logo?.url ?? null} />
