@@ -36,7 +36,7 @@ export default async function ContentPage(props: PageProps<"/content">) {
     cn("pressable inline-flex min-h-9 items-center rounded-full px-3.5 text-sm whitespace-nowrap", active ? "bg-fg font-medium text-bg shadow-card" : "bg-fg/[0.05] text-muted hover:bg-fg/[0.08] hover:text-fg");
   return (
     <>
-      <PageHeader eyebrow="Creator" title="Content" description="We teach what we build: tutorials, walkthroughs and honest experiments with AI tools." />
+      <PageHeader eyebrow="Videos & tutorials" title="Tutorials" description="We teach what we build: tutorials, walkthroughs and honest experiments with AI tools." />
       {platforms.length && !platform ? (
         <Section aria-labelledby="platforms-title">
           <SectionHeading id="platforms-title" eyebrow="Channels" title="Where to follow" />
