@@ -35,7 +35,7 @@ export default async function SponsorshipPage() {
   const campaign = groupContent(content, "campaign", 3);
   return (
     <>
-      <PageHeader eyebrow="Partnerships" title={`Partner with ${general.siteName}`} description={s.intro}>
+      <PageHeader eyebrow="For brands & sponsors" title={`Partner with ${general.siteName}`} description={s.intro}>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <a href="#inquiry" className={buttonVariants({ size: "lg" })}>Start a partnership</a>
           <Link href="/media-kit" className={buttonVariants({ size: "lg", variant: "secondary" })}>View media kit</Link>
