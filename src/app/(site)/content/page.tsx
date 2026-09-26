@@ -8,6 +8,7 @@ import { PlatformCards } from "@/components/site/platform-cards";
 import { EmptyState, PageHeader, Section, SectionHeading } from "@/components/site/section";
 import { contentPlatform, type ContentPlatform } from "@/db/schema";
 import { breadcrumbLd } from "@/lib/jsonld";
+import { buttonVariants } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { groupContent, listActivePlatforms, listPublishedContent, PLATFORM_LABELS } from "@/server/dal/public/content";
@@ -65,7 +66,13 @@ export default async function ContentPage(props: PageProps<"/content">) {
             {items.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}
           </ul>
         ) : (
-          <EmptyState title="New content is on the way" icon={<PlaySquare />} />
+          <EmptyState
+            title="New content is on the way"
+            icon={<PlaySquare />}
+            actions={<Link href="/links" className={buttonVariants({ variant: "secondary" })}>Follow our channels</Link>}
+          >
+            Tutorials and build breakdowns are published here as they go live.
+          </EmptyState>
         )}
       </Section>
       <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Content", path: "/content" }])} />
