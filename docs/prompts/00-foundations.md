@@ -13,7 +13,7 @@ Tailwind v4 codebase. The result must feel like a calm, premium, iOS-26-style pr
 3. **Accent is rare.** Primary CTA, current selection, links. Everything else neutral.
 4. **Typography.** System font → Inter. Weights 400/500/600. Hierarchy by size, weight, colour (`text-fg`,
    `text-muted`, `text-subtle`) and space. Headings: `text-[1.75rem] sm:text-[2.5rem]` (section), `text-[2.5rem] sm:text-6xl` (page).
-5. **Light and dark.** Test both (`prefers-color-scheme`). Never assume a dark background.
+5. **Light and dark.** Light is default; dark (original cyan look) comes from the theme toggle (`html[data-theme="dark"]`, Tailwind `dark:`). Test both. Never assume a dark background, and never use `text-white` on accent/status fills — use `text-accent-fg` / `text-surface`.
 6. **Motion.** `data-reveal="group"` on grids/lists, `data-reveal="item"` on single blocks; buttons already
    have hover/press scale. Nothing longer than ~0.5 s, nothing that bounces or loops except the ambient light.
    Everything must be fine with `prefers-reduced-motion`.
