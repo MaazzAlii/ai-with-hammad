@@ -46,7 +46,7 @@ export default async function ProjectsPage(props: PageProps<"/projects">) {
   };
   return (
     <>
-      <PageHeader eyebrow="Work" title="Projects & case studies" description="Real systems we've designed and built — with the problem, the approach, the architecture and what changed." />
+      <PageHeader eyebrow="Our work" title="Projects & case studies" description="Real systems we've designed and built — with the problem, the approach, the architecture and what changed." />
       <Section>
         {facets.categories.length || facets.technologies.length ? (
           <nav aria-label="Filter projects" className="mb-12 space-y-3">
