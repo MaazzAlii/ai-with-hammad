@@ -79,7 +79,7 @@ export async function getServiceForEdit(id: string) {
 /* team */
 export async function listTeamAdmin() {
   return db()
-    .select({ id: teamMembers.id, name: teamMembers.name, slug: teamMembers.slug, roleTitle: teamMembers.roleTitle, isPublished: teamMembers.isPublished, isFeatured: teamMembers.isFeatured, photoMediaId: teamMembers.photoMediaId })
+    .select({ id: teamMembers.id, name: teamMembers.name, slug: teamMembers.slug, roleTitle: teamMembers.roleTitle, isPublished: teamMembers.isPublished, isFeatured: teamMembers.isFeatured, isLocked: teamMembers.isLocked, photoMediaId: teamMembers.photoMediaId })
     .from(teamMembers)
     .where(isNull(teamMembers.deletedAt))
     .orderBy(asc(teamMembers.sortOrder), asc(teamMembers.name));
