@@ -459,3 +459,40 @@ html[data-reveal] [data-reveal="group"]:not([data-shown]) > * {
   0% { transform: translateX(-110%); }
   100% { transform: translateX(330%); }
 }
+
+/* ---------- Depth on hover (pointer devices only; reduced motion disables via the global rule) ---------- */
+
+/* Subtle tilt + light reflection for photos and media (see components/ui/tilt.tsx). */
+.tilt {
+  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 600ms var(--ease-spring);
+}
+.tilt[data-active] { transition-duration: 150ms; }
+.tilt-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: var(--radius-media);
+  pointer-events: none;
+  background: radial-gradient(28rem circle at var(--gx, 50%) var(--gy, 50%), rgb(255 255 255 / 0.16), transparent 45%);
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out-soft);
+}
+.tilt[data-active] .tilt-sheen { opacity: 1; }
+
+/*
+ * Focus group: in a grid of cards, the one under the pointer stays in focus while its
+ * neighbours recede slightly. Nothing moves sideways, so there is no layout jump or misclick.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .focus-group > * {
+    /* Keep the scroll-reveal's transform transition alongside the dim/restore. */
+    transition: opacity var(--duration-slow) var(--ease-out-soft), filter var(--duration-slow) var(--ease-out-soft), transform 700ms var(--ease-spring);
+  }
+  .focus-group:has(> :hover) > :not(:hover) {
+    opacity: 0.6;
+    filter: saturate(0.85);
+    transition-delay: 0ms;
+  }
+  .focus-group:has(> :hover) > :hover { transition-delay: 0ms; }
+}
