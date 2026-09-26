@@ -1472,10 +1472,10 @@ insert into public.navigation_items (location, label, href, sort_order)
 select v.location::public.nav_location, v.label, v.href, v.sort_order
 from (values
   ('header', 'Services',    '/services',    10),
-  ('header', 'Projects',    '/projects',    20),
+  ('header', 'Our work',    '/projects',    20),
   ('header', 'Team',        '/team',        30),
-  ('header', 'Content',     '/content',     40),
-  ('header', 'Sponsorship', '/sponsorship', 50),
+  ('header', 'Tutorials',   '/content',     40),
+  ('header', 'For brands',  '/sponsorship', 50),
   ('header', 'About',       '/about',       60),
   ('footer', 'Services',    '/services',    10),
   ('footer', 'Projects',    '/projects',    20),
@@ -1492,7 +1492,7 @@ where not exists (select 1 from public.navigation_items);
 
 -- Link in bio in the header navigation (added in v2; only inserted when missing).
 insert into public.navigation_items (location, label, href, sort_order)
-select 'header'::public.nav_location, 'Links', '/links', 70
+select 'header'::public.nav_location, 'All links', '/links', 70
 where not exists (select 1 from public.navigation_items where location = 'header' and href = '/links');
 
 insert into public.legal_documents (slug, title, body, effective_on) values
