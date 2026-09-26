@@ -46,6 +46,8 @@ const serverSchema = z.object({
   EMAIL_FROM: trimmed,
   INQUIRY_NOTIFICATION_EMAIL: trimmed,
   IP_HASH_SALT: trimmed,
+  MISTRAL_API_KEY: trimmed,
+  MISTRAL_MODEL: trimmed,
 });
 
 export type ServerEnv = {
@@ -55,6 +57,9 @@ export type ServerEnv = {
   emailFrom?: string;
   inquiryNotificationEmail?: string;
   ipHashSalt: string;
+  /** Mistral key for the site assistant (chat + voice). Unset = assistant hidden. */
+  mistralApiKey?: string;
+  mistralModel: string;
 };
 
 let cached: ServerEnv | null = null;
@@ -80,6 +85,8 @@ export function serverEnv(): ServerEnv {
     emailFrom: parsed.EMAIL_FROM,
     inquiryNotificationEmail: parsed.INQUIRY_NOTIFICATION_EMAIL,
     ipHashSalt: ipHashSalt || "local-development-salt",
+    mistralApiKey: parsed.MISTRAL_API_KEY,
+    mistralModel: parsed.MISTRAL_MODEL ?? "mistral-small-latest",
   };
   return cached;
 }
