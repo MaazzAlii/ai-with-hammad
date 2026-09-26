@@ -40,9 +40,9 @@ export default async function FaqsPage() {
           items={rows.map((f) => ({
             id: f.id,
             content: (
-              <details>
+              <details className="group/row">
                 <summary className="cursor-pointer list-none">
-                  <EntityRow title={f.question} meta={f.category} thumb={false} entity="faqs" id={f.id} canPublish={canWrite} flags={[{ flag: "isPublished", value: f.isPublished, label: "Published", offLabel: "Hidden" }]} />
+                  <EntityRow title={f.question} meta={f.category} thumb={false} entity="faqs" id={f.id} canPublish={canWrite} inlineEdit label="FAQ" flags={[{ flag: "isPublished", value: f.isPublished, label: "Published", offLabel: "Hidden" }]} />
                 </summary>
                 <div className="border-t border-border p-4">
                   <AdminForm action={saveFaq.bind(null, f.id)} disabled={!canWrite} compact footer={canWrite ? <DeleteEntityButton entity="faqs" id={f.id} redirectTo="/admin/faqs" label="FAQ" /> : null}>
