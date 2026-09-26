@@ -85,7 +85,7 @@ export default async function ContentItemPage(props: PageProps<"/content/[slug]"
       {more.length ? (
         <Section aria-labelledby="more-content">
           <SectionHeading id="more-content" eyebrow="More" title={`More on ${PLATFORM_LABELS[item.platform]}`} />
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{more.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}</ul>
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{more.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}</ul>
         </Section>
       ) : null}
       <JsonLd
