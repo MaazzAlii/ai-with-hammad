@@ -57,9 +57,22 @@ export function SponsorshipForm({ packages }: { packages: { id: string; name: st
     startTransition(async () => {
       const honeypot = (document.getElementById("sponsor-hp") as HTMLInputElement | null)?.value ?? "";
       const captcha = { captchaToken: fd.get("captchaToken") ?? "", captchaAnswer: fd.get("captchaAnswer") ?? "", turnstileToken: fd.get("turnstileToken") ?? "" };
-      const result = await submitSponsorshipInquiry({ ...values, website_url_confirm: honeypot, started_at: startedAt || undefined, ...captcha });
+      let result: Awaited<ReturnType<typeof submitSponsorshipInquiry>>;
+      try {
+        result = await submitSponsorshipInquiry({ ...values, website_url_confirm: honeypot, started_at: startedAt || undefined, ...captcha });
+      } catch (error) {
+        // Network/server failure: keep the visitor's text and explain, instead of crashing the page.
+        console.error("[sponsorship-form] submit failed", error);
+        setServerError("We couldn't send your message just now. Please try again in a moment — your text is still here.");
+        setCaptchaKey((k) => k + 1);
+        return;
+      }
       if (result.ok) {
-        track("inquiry_submitted", { form: "sponsorship" });
+        try {
+          track("inquiry_submitted", { form: "sponsorship" });
+        } catch {
+          // Analytics must never break a successful submission.
+        }
         setDone(result.message ?? "Thanks!");
         form.reset();
       } else {
