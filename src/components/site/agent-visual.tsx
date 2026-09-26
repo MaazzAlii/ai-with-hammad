@@ -48,7 +48,7 @@ export function AgentVisual() {
                 <span className="block truncate text-xs text-subtle">{s.detail}</span>
               </span>
               {s.state === "done" ? (
-                <span className="grid size-5 place-items-center rounded-full bg-success text-white motion-safe:animate-[check-in_420ms_var(--ease-snap)_both]" style={{ animationDelay: `${520 + i * 140}ms` }}>
+                <span className="grid size-5 place-items-center rounded-full bg-success text-surface motion-safe:animate-[check-in_420ms_var(--ease-snap)_both]" style={{ animationDelay: `${520 + i * 140}ms` }}>
                   <Check className="size-3" strokeWidth={3} />
                 </span>
               ) : s.state === "active" ? (
