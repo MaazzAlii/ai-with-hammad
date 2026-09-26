@@ -52,13 +52,15 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
       };
     case "contact":
       return { intro: o.intro, budgets: lines(o.budgets), timelines: lines(o.timelines), showFaq: on(o.showFaq) };
+    case "assistant":
+      return { enabled: on(o.enabled), greeting: o.greeting, instructions: o.instructions };
     case "internal.notifications":
       return { inquiryRecipients: lines(o.inquiryRecipients) };
   }
 }
 
 const notificationsSchema = z.object({ inquiryRecipients: z.array(z.email()).max(10) });
-const keySchema = z.enum(["general", "home", "about", "seo", "social", "sponsorship", "contact", "internal.notifications"]);
+const keySchema = z.enum(["general", "home", "about", "seo", "social", "sponsorship", "contact", "assistant", "internal.notifications"]);
 
 export async function saveSettings(keyRaw: string, _prev: unknown, fd: FormData): Promise<ActionResult<{ id?: string }>> {
   return runAction(async () => {
