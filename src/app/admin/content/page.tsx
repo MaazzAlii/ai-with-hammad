@@ -18,6 +18,7 @@ export default async function ContentAdminPage() {
   const staff = await requirePagePermission("cms.read");
   const rows = await listContentAdmin();
   const canPublish = can(staff, "content.publish");
+  const canDelete = can(staff, "content.delete");
   return (
     <>
       <AdminPageHeader title="Content" description="Creator content. Drag to reorder; use highlight flags to feature items on the homepage and sponsorship pages." actions={can(staff, "content.write") ? <Link href="/admin/content/new" className={buttonVariants()}><Plus /> New content</Link> : null} />
@@ -39,6 +40,8 @@ export default async function ContentAdminPage() {
                 entity="content"
                 id={c.id}
                 canPublish={canPublish}
+                canDelete={canDelete}
+                label="content item"
                 flags={[
                   { flag: "isPublished", value: c.isPublished, label: "Published", offLabel: "Draft" },
                   { flag: "isFeatured", value: c.isFeatured, label: "Featured" },
