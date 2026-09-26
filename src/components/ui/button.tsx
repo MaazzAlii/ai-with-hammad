@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  * Capsule buttons with a tactile response: a slight scale-up on hover
  * (pointer devices only) and a press-down on :active.
  */
-export const buttonVariants = cva(
+const buttonStyles = cva(
   [
     "relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-button text-sm font-medium tracking-[-0.01em] select-none",
     "transition-[transform,background-color,border-color,box-shadow,color,opacity] duration-(--duration-base) ease-spring",
@@ -23,11 +23,12 @@ export const buttonVariants = cva(
           "bg-accent text-accent-fg shadow-glow",
           "bg-[linear-gradient(180deg,rgb(255_255_255/0.16),transparent_55%)] inset-shadow-[0_1px_0_rgb(255_255_255/0.28)]",
           "hover:bg-[color-mix(in_oklab,var(--color-accent)_90%,var(--color-fg))]",
+          "dark:bg-[linear-gradient(135deg,var(--color-accent),var(--color-accent-2))] dark:hover:shadow-[0_0_36px_rgb(34_211_238/0.4)]",
         ],
         secondary: "glass-panel text-fg shadow-card hover:bg-surface",
         ghost: "text-muted hover:bg-fg/[0.05] hover:text-fg",
         outline: "border border-border-strong bg-transparent text-fg hover:border-fg/25 hover:bg-surface/60",
-        danger: "bg-danger text-white shadow-card inset-shadow-[0_1px_0_rgb(255_255_255/0.22)] hover:bg-[color-mix(in_oklab,var(--color-danger)_88%,black)]",
+        danger: "bg-danger text-white dark:text-bg shadow-card inset-shadow-[0_1px_0_rgb(255_255_255/0.22)] hover:bg-[color-mix(in_oklab,var(--color-danger)_88%,black)]",
         link: "h-auto rounded-md px-0 text-accent hover:underline hover:scale-100 active:scale-100 underline-offset-4",
       },
       size: {
@@ -42,9 +43,17 @@ export const buttonVariants = cva(
   },
 );
 
-export type ButtonProps = React.ComponentProps<"button"> & VariantProps<typeof buttonVariants> & { asChild?: boolean };
+/**
+ * Class string for a button look. Runs through tailwind-merge so a caller's `className`
+ * (e.g. `hidden sm:inline-flex`) reliably overrides the base (`inline-flex`).
+ */
+export function buttonVariants({ className, ...props }: VariantProps<typeof buttonStyles> & { className?: string } = {}) {
+  return cn(buttonStyles(props), className);
+}
+
+export type ButtonProps = React.ComponentProps<"button"> & VariantProps<typeof buttonStyles> & { asChild?: boolean };
 
 export function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
   const Comp = asChild ? Slot.Root : "button";
-  return <Comp data-slot="button" className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+  return <Comp data-slot="button" className={buttonVariants({ variant, size, className })} {...props} />;
 }
