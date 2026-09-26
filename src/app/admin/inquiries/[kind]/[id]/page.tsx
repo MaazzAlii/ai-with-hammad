@@ -39,7 +39,7 @@ export default async function InquiryPage(props: PageProps<"/admin/inquiries/[ki
     <>
       <AdminPageHeader
         title={r.name}
-        description={`${kind === "contact" ? "Contact" : "Sponsorship"} inquiry · received ${formatDate(r.createdAt, { hour: "2-digit", minute: "2-digit" })} · email notification: ${r.emailStatus}`}
+        description={`${kind === "contact" ? ("sourcePath" in r && r.sourcePath === "/assistant" ? "Contact inquiry via the site assistant" : "Contact inquiry") : "Sponsorship inquiry"} · received ${formatDate(r.createdAt, { hour: "2-digit", minute: "2-digit" })} · email notification: ${r.emailStatus}`}
         breadcrumbs={[{ href: "/admin/inquiries", label: "Inquiries" }]}
         actions={
           can(staff, "inquiries.delete") ? (
