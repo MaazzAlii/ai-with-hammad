@@ -160,7 +160,7 @@ export default async function HomePage() {
             description="Scoped engagements — from one automated workflow to agent systems that run part of your operations."
             action={<ViewAllLink href="/services">All services</ViewAllLink>}
           />
-          <ul data-reveal="group" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+          <ul data-reveal="group" className="focus-group grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
             {services.slice(0, 6).map((s) => (
               <li key={s.id}>
                 <ServiceCard service={s} features={featureTitles.get(s.id)} />
@@ -180,7 +180,7 @@ export default async function HomePage() {
             description="The problem, how we approached it, what we built — and what changed afterwards."
             action={<ViewAllLink href="/projects">All projects</ViewAllLink>}
           />
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p, i) => (
               <li key={p.id}>
                 <ProjectCard project={p} priority={i === 0 && !media.heroImage} />
@@ -209,7 +209,7 @@ export default async function HomePage() {
       {home.process.length ? (
         <Section aria-labelledby="process-title" className="cv-auto">
           <SectionHeading id="process-title" eyebrow="Process" title="From first call to handover" />
-          <ol data-reveal="group" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ol data-reveal="group" className="focus-group grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {home.process.map((step, i) => (
               <li key={step.title} className="glass-card rounded-card p-6 sm:p-7">
                 <span className="grid size-8 place-items-center rounded-full bg-fg text-sm font-semibold text-bg tabular-nums">{i + 1}</span>
@@ -225,7 +225,7 @@ export default async function HomePage() {
       {team.length ? (
         <Section aria-labelledby="team-title" className="cv-auto">
           <SectionHeading id="team-title" eyebrow="People" title="The engineers behind the work" action={<ViewAllLink href="/team">Meet the team</ViewAllLink>} />
-          <ul data-reveal="group" className={cn("grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6", TEAM_GRID[Math.min(team.length, 4)])}>
+          <ul data-reveal="group" className={cn("focus-group grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6", TEAM_GRID[Math.min(team.length, 4)])}>
             {team.slice(0, 4).map((m) => (
               <li key={m.id}>
                 <TeamCard member={m} compact />
@@ -245,7 +245,7 @@ export default async function HomePage() {
             description="Tutorials, build breakdowns and experiments from our channels."
             action={<ViewAllLink href="/content">All content</ViewAllLink>}
           />
-          <ul data-reveal="group" className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {showcaseContent.map((c) => (
               <li key={c.id}>
                 <ContentCard item={c} />
