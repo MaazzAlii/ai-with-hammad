@@ -29,6 +29,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 import type { AdminNavItem } from "./nav";
@@ -112,6 +113,7 @@ export function AdminSidebar({ groups, user, newInquiries, unreadMessages = 0 }:
         <Link href="/" className={buttonVariants({ variant: "secondary", size: "sm", className: "flex-1" })} target="_blank">
           View site
         </Link>
+        <ThemeToggle className="size-9 shrink-0" />
         <form action="/auth/signout" method="post" className="flex-1">
           <button type="submit" className={buttonVariants({ variant: "ghost", size: "sm", className: "w-full" })}>
             Sign out
@@ -125,6 +127,8 @@ export function AdminSidebar({ groups, user, newInquiries, unreadMessages = 0 }:
       <div className="sticky top-0 z-30 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] lg:hidden">
         <div className="glass-chrome flex h-(--header-h) items-center justify-between rounded-full pr-1.5 pl-5">
           <span className="text-sm font-semibold tracking-tight">Admin</span>
+          <span className="flex-1" />
+          <ThemeToggle />
           <button type="button" onClick={() => setOpen(true)} className={buttonVariants({ variant: "ghost", size: "icon" })} aria-label="Open admin menu" aria-expanded={open}>
             <Menu className="size-5" />
           </button>
