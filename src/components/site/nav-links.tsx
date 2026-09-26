@@ -27,8 +27,13 @@ export function NavLinks({ links }: { links: NavLink[] }) {
   const [ready, setReady] = useState(false);
 
   const measure = useCallback(() => {
-    const active = listRef.current?.querySelector<HTMLElement>('a[aria-current="page"]');
-    setPill(active ? { x: active.offsetLeft, w: active.offsetWidth } : null);
+    const list = listRef.current;
+    const active = list?.querySelector<HTMLElement>('a[aria-current="page"]');
+    if (!list || !active) return setPill(null);
+    // Measure against the list itself (offsetLeft would be relative to the <li>, i.e. always 0).
+    const l = list.getBoundingClientRect();
+    const a = active.getBoundingClientRect();
+    setPill({ x: a.left - l.left, w: a.width });
   }, []);
 
   useLayoutEffect(() => {
