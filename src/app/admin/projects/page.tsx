@@ -1,6 +1,7 @@
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
+import { RowActions } from "@/components/admin/entity-row";
 import { FlagToggle } from "@/components/admin/flag-toggle";
 import { MediaThumb } from "@/components/admin/media-thumb";
 import { AdminPageHeader } from "@/components/admin/page-header";
@@ -19,6 +20,7 @@ export default async function ProjectsAdminPage() {
   const rows = await listProjectsAdmin();
   const covers = await getMediaMany(rows.map((r) => r.coverMediaId));
   const canPublish = can(staff, "projects.publish");
+  const canDelete = can(staff, "projects.delete");
   return (
     <>
       <AdminPageHeader
@@ -47,6 +49,7 @@ export default async function ProjectsAdminPage() {
                 <FlagToggle entity="projects" id={p.id} flag="isFeatured" value={p.isFeatured} label="Featured" disabled={!canPublish} />
                 <FlagToggle entity="projects" id={p.id} flag="isPinned" value={p.isPinned} label="Pinned" disabled={!canPublish} />
               </div>
+              <RowActions editHref={`/admin/projects/${p.id}`} entity="projects" id={p.id} canDelete={canDelete} label="project" />
             </div>
             ),
           }))}
