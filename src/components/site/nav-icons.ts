@@ -5,6 +5,7 @@ import {
   Handshake,
   Home,
   Info,
+  Link2,
   Mail,
   MessageSquareQuote,
   PlaySquare,
@@ -23,6 +24,7 @@ const ICONS: [prefix: string, icon: LucideIcon][] = [
   ["/media-kit", Handshake],
   ["/testimonials", MessageSquareQuote],
   ["/contact", Mail],
+  ["/links", Link2],
 ];
 
 export function navIcon(href: string): LucideIcon {
