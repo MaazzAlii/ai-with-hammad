@@ -1,6 +1,6 @@
 import "server-only";
 
-import { sql } from "drizzle-orm";
+import { sql, TransactionRollbackError } from "drizzle-orm";
 
 import { getDb } from "@/db";
 import { publicEnv, serverEnv } from "@/lib/env";
@@ -71,6 +71,18 @@ export async function runSystemChecks(): Promise<Check[]> {
   checks.push(await timed("Database", "Ping (select 1)", async () => {
     await getDb().execute(sql`select 1`);
     return "connected";
+  }));
+  checks.push(await timed("Database", "Transaction (save test)", async () => {
+    // Same path every admin save uses; rolled back, so nothing is written.
+    await getDb()
+      .transaction(async (tx) => {
+        await tx.execute(sql`select 1`);
+        tx.rollback();
+      })
+      .catch((e: unknown) => {
+        if (!(e instanceof TransactionRollbackError)) throw e;
+      });
+    return "begin → query → rollback OK";
   }));
   checks.push(await timed("Database", "10 queries in parallel", async () => {
     await Promise.all(Array.from({ length: 10 }, () => getDb().execute(sql`select 1`)));
