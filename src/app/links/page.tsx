@@ -15,7 +15,8 @@ import { cn } from "@/lib/utils";
 import { getLinkPage, type BioLinkDTO } from "@/server/dal/public/links";
 import { getPublicSettings, getSiteMedia } from "@/server/dal/public/site";
 
-export const revalidate = 300;
+/** Rendered per request: the page is tiny, and links must appear the moment they are saved. */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { general } = await getPublicSettings();
