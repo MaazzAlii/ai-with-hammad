@@ -173,6 +173,17 @@ export const services = pgTable("services", {
   description: text("description").notNull().default(""),
   icon: text("icon").notNull().default("sparkles"),
   coverMediaId: uuid("cover_media_id").references(() => mediaAssets.id, { onDelete: "set null" }),
+  startingAtPrice: text("starting_at_price").notNull().default(""),
+  timelineEstimate: text("timeline_estimate").notNull().default(""),
+  idealFor: text("ideal_for").notNull().default(""),
+  techStack: text("tech_stack").array().notNull().default(sql`'{}'::text[]`),
+  videoUrl: text("video_url"),
+  engagementTerms: text("engagement_terms").notNull().default(""),
+  slaNotes: text("sla_notes").notNull().default(""),
+  comparisonNotes: text("comparison_notes").notNull().default(""),
+  processNotes: text("process_notes").notNull().default(""),
+  technicalNotes: text("technical_notes").notNull().default(""),
+  trainingAndDocs: text("training_and_docs").notNull().default(""),
   seoTitle: text("seo_title"),
   seoDescription: text("seo_description"),
   isPublished: boolean("is_published").notNull().default(false),
@@ -191,6 +202,19 @@ export const serviceFeatures = pgTable("service_features", {
     .references(() => services.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description").notNull().default(""),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: createdAt(),
+});
+
+/** Optional extras a client can add on top of a service (maintenance, hosting, monitoring…). */
+export const serviceAddOns = pgTable("service_add_ons", {
+  id: id(),
+  serviceId: uuid("service_id")
+    .notNull()
+    .references(() => services.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  priceNote: text("price_note").notNull().default(""),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: createdAt(),
 });
