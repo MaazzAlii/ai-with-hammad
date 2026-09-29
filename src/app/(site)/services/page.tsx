@@ -1,9 +1,11 @@
-import { BriefcaseBusiness } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { JsonLd } from "@/components/site/json-ld";
 import { EmptyState, PageHeader, Section } from "@/components/site/section";
 import { ServiceCard } from "@/components/site/service-card";
+import { buttonVariants } from "@/components/ui/button";
 import { breadcrumbLd, serviceLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
 import { getServiceFeatureTitles, listPublishedServices } from "@/server/dal/public/services";
@@ -39,6 +41,19 @@ export default async function ServicesPage() {
           <EmptyState title="Services are being updated" icon={<BriefcaseBusiness />}>Check back soon, or contact us directly — we are happy to talk it through.</EmptyState>
         )}
       </Section>
+      {services.length ? (
+        <Section>
+          <div data-reveal="item" className="glass-panel flex flex-col items-start gap-6 rounded-[2rem] p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
+            <div>
+              <h2 className="text-2xl">Not sure which service fits?</h2>
+              <p className="mt-2 text-muted">Tell us what you&apos;re trying to solve and we&apos;ll point you at the right one — or a mix.</p>
+            </div>
+            <Link href="/contact" className={buttonVariants({ size: "lg", className: "group/btn shrink-0" })}>
+              Talk it through <ArrowRight aria-hidden className="transition-transform duration-(--duration-base) ease-spring group-hover/btn:translate-x-0.5" />
+            </Link>
+          </div>
+        </Section>
+      ) : null}
       <JsonLd
         data={[
           breadcrumbLd([{ name: "Home", path: "/" }, { name: "Services", path: "/services" }]),
