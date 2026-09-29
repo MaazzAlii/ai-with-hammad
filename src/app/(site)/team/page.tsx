@@ -24,9 +24,9 @@ export default async function TeamPage() {
       <Section>
         {team.length ? (
           <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-            {team.map((m) => (
+            {team.map((m, i) => (
               <li key={m.id}>
-                <TeamCard member={m} />
+                <TeamCard member={m} priority={i === 0} />
               </li>
             ))}
           </ul>
