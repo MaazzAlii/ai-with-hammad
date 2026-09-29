@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, inArray, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import { cache } from "react";
 
 import {
@@ -13,6 +13,7 @@ import {
   projects,
   services,
   teamMembers,
+  testimonials,
 } from "@/db/schema";
 import { parseVideoEmbed, type Embed } from "@/lib/embeds";
 import { safeHttpUrl } from "@/lib/url-safety";
@@ -21,7 +22,7 @@ import { withPublicDb } from "./db";
 import { isPublic } from "./filters";
 import { loadPublicMedia, type MediaDTO } from "./media";
 
-export type Tag = { label: string; slug: string; kind: "technology" | "topic" };
+export type Tag = { label: string; slug: string; kind: "technology" | "topic" | "integration" };
 
 export type ProjectCardDTO = {
   id: string;
@@ -29,6 +30,7 @@ export type ProjectCardDTO = {
   title: string;
   summary: string;
   category: string;
+  status: "live" | "in_progress" | "archived";
   isFeatured: boolean;
   isPinned: boolean;
   cover: MediaDTO | null;
@@ -46,8 +48,10 @@ export type ProjectMediaItem =
 export type ProjectDetailDTO = ProjectCardDTO & {
   subtitle: string;
   clientName: string;
+  clientLogo: MediaDTO | null;
   industry: string;
   projectYear: number | null;
+  durationLabel: string;
   projectUrl: string | null;
   repositoryUrl: string | null;
   overview: string;
@@ -56,6 +60,13 @@ export type ProjectDetailDTO = ProjectCardDTO & {
   architecture: string;
   implementation: string;
   results: string;
+  challenges: string;
+  lessonsLearned: string;
+  scalabilityNotes: string;
+  securityMeasures: string;
+  feedbackProcess: string;
+  futureRoadmap: string;
+  roiSummary: string;
   seoTitle: string | null;
   seoDescription: string | null;
   publishedAt: Date | null;
@@ -64,6 +75,7 @@ export type ProjectDetailDTO = ProjectCardDTO & {
   features: { title: string; description: string }[];
   team: { slug: string; name: string; roleTitle: string; roleOnProject: string; photo: MediaDTO | null }[];
   services: { slug: string; title: string }[];
+  testimonials: { id: string; authorName: string; authorTitle: string; company: string; quote: string; rating: number; photo: MediaDTO | null }[];
 };
 
 const cardCols = {
@@ -72,6 +84,7 @@ const cardCols = {
   title: projects.title,
   summary: projects.summary,
   category: projects.category,
+  status: projects.status,
   isFeatured: projects.isFeatured,
   isPinned: projects.isPinned,
   coverMediaId: projects.coverMediaId,
@@ -159,8 +172,10 @@ export const getPublishedProject = cache(async (slug: string): Promise<ProjectDe
         ...cardCols,
         subtitle: projects.subtitle,
         clientName: projects.clientName,
+        clientLogoMediaId: projects.clientLogoMediaId,
         industry: projects.industry,
         projectYear: projects.projectYear,
+        durationLabel: projects.durationLabel,
         projectUrl: projects.projectUrl,
         repositoryUrl: projects.repositoryUrl,
         overview: projects.overview,
@@ -169,6 +184,13 @@ export const getPublishedProject = cache(async (slug: string): Promise<ProjectDe
         architecture: projects.architecture,
         implementation: projects.implementation,
         results: projects.results,
+        challenges: projects.challenges,
+        lessonsLearned: projects.lessonsLearned,
+        scalabilityNotes: projects.scalabilityNotes,
+        securityMeasures: projects.securityMeasures,
+        feedbackProcess: projects.feedbackProcess,
+        futureRoadmap: projects.futureRoadmap,
+        roiSummary: projects.roiSummary,
         seoTitle: projects.seoTitle,
         seoDescription: projects.seoDescription,
         publishedAt: projects.publishedAt,
@@ -179,7 +201,7 @@ export const getPublishedProject = cache(async (slug: string): Promise<ProjectDe
     if (!row) return null;
 
     const [card] = await hydrateCards(db, [row as never]);
-    const [mediaRows, metrics, features, team, svc] = await Promise.all([
+    const [mediaRows, metrics, features, team, svc, projectTestimonials] = await Promise.all([
       db.select().from(projectMedia).where(eq(projectMedia.projectId, row.id)).orderBy(asc(projectMedia.sortOrder)),
       db
         .select({ label: projectMetrics.label, value: projectMetrics.value, description: projectMetrics.description })
@@ -209,11 +231,26 @@ export const getPublishedProject = cache(async (slug: string): Promise<ProjectDe
         .innerJoin(services, eq(services.id, projectServices.serviceId))
         .where(and(eq(projectServices.projectId, row.id), isPublic(services)))
         .orderBy(asc(services.sortOrder)),
+      db
+        .select({
+          id: testimonials.id,
+          authorName: testimonials.authorName,
+          authorTitle: testimonials.authorTitle,
+          company: testimonials.company,
+          quote: testimonials.quote,
+          rating: testimonials.rating,
+          photoMediaId: testimonials.photoMediaId,
+        })
+        .from(testimonials)
+        .where(and(eq(testimonials.projectId, row.id), eq(testimonials.isPublished, true), eq(testimonials.status, "approved"), eq(testimonials.consentToPublish, true), isNull(testimonials.deletedAt)))
+        .orderBy(desc(testimonials.isFeatured), asc(testimonials.sortOrder)),
     ]);
 
     const media = await loadPublicMedia(db, [
       ...mediaRows.flatMap((m) => [m.mediaAssetId, m.posterMediaId]),
       ...team.map((t) => t.photoMediaId),
+      row.clientLogoMediaId,
+      ...projectTestimonials.map((t) => t.photoMediaId),
     ]);
 
     const items: ProjectMediaItem[] = [];
@@ -240,8 +277,10 @@ export const getPublishedProject = cache(async (slug: string): Promise<ProjectDe
       ...card!,
       subtitle: row.subtitle,
       clientName: row.clientName,
+      clientLogo: row.clientLogoMediaId ? (media.get(row.clientLogoMediaId) ?? null) : null,
       industry: row.industry,
       projectYear: row.projectYear,
+      durationLabel: row.durationLabel,
       projectUrl: safeHttpUrl(row.projectUrl),
       repositoryUrl: safeHttpUrl(row.repositoryUrl),
       overview: row.overview,
@@ -250,6 +289,13 @@ export const getPublishedProject = cache(async (slug: string): Promise<ProjectDe
       architecture: row.architecture,
       implementation: row.implementation,
       results: row.results,
+      challenges: row.challenges,
+      lessonsLearned: row.lessonsLearned,
+      scalabilityNotes: row.scalabilityNotes,
+      securityMeasures: row.securityMeasures,
+      feedbackProcess: row.feedbackProcess,
+      futureRoadmap: row.futureRoadmap,
+      roiSummary: row.roiSummary,
       seoTitle: row.seoTitle,
       seoDescription: row.seoDescription,
       publishedAt: row.publishedAt,
@@ -258,6 +304,7 @@ export const getPublishedProject = cache(async (slug: string): Promise<ProjectDe
       features,
       team: team.map(({ photoMediaId, ...t }) => ({ ...t, photo: photoMediaId ? (media.get(photoMediaId) ?? null) : null })),
       services: svc,
+      testimonials: projectTestimonials.map(({ photoMediaId, ...t }) => ({ ...t, photo: photoMediaId ? (media.get(photoMediaId) ?? null) : null })),
     };
   }),
 );
