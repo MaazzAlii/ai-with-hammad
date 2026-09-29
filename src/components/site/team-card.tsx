@@ -13,7 +13,7 @@ export function initials(name: string) {
     .join("");
 }
 
-export function TeamCard({ member, compact = false }: { member: TeamMemberDTO; compact?: boolean }) {
+export function TeamCard({ member, compact = false, priority = false }: { member: TeamMemberDTO; compact?: boolean; priority?: boolean }) {
   const ratio = compact ? "1/1" : "4/3";
   return (
     <article data-tilt-root className="group relative">
@@ -24,6 +24,7 @@ export function TeamCard({ member, compact = false }: { member: TeamMemberDTO; c
             alt={member.photo.alt || `Portrait of ${member.name}`}
             ratio={ratio}
             sizes="(min-width: 1024px) 25vw, 50vw"
+            priority={priority}
             className="shadow-card"
             imgClassName="transition-transform duration-700 ease-out-soft group-hover:scale-[1.03]"
           />
