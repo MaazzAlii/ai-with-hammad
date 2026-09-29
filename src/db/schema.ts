@@ -58,7 +58,8 @@ export const projectMediaType = pgEnum("project_media_type", [
   "external",
   "document",
 ]);
-export const tagKind = pgEnum("tag_kind", ["technology", "topic"]);
+export const tagKind = pgEnum("tag_kind", ["technology", "topic", "integration"]);
+export const projectStatus = pgEnum("project_status", ["live", "in_progress", "archived"]);
 export const navLocation = pgEnum("nav_location", ["header", "footer", "legal"]);
 export const accountKind = pgEnum("account_kind", ["staff", "client"]);
 export const threadStatus = pgEnum("thread_status", ["open", "closed"]);
@@ -242,8 +243,11 @@ export const projects = pgTable("projects", {
   summary: text("summary").notNull().default(""),
   category: text("category").notNull().default(""),
   clientName: text("client_name").notNull().default(""),
+  clientLogoMediaId: uuid("client_logo_media_id").references(() => mediaAssets.id, { onDelete: "set null" }),
   industry: text("industry").notNull().default(""),
   projectYear: integer("project_year"),
+  durationLabel: text("duration_label").notNull().default(""),
+  status: projectStatus("status").notNull().default("live"),
   projectUrl: text("project_url"),
   repositoryUrl: text("repository_url"),
   coverMediaId: uuid("cover_media_id").references(() => mediaAssets.id, { onDelete: "set null" }),
@@ -253,6 +257,13 @@ export const projects = pgTable("projects", {
   architecture: text("architecture").notNull().default(""),
   implementation: text("implementation").notNull().default(""),
   results: text("results").notNull().default(""),
+  challenges: text("challenges").notNull().default(""),
+  lessonsLearned: text("lessons_learned").notNull().default(""),
+  scalabilityNotes: text("scalability_notes").notNull().default(""),
+  securityMeasures: text("security_measures").notNull().default(""),
+  feedbackProcess: text("feedback_process").notNull().default(""),
+  futureRoadmap: text("future_roadmap").notNull().default(""),
+  roiSummary: text("roi_summary").notNull().default(""),
   seoTitle: text("seo_title"),
   seoDescription: text("seo_description"),
   isPublished: boolean("is_published").notNull().default(false),
