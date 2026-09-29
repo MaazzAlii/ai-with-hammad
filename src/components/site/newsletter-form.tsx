@@ -17,6 +17,7 @@ export function NewsletterForm() {
   const [captchaError, setCaptchaError] = useState<string | undefined>();
   const [captchaKey, setCaptchaKey] = useState(0);
   const [done, setDone] = useState<string | null>(null);
+  const [interacted, setInteracted] = useState(false);
   const honeypotRef = useRef<HTMLInputElement>(null);
   const [startedAt, setStartedAt] = useState(0);
   useEffect(() => {
@@ -33,6 +34,10 @@ export function NewsletterForm() {
       className="flex flex-col gap-3"
       onSubmit={(e) => {
         e.preventDefault();
+        if (!interacted) {
+          setInteracted(true); // reveal the (until-now unmounted) security check first
+          return;
+        }
         setError(null);
         setCaptchaError(undefined);
         const fd = new FormData(e.currentTarget);
@@ -65,12 +70,26 @@ export function NewsletterForm() {
     >
       <Honeypot register={{ name: "website_url_confirm", ref: honeypotRef }} />
       <div className="flex gap-2">
-        <Input type="email" required placeholder="you@company.com" aria-label="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="min-w-0 flex-1" />
+        <Input
+          type="email"
+          required
+          placeholder="you@company.com"
+          aria-label="Email address"
+          value={email}
+          onFocus={() => setInteracted(true)}
+          onChange={(e) => {
+            setInteracted(true);
+            setEmail(e.target.value);
+          }}
+          className="min-w-0 flex-1"
+        />
         <Button type="submit" size="icon" disabled={pending} aria-label="Subscribe">
           <Send aria-hidden />
         </Button>
       </div>
-      <Captcha resetKey={captchaKey} error={captchaError} idPrefix="newsletter-captcha" />
+      {/* Only fetch a challenge once the visitor actually starts filling the form — this sits in
+          the footer of every page, and a server round trip on mount for every page view is waste. */}
+      {interacted ? <Captcha resetKey={captchaKey} error={captchaError} idPrefix="newsletter-captcha" /> : null}
       {error ? <p className="text-xs text-danger">{error}</p> : null}
     </form>
   );
