@@ -682,6 +682,17 @@ create index if not exists bio_links_public_idx on public.bio_links (is_publishe
 create index if not exists bio_links_team_member_idx on public.bio_links (team_member_id);
 select private.ensure_updated_at_trigger('public.bio_links');
 
+-- Homepage/footer newsletter opt-ins. Created by the application server only (no marketing platform wired up).
+create table if not exists public.newsletter_subscribers (
+  id              uuid primary key default gen_random_uuid(),
+  email           text        not null check (email ~* '^[^\s@]+@[^\s@]+\.[^\s@]+$'),
+  source_path     text        not null default '',
+  ip_hash         text,
+  unsubscribed_at timestamptz,
+  created_at      timestamptz not null default now()
+);
+create unique index if not exists newsletter_subscribers_email_idx on public.newsletter_subscribers (lower(email));
+
 -- 3.9 Site -------------------------------------------------------------------
 -- Keys starting with 'internal.' are never readable publicly.
 create table if not exists public.site_settings (
@@ -979,7 +990,7 @@ begin
     'sponsorship_partners','sponsorship_packages','sponsorship_package_rates','sponsorship_inquiries',
     'clients','message_threads','messages','testimonials','faqs','bio_links',
     'contact_inquiries','inquiry_notes','site_settings','navigation_items','legal_documents',
-    'audit_logs','rate_limits'
+    'audit_logs','rate_limits','newsletter_subscribers'
   ] loop
     execute format('alter table public.%I enable row level security', t);
   end loop;
@@ -988,7 +999,8 @@ end $$;
 -- Sensitive tables: remove default Data API privileges from anon entirely.
 revoke all on public.clients, public.message_threads, public.messages from anon;
 revoke all on public.sponsorship_package_rates, public.sponsorship_inquiries, public.contact_inquiries,
-              public.inquiry_notes, public.audit_logs, public.rate_limits, public.profiles
+              public.inquiry_notes, public.audit_logs, public.rate_limits, public.profiles,
+              public.newsletter_subscribers
   from anon;
 
 -- 6.1 Reference tables: readable by staff ------------------------------------
@@ -1146,6 +1158,14 @@ drop policy if exists "inquiries delete" on public.sponsorship_inquiries;
 create policy "inquiries delete" on public.sponsorship_inquiries
   for delete to authenticated using ((select private.has_permission('inquiries.delete')));
 
+-- Newsletter subscribers: created by the application server only (no public insert policy).
+drop policy if exists "newsletter read" on public.newsletter_subscribers;
+create policy "newsletter read" on public.newsletter_subscribers
+  for select to authenticated using ((select private.has_permission('newsletter.manage')));
+drop policy if exists "newsletter delete" on public.newsletter_subscribers;
+create policy "newsletter delete" on public.newsletter_subscribers
+  for delete to authenticated using ((select private.has_permission('newsletter.manage')));
+
 drop policy if exists "notes read" on public.inquiry_notes;
 create policy "notes read" on public.inquiry_notes
   for select to authenticated using ((select private.has_permission('inquiries.read')));
@@ -1238,7 +1258,7 @@ insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
   ('project-images',     'project-images',     true,  15728640,  array['image/jpeg','image/png','image/webp','image/gif']),
   ('project-gallery',    'project-gallery',    true,  15728640,  array['image/jpeg','image/png','image/webp','image/gif']),
   ('project-videos',     'project-videos',     true,  524288000, array['video/mp4','video/webm']),
-  ('team-images',        'team-images',        true,  10485760,  array['image/jpeg','image/png','image/webp']),
+  ('team-images',        'team-images',        true,  6291456,   array['image/jpeg','image/png','image/webp']),
   ('content-thumbnails', 'content-thumbnails', true,  10485760,  array['image/jpeg','image/png','image/webp']),
   ('content-media',      'content-media',      true,  524288000, array['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm']),
   ('sponsorship-media',  'sponsorship-media',  true,  52428800,  array['image/jpeg','image/png','image/webp','application/pdf']),
@@ -1351,7 +1371,8 @@ insert into public.permissions (key, description) values
   ('messages.write',      'Reply to clients and manage conversations'),
   ('testimonials.moderate','Approve, publish, feature and add testimonials'),
   ('faqs.write',          'Edit FAQs'),
-  ('links.write',         'Edit link-in-bio links')
+  ('links.write',         'Edit link-in-bio links'),
+  ('newsletter.manage',   'Read and remove newsletter subscribers')
 on conflict (key) do update set description = excluded.description;
 
 -- Role → permission matrix. Keep in sync with src/lib/permissions.ts
@@ -1373,7 +1394,8 @@ select 'manager'::public.app_role, key from public.permissions
     'inquiries.read','inquiries.write',
     'media.upload','media.update','media.delete',
     'audit.read',
-    'clients.read','clients.manage','messages.read','messages.write','testimonials.moderate','faqs.write','links.write'
+    'clients.read','clients.manage','messages.read','messages.write','testimonials.moderate','faqs.write','links.write',
+    'newsletter.manage'
   )
 union all
 select 'editor'::public.app_role, key from public.permissions
