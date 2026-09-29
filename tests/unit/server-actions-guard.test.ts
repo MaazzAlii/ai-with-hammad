@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
 const PUBLIC_ACTIONS = new Set([
   "submitContactInquiry",
   "submitSponsorshipInquiry",
+  "subscribeNewsletter",
   "signIn",
   "requestPasswordReset",
   "setPassword", // requires a valid session from the email link (checked with getUser)
