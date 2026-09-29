@@ -25,6 +25,7 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
       { href: "/admin/messages", label: "Messages", icon: "messages", permission: "messages.read" },
       { href: "/admin/clients", label: "Clients", icon: "clients", permission: "clients.read" },
       { href: "/admin/inquiries", label: "Inquiries", icon: "inquiries", permission: "inquiries.read" },
+      { href: "/admin/newsletter", label: "Newsletter", icon: "newsletter", permission: "newsletter.manage" },
     ],
   },
   {
