@@ -61,7 +61,13 @@ export function PartnerForm({ action, partner, logo, canWrite, canPublish }: { a
         </div>
         <TextAreaField name="description" label="About the partner" rows={3} defaultValue={partner?.description} />
         <TextAreaField name="campaignSummary" label="Campaign summary" rows={3} defaultValue={partner?.campaignSummary} />
-        <MediaField name="logoMediaId" label="Logo" defaultMedia={logo} uploadBucket="sponsorship-media" />
+        <MediaField
+          name="logoMediaId"
+          label="Logo"
+          defaultMedia={logo}
+          uploadBucket="sponsorship-media"
+          hint="Transparent PNG works best — it also feeds the homepage 'Trusted by' logo strip when published. Roughly 300×100px or a similar wide/square ratio, up to 15 MB."
+        />
         <SwitchField name="isPublished" label="Published" defaultChecked={partner?.isPublished} disabled={!canPublish} />
       </FormSection>
     </AdminForm>
