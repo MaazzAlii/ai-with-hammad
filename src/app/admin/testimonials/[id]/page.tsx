@@ -8,6 +8,7 @@ import { getDb } from "@/db";
 import { testimonials } from "@/db/schema";
 import { saveManualTestimonial } from "@/server/actions/testimonials";
 import { requirePagePermission } from "@/server/auth/session";
+import { projectOptions } from "@/server/dal/admin/cms";
 import { getMediaMany } from "@/server/dal/admin/media";
 import { clientOptions } from "@/server/dal/portal";
 
@@ -28,7 +29,7 @@ export default async function EditTestimonialPage(props: PageProps<"/admin/testi
         actions={<DeleteEntityButton entity="testimonials" id={id} redirectTo="/admin/testimonials" label="testimonial" />}
       />
       <div className="max-w-3xl">
-        <TestimonialForm action={saveManualTestimonial.bind(null, id)} t={t} photo={t.photoMediaId ? media.get(t.photoMediaId) : null} clientOptions={await clientOptions()} />
+        <TestimonialForm action={saveManualTestimonial.bind(null, id)} t={t} photo={t.photoMediaId ? media.get(t.photoMediaId) : null} clientOptions={await clientOptions()} projectOptions={await projectOptions()} />
       </div>
     </>
   );
