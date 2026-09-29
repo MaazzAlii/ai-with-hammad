@@ -24,7 +24,7 @@ export const BUCKETS = {
   "project-images": { id: "project-images", label: "Project images", public: true, maxBytes: 15 * MB, mimeTypes: IMAGE_TYPES },
   "project-gallery": { id: "project-gallery", label: "Project gallery", public: true, maxBytes: 15 * MB, mimeTypes: IMAGE_TYPES },
   "project-videos": { id: "project-videos", label: "Project videos", public: true, maxBytes: 500 * MB, mimeTypes: VIDEO_TYPES },
-  "team-images": { id: "team-images", label: "Team photos", public: true, maxBytes: 10 * MB, mimeTypes: ["image/jpeg", "image/png", "image/webp"] },
+  "team-images": { id: "team-images", label: "Team photos", public: true, maxBytes: 6 * MB, mimeTypes: ["image/jpeg", "image/png", "image/webp"] },
   "content-thumbnails": { id: "content-thumbnails", label: "Content thumbnails", public: true, maxBytes: 10 * MB, mimeTypes: ["image/jpeg", "image/png", "image/webp"] },
   "content-media": { id: "content-media", label: "Content media", public: true, maxBytes: 500 * MB, mimeTypes: [...IMAGE_TYPES, ...VIDEO_TYPES] },
   "sponsorship-media": { id: "sponsorship-media", label: "Sponsorship media", public: true, maxBytes: 50 * MB, mimeTypes: ["image/jpeg", "image/png", "image/webp", "application/pdf"] },
