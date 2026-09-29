@@ -15,11 +15,11 @@ import { NavLinks } from "./nav-links";
  * Floating glass navigation bar. Desktop: segmented nav + CTA in one capsule.
  * Phones/tablets: logo, compact CTA and a menu button that drops a panel down from the top.
  */
-export function SiteHeader({ siteName, logo, links }: { siteName: string; logo: MediaDTO | null; links: NavLink[] }) {
+export function SiteHeader({ siteName, logo, logoDark, links }: { siteName: string; logo: MediaDTO | null; logoDark?: MediaDTO | null; links: NavLink[] }) {
   return (
     <HeaderShell>
       <Link href="/" className="pressable min-w-0 rounded-full py-1 pr-2 pl-1.5" aria-label={`${siteName} — home`}>
-        <Logo name={siteName} logo={logo} />
+        <Logo name={siteName} logo={logo} logoDark={logoDark} />
       </Link>
       <nav aria-label="Main" className="hidden xl:block">
         <NavLinks links={links} />
