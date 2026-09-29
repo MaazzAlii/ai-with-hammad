@@ -32,7 +32,7 @@ const db = () => getDb();
 /* projects */
 export async function listProjectsAdmin() {
   return db()
-    .select({ id: projects.id, title: projects.title, slug: projects.slug, category: projects.category, isPublished: projects.isPublished, isFeatured: projects.isFeatured, isPinned: projects.isPinned, updatedAt: projects.updatedAt, coverMediaId: projects.coverMediaId })
+    .select({ id: projects.id, title: projects.title, slug: projects.slug, category: projects.category, status: projects.status, isPublished: projects.isPublished, isFeatured: projects.isFeatured, isPinned: projects.isPinned, updatedAt: projects.updatedAt, coverMediaId: projects.coverMediaId })
     .from(projects)
     .where(isNull(projects.deletedAt))
     .orderBy(asc(projects.sortOrder), desc(projects.createdAt));
@@ -58,6 +58,9 @@ export async function teamOptions() {
 }
 export async function serviceOptions() {
   return db().select({ id: services.id, title: services.title }).from(services).where(isNull(services.deletedAt)).orderBy(asc(services.sortOrder));
+}
+export async function projectOptions() {
+  return db().select({ id: projects.id, title: projects.title }).from(projects).where(isNull(projects.deletedAt)).orderBy(asc(projects.sortOrder));
 }
 
 /* services */
