@@ -619,6 +619,16 @@ export const bioLinks = pgTable("bio_links", {
   deletedAt: ts("deleted_at"),
 });
 
+/** Homepage/footer newsletter opt-ins (email capture, no marketing platform wired up yet). */
+export const newsletterSubscribers = pgTable("newsletter_subscribers", {
+  id: id(),
+  email: text("email").notNull(),
+  sourcePath: text("source_path").notNull().default(""),
+  ipHash: text("ip_hash"),
+  unsubscribedAt: ts("unsubscribed_at"),
+  createdAt: createdAt(),
+});
+
 // ---------------------------------------------------------------------------
 // Site
 // ---------------------------------------------------------------------------
