@@ -83,9 +83,21 @@ export const serviceSchema = z.object({
   description: optText(20000),
   icon: z.string().max(30).default("sparkles"),
   coverMediaId: optUuid,
+  startingAtPrice: optText(60),
+  timelineEstimate: optText(60),
+  idealFor: optText(300),
+  techStack: stringList(30, 40),
+  videoUrl: optHttpsUrl,
+  engagementTerms: optText(4000),
+  slaNotes: optText(4000),
+  comparisonNotes: optText(4000),
+  processNotes: optText(4000),
+  technicalNotes: optText(4000),
+  trainingAndDocs: optText(4000),
   ...seo,
   ...flags,
   features: jsonArray(z.object({ title: title(120), description: optText(400) }), 20),
+  addOns: jsonArray(z.object({ title: title(120), description: optText(400), priceNote: optText(60) }), 20),
 });
 
 /* ---------------------------------- team ---------------------------------- */
