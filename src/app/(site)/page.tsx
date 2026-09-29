@@ -1,5 +1,6 @@
-import { ArrowRight, MessageCircle, Sparkles } from "lucide-react";
+import { ArrowRight, Calendar, MessageCircle, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { AgentVisual } from "@/components/site/agent-visual";
@@ -9,6 +10,7 @@ import { MediaImage } from "@/components/site/media-image";
 import { ProjectCard } from "@/components/site/project-card";
 import { Section, SectionHeading, ViewAllLink } from "@/components/site/section";
 import { ServiceCard } from "@/components/site/service-card";
+import { ShareButtons } from "@/components/site/share-buttons";
 import { TeamCard } from "@/components/site/team-card";
 import { TechMarquee } from "@/components/site/tech-marquee";
 import { TestimonialGrid } from "@/components/site/testimonials";
@@ -22,6 +24,7 @@ import { groupContent, listPublishedContent } from "@/server/dal/public/content"
 import { listHomepageProjects } from "@/server/dal/public/projects";
 import { getServiceFeatureTitles, listPublishedServices } from "@/server/dal/public/services";
 import { getPublicSettings, getSiteMedia } from "@/server/dal/public/site";
+import { listPublishedPartners } from "@/server/dal/public/sponsorship";
 import { listPublishedTeam } from "@/server/dal/public/team";
 import { averageRating, listPublishedFaqs, listPublishedTestimonials } from "@/server/dal/public/testimonials";
 
@@ -50,7 +53,7 @@ const TEAM_GRID: Record<number, string> = {
 const arrow = "transition-transform duration-(--duration-base) ease-spring group-hover/btn:translate-x-0.5";
 
 export default async function HomePage() {
-  const [settings, media, services, projects, team, content, testimonials, faqs] = await Promise.all([
+  const [settings, media, services, projects, team, content, testimonials, faqs, partners] = await Promise.all([
     getPublicSettings(),
     getSiteMedia(),
     listPublishedServices(),
@@ -59,7 +62,9 @@ export default async function HomePage() {
     listPublishedContent(),
     listPublishedTestimonials({ limit: 6 }),
     listPublishedFaqs(),
+    listPublishedPartners(),
   ]);
+  const clientLogos = partners.filter((p) => p.logo);
   const allTestimonials = testimonials.length ? await listPublishedTestimonials() : [];
   const avg = averageRating(allTestimonials);
   const { home, general } = settings;
@@ -68,6 +73,7 @@ export default async function HomePage() {
   const showcaseContent = highlighted.length ? highlighted : groupContent(content, "featured", 3).length ? groupContent(content, "featured", 3) : groupContent(content, "latest", 3);
   const primaryHref = safeHref(home.primaryCtaHref) ?? "/contact";
   const secondaryHref = safeHref(home.secondaryCtaHref) ?? "/projects";
+  const bookingHref = safeHref(home.bookingUrl);
   const wa = whatsappLink(general.whatsapp, general.whatsappMessage);
 
   return (
@@ -88,6 +94,15 @@ export default async function HomePage() {
               {home.heroTitle}
             </h1>
             {home.heroSubtitle ? <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted sm:text-xl">{home.heroSubtitle}</p> : null}
+            {home.availabilityStatus ? (
+              <p className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-accent">
+                <span className="relative flex size-2">
+                  <span aria-hidden className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60" />
+                  <span aria-hidden className="relative inline-flex size-2 rounded-full bg-accent" />
+                </span>
+                {home.availabilityStatus}
+              </p>
+            ) : null}
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Link href={primaryHref} className={buttonVariants({ size: "lg", className: "group/btn" })}>
                 {home.primaryCtaLabel}
@@ -96,12 +111,18 @@ export default async function HomePage() {
               <Link href={secondaryHref} className={buttonVariants({ size: "lg", variant: "secondary" })}>
                 {home.secondaryCtaLabel}
               </Link>
+              {bookingHref ? (
+                <a href={bookingHref} target="_blank" rel="noopener noreferrer" className={buttonVariants({ size: "lg", variant: "ghost" })}>
+                  <Calendar aria-hidden /> Book a 15-min call
+                </a>
+              ) : null}
               {wa ? (
                 <a href={wa} target="_blank" rel="noopener noreferrer" className={buttonVariants({ size: "lg", variant: "ghost" })}>
                   <MessageCircle aria-hidden /> WhatsApp us
                 </a>
               ) : null}
             </div>
+            {home.pricingFrom ? <p className="mt-4 text-sm text-muted">{home.pricingFrom}</p> : null}
             {avg && allTestimonials.length ? (
               <p className="mt-9 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-muted">
                 <Stars rating={avg} />
@@ -128,6 +149,21 @@ export default async function HomePage() {
           </div>
         ) : null}
       </section>
+
+      {/* Client logos */}
+      {home.showClientLogos && clientLogos.length ? (
+        <div className="container-page pb-6">
+          <p className="label-caps mb-6 text-center">Trusted by</p>
+          <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 opacity-80 grayscale">
+            {clientLogos.map((p) => {
+              const w = p.logo!.width ?? 160;
+              const h = p.logo!.height ?? 40;
+              const img = <Image src={p.logo!.url} alt={p.name} width={w} height={h} className="h-8 w-auto object-contain sm:h-9" unoptimized={p.logo!.mimeType === "image/svg+xml" || p.logo!.mimeType === "image/gif"} />;
+              return <li key={p.slug}>{p.websiteUrl ? <a href={p.websiteUrl} target="_blank" rel="noopener noreferrer" aria-label={p.name}>{img}</a> : img}</li>;
+            })}
+          </ul>
+        </div>
+      ) : null}
 
       {/* Positioning */}
       {home.positioningTitle ? (
@@ -221,14 +257,43 @@ export default async function HomePage() {
         </Section>
       ) : null}
 
+      {/* Why us */}
+      {home.comparison.length ? (
+        <Section aria-labelledby="comparison-title" className="cv-auto">
+          <SectionHeading id="comparison-title" eyebrow="Why us" title="How we compare" />
+          <div className="glass-panel overflow-x-auto rounded-card">
+            <table className="w-full min-w-[36rem] text-sm">
+              <thead>
+                <tr className="border-b border-(--glass-line) text-left">
+                  <th className="p-4 font-medium text-muted">What matters</th>
+                  <th className="p-4 font-semibold text-accent">Us</th>
+                  <th className="p-4 font-medium text-muted">A freelancer</th>
+                  <th className="p-4 font-medium text-muted">A big agency</th>
+                </tr>
+              </thead>
+              <tbody>
+                {home.comparison.map((row) => (
+                  <tr key={row.label} className="border-b border-(--glass-line) last:border-0">
+                    <td className="p-4 font-medium text-fg">{row.label}</td>
+                    <td className="bg-accent-soft/40 p-4 text-fg">{row.us}</td>
+                    <td className="p-4 text-muted">{row.freelancer}</td>
+                    <td className="p-4 text-muted">{row.agency}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Section>
+      ) : null}
+
       {/* Team */}
       {team.length ? (
         <Section aria-labelledby="team-title" className="cv-auto">
           <SectionHeading id="team-title" eyebrow="People" title="The engineers behind the work" action={<ViewAllLink href="/team">Meet the team</ViewAllLink>} />
           <ul data-reveal="group" className={cn("focus-group grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6", TEAM_GRID[Math.min(team.length, 4)])}>
-            {team.slice(0, 4).map((m) => (
+            {team.slice(0, 4).map((m, i) => (
               <li key={m.id}>
-                <TeamCard member={m} compact />
+                <TeamCard member={m} compact priority={i === 0} />
               </li>
             ))}
           </ul>
@@ -313,6 +378,7 @@ export default async function HomePage() {
               <Link href="/media-kit" className={buttonVariants({ variant: "ghost" })}>
                 Media kit
               </Link>
+              <ShareButtons title={home.heroTitle} />
             </div>
           </div>
         </div>
