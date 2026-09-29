@@ -19,7 +19,9 @@ const BLOCKED_EXTENSIONS = new Set([
   "dll", "so", "bin", "svgz", "xml", "swf",
 ]);
 
-export const MAX_IMAGE_DIMENSION = 12000;
+/** Kept well under Vercel Image Optimization's practical cold-cache limits — a 12000px original could
+ *  take the optimizer close to a minute to fetch and resize on first request. */
+export const MAX_IMAGE_DIMENSION = 4000;
 export const MAX_VIDEO_SECONDS = 60 * 60 * 2;
 
 export function extensionOf(filename: string): string {
