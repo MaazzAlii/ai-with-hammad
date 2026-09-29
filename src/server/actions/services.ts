@@ -3,7 +3,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { serviceFeatures, services } from "@/db/schema";
+import { serviceAddOns, serviceFeatures, services } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { formDataToObject } from "@/lib/form-data";
 import { serviceSchema } from "@/lib/validation/admin";
@@ -20,7 +20,7 @@ async function save(id: string | null, fd: FormData): Promise<Result> {
   const staff = await authorize("services.write");
   const input = serviceSchema.parse(formDataToObject(fd));
   const canPublish = staff.permissions.has("services.publish");
-  const { features, isPublished, isFeatured, ...base } = input;
+  const { features, addOns, isPublished, isFeatured, ...base } = input;
   const flags = canPublish ? { isPublished, isFeatured } : {};
   const db = getDb();
   const sid = await db.transaction(async (tx) => {
@@ -30,11 +30,13 @@ async function save(id: string | null, fd: FormData): Promise<Result> {
       if (!ex) return null;
       await tx.update(services).set({ ...base, ...flags, ...(canPublish && isPublished && !ex.publishedAt ? { publishedAt: new Date() } : {}) }).where(eq(services.id, sid));
       await tx.delete(serviceFeatures).where(eq(serviceFeatures.serviceId, sid));
+      await tx.delete(serviceAddOns).where(eq(serviceAddOns.serviceId, sid));
     } else {
       const [row] = await tx.insert(services).values({ ...base, ...flags, ...(canPublish && isPublished ? { publishedAt: new Date() } : {}) }).returning({ id: services.id });
       sid = row!.id;
     }
     if (features.length) await tx.insert(serviceFeatures).values(features.map((f, i) => ({ ...f, serviceId: sid!, sortOrder: i })));
+    if (addOns.length) await tx.insert(serviceAddOns).values(addOns.map((a, i) => ({ ...a, serviceId: sid!, sortOrder: i })));
     return sid;
   });
   if (!sid) return fail("Service not found.");
