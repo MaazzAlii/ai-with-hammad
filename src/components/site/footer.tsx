@@ -5,6 +5,7 @@ import type { MediaDTO } from "@/server/dal/public/media";
 import type { NavLink } from "@/server/dal/public/site";
 
 import { Logo } from "./logo";
+import { NewsletterForm } from "./newsletter-form";
 
 const linkClass = "text-muted transition-colors duration-(--duration-fast) hover:text-fg";
 
@@ -12,6 +13,7 @@ export function SiteFooter({
   siteName,
   tagline,
   logo,
+  logoDark,
   links,
   legal,
   social,
@@ -23,6 +25,7 @@ export function SiteFooter({
   siteName: string;
   tagline: string;
   logo: MediaDTO | null;
+  logoDark?: MediaDTO | null;
   links: NavLink[];
   legal: NavLink[];
   social: { platform: string; url: string }[];
@@ -36,9 +39,9 @@ export function SiteFooter({
     <footer className="no-print pb-safe">
       <div className="container-page">
         <hr className="hairline" />
-        <div className="grid gap-12 py-14 lg:grid-cols-[1fr_1.6fr_auto] lg:gap-16 lg:py-20">
+        <div className="grid gap-12 py-14 lg:grid-cols-[1fr_1.3fr_auto_auto] lg:gap-16 lg:py-20">
           <div>
-            <Logo name={siteName} logo={logo} />
+            <Logo name={siteName} logo={logo} logoDark={logoDark} />
             {tagline ? <p className="mt-4 max-w-xs text-[0.9375rem] leading-relaxed text-muted">{tagline}</p> : null}
             <ul className="mt-6 space-y-2.5 text-sm">
               {email ? (
@@ -108,6 +111,11 @@ export function SiteFooter({
               </ul>
             </div>
           ) : null}
+          <div className="lg:w-64">
+            <h2 className="label-caps mb-4">Stay in the loop</h2>
+            <p className="mb-4 text-sm leading-relaxed text-muted">Occasional notes on what we&apos;re building. No spam.</p>
+            <NewsletterForm />
+          </div>
         </div>
         <div className="flex flex-col gap-3 border-t border-(--glass-line) py-6 text-xs text-subtle sm:flex-row sm:items-center sm:justify-between">
           <p>
