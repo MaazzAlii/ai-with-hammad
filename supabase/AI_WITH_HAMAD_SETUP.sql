@@ -67,6 +67,11 @@ exception when duplicate_object then null; end $$;
 do $$ begin
   create type public.tag_kind as enum ('technology', 'topic');
 exception when duplicate_object then null; end $$;
+alter type public.tag_kind add value if not exists 'integration';
+
+do $$ begin
+  create type public.project_status as enum ('live', 'in_progress', 'archived');
+exception when duplicate_object then null; end $$;
 
 do $$ begin
   create type public.nav_location as enum ('header', 'footer', 'legal');
@@ -273,8 +278,11 @@ create table if not exists public.projects (
   summary         text        not null default '',
   category        text        not null default '',
   client_name     text        not null default '',
+  client_logo_media_id uuid  references public.media_assets (id) on delete set null,
   industry        text        not null default '',
   project_year    integer     check (project_year is null or project_year between 1990 and 2100),
+  duration_label  text        not null default '',
+  status          public.project_status not null default 'live',
   project_url     text        check (project_url is null or project_url ~* '^https?://'),
   repository_url  text        check (repository_url is null or repository_url ~* '^https?://'),
   cover_media_id  uuid        references public.media_assets (id) on delete set null,
@@ -284,6 +292,13 @@ create table if not exists public.projects (
   architecture    text        not null default '',
   implementation  text        not null default '',
   results         text        not null default '',
+  challenges         text     not null default '',
+  lessons_learned    text     not null default '',
+  scalability_notes  text     not null default '',
+  security_measures  text     not null default '',
+  feedback_process   text     not null default '',
+  future_roadmap     text     not null default '',
+  roi_summary        text     not null default '',
   seo_title       text,
   seo_description text,
   is_published    boolean     not null default false,
