@@ -10,7 +10,7 @@ import { NavigationLoader } from "@/components/site/navigation-loader";
 import { RevealObserver } from "@/components/site/reveal-observer";
 import { WhatsAppButton } from "@/components/site/whatsapp-button";
 import { serverEnv } from "@/lib/env";
-import { organizationLd, websiteLd } from "@/lib/jsonld";
+import { localBusinessLd, organizationLd, websiteLd } from "@/lib/jsonld";
 import { whatsappLink } from "@/lib/whatsapp";
 import { getNavigation, getPublicSettings, getSiteMedia } from "@/server/dal/public/site";
 
@@ -26,7 +26,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       >
         Skip to content
       </a>
-      <SiteHeader siteName={general.siteName} logo={media.logo} links={nav.header} />
+      <SiteHeader siteName={general.siteName} logo={media.logo} logoDark={media.logoDark} links={nav.header} />
       <main id="main" tabIndex={-1} className="pt-[calc(var(--header-h)+max(0.75rem,env(safe-area-inset-top)))] outline-none">
         {children}
       </main>
@@ -34,6 +34,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         siteName={general.siteName}
         tagline={general.tagline}
         logo={media.logo}
+        logoDark={media.logoDark}
         links={nav.footer}
         legal={nav.legal}
         social={social.links}
@@ -60,7 +61,15 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             email: general.contactEmail || undefined,
           }),
           websiteLd(general.siteName),
-        ]}
+          localBusinessLd({
+            name: general.siteName,
+            description: general.description,
+            logoUrl: media.logo?.url,
+            email: general.contactEmail || undefined,
+            phone: general.phone || undefined,
+            address: general.address || general.location || undefined,
+          }),
+        ].filter((d): d is NonNullable<typeof d> => d !== null)}
       />
       {/* Vercel serves the analytics scripts; elsewhere they would 404. */}
       {process.env.VERCEL ? (
