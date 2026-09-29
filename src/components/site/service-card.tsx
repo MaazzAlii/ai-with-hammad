@@ -17,6 +17,7 @@ export function ServiceCard({ service, features }: { service: ServiceSummary; fe
         </Link>
       </h3>
       <p className="mt-2 flex-1 text-[0.9375rem] leading-relaxed text-muted">{service.summary}</p>
+      {service.startingAtPrice ? <p className="mt-3 text-sm font-medium text-fg">{service.startingAtPrice}</p> : null}
       {features?.length ? (
         <ul className="mt-5 space-y-2 border-t border-(--glass-line) pt-5 text-sm text-muted">
           {features.slice(0, 3).map((f) => (
