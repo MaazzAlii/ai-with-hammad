@@ -23,6 +23,8 @@ export const settingsSchemas = {
     address: z.string().max(300).default(""),
     businessHours: z.string().max(120).default(""),
     logoMediaId: z.uuid().nullable().default(null),
+    /** Optional alternate logo shown when a visitor switches to dark mode. Falls back to `logoMediaId` when unset. */
+    logoDarkMediaId: z.uuid().nullable().default(null),
   }),
   home: z.object({
     heroEyebrow: z.string().max(80).default(""),
@@ -44,6 +46,19 @@ export const settingsSchemas = {
     process: z.array(titled).max(8).default([]),
     /** Show the FAQ section on the homepage (Admin → FAQs or Settings → Homepage). */
     showFaq: z.boolean().default(true),
+    /** Calendly/Cal.com (or similar) scheduling link. Shown as a hero button when set. */
+    bookingUrl: z.union([z.literal(""), z.url()]).default(""),
+    /** Short anchor near the hero CTAs, e.g. "Projects start at $1,500". Left blank hides it. */
+    pricingFrom: z.string().max(60).default(""),
+    /** Short availability note, e.g. "Accepting 2 new projects for December". Left blank hides it. */
+    availabilityStatus: z.string().max(80).default(""),
+    /** "Why us" comparison table: one row per label, one short answer per column. */
+    comparison: z
+      .array(z.object({ label: z.string().max(60), us: z.string().max(60), freelancer: z.string().max(60), agency: z.string().max(60) }))
+      .max(10)
+      .default([]),
+    /** Show the client-logo strip built from published, non-confidential sponsorship partners. */
+    showClientLogos: z.boolean().default(true),
   }),
   about: z.object({
     title: z.string().max(120).default("About"),
