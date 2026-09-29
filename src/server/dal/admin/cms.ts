@@ -15,6 +15,7 @@ import {
   projectTags,
   projectTeamMembers,
   projects,
+  serviceAddOns,
   serviceFeatures,
   services,
   socialPlatforms,
@@ -74,9 +75,12 @@ export async function listServicesAdmin() {
 export async function getServiceForEdit(id: string) {
   const [s] = await db().select().from(services).where(eq(services.id, id));
   if (!s || s.deletedAt) return null;
-  const features = await db().select().from(serviceFeatures).where(eq(serviceFeatures.serviceId, id)).orderBy(asc(serviceFeatures.sortOrder));
+  const [features, addOns] = await Promise.all([
+    db().select().from(serviceFeatures).where(eq(serviceFeatures.serviceId, id)).orderBy(asc(serviceFeatures.sortOrder)),
+    db().select().from(serviceAddOns).where(eq(serviceAddOns.serviceId, id)).orderBy(asc(serviceAddOns.sortOrder)),
+  ]);
   const mediaMap = await getMediaMany([s.coverMediaId]);
-  return { service: s, features, cover: s.coverMediaId ? (mediaMap.get(s.coverMediaId) ?? null) : null };
+  return { service: s, features, addOns, cover: s.coverMediaId ? (mediaMap.get(s.coverMediaId) ?? null) : null };
 }
 
 /* team */
