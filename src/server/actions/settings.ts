@@ -30,9 +30,18 @@ const nullable = (v: unknown) => (typeof v === "string" && v.trim() === "" ? nul
 function shape(key: SettingsKey | "internal.notifications", o: Record<string, unknown>): unknown {
   switch (key) {
     case "general":
-      return { ...o, logoMediaId: nullable(o.logoMediaId) };
+      return { ...o, logoMediaId: nullable(o.logoMediaId), logoDarkMediaId: nullable(o.logoDarkMediaId) };
     case "home":
-      return { ...o, heroMediaId: nullable(o.heroMediaId), capabilities: json(o.capabilities), process: json(o.process), techStack: lines(o.techStack), showFaq: on(o.showFaq) };
+      return {
+        ...o,
+        heroMediaId: nullable(o.heroMediaId),
+        capabilities: json(o.capabilities),
+        process: json(o.process),
+        techStack: lines(o.techStack),
+        showFaq: on(o.showFaq),
+        comparison: json(o.comparison),
+        showClientLogos: on(o.showClientLogos),
+      };
     case "about":
       return { ...o, values: json(o.values) };
     case "seo":
