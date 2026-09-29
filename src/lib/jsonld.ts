@@ -20,6 +20,27 @@ export function organizationLd(o: { name: string; description: string; logoUrl?:
   };
 }
 
+/**
+ * Local business signal for search — only added when the admin has actually entered
+ * an address/phone (Settings → General). Address is schema.org "Text" (we only store
+ * a free-text line, not a structured street/city/postal breakdown).
+ */
+export function localBusinessLd(o: { name: string; description: string; logoUrl?: string | null; email?: string; phone?: string; address?: string }): Json | null {
+  if (!o.address && !o.phone) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": absoluteUrl("/#local-business"),
+    name: o.name,
+    url: absoluteUrl("/"),
+    description: o.description || undefined,
+    ...(o.logoUrl ? { image: o.logoUrl } : {}),
+    ...(o.address ? { address: o.address } : {}),
+    ...(o.phone ? { telephone: o.phone } : {}),
+    ...(o.email ? { email: o.email } : {}),
+  };
+}
+
 export function websiteLd(name: string): Json {
   return {
     "@context": "https://schema.org",
