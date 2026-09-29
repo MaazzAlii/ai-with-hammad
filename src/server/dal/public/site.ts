@@ -25,13 +25,14 @@ export const getPublicSettings = cache(async (): Promise<PublicSettings> => {
   return Object.fromEntries(PUBLIC_KEYS.map((k) => [k, parseSettings(k, byKey.get(k))])) as PublicSettings;
 });
 
-export const getSiteMedia = cache(async (): Promise<{ logo: MediaDTO | null; ogImage: MediaDTO | null; heroImage: MediaDTO | null }> => {
+export const getSiteMedia = cache(async (): Promise<{ logo: MediaDTO | null; logoDark: MediaDTO | null; ogImage: MediaDTO | null; heroImage: MediaDTO | null }> => {
   const s = await getPublicSettings();
   const map = await withPublicDb(new Map<string, MediaDTO>(), (db) =>
-    loadPublicMedia(db, [s.general.logoMediaId, s.seo.ogImageMediaId, s.home.heroMediaId]),
+    loadPublicMedia(db, [s.general.logoMediaId, s.general.logoDarkMediaId, s.seo.ogImageMediaId, s.home.heroMediaId]),
   );
   return {
     logo: s.general.logoMediaId ? (map.get(s.general.logoMediaId) ?? null) : null,
+    logoDark: s.general.logoDarkMediaId ? (map.get(s.general.logoDarkMediaId) ?? null) : null,
     ogImage: s.seo.ogImageMediaId ? (map.get(s.seo.ogImageMediaId) ?? null) : null,
     heroImage: s.home.heroMediaId ? (map.get(s.home.heroMediaId) ?? null) : null,
   };
