@@ -7,6 +7,8 @@ import type { ProjectCardDTO } from "@/server/dal/public/projects";
 
 import { MediaImage, MediaPlaceholder } from "./media-image";
 
+const STATUS_LABEL: Record<string, string> = { in_progress: "In progress", archived: "Archived" };
+
 export function ProjectCard({ project, priority = false, headingLevel = 3 }: { project: ProjectCardDTO; priority?: boolean; headingLevel?: 2 | 3 }) {
   const H = headingLevel === 2 ? "h2" : "h3";
   const techs = project.tags.filter((t) => t.kind === "technology").slice(0, 3);
@@ -28,7 +30,7 @@ export function ProjectCard({ project, priority = false, headingLevel = 3 }: { p
           <MediaPlaceholder label={project.title.charAt(0)} ratio="4/3" />
         )}
         </Tilt>
-        {project.isFeatured || project.isPinned ? (
+        {project.isFeatured || project.isPinned || project.status !== "live" ? (
           <div className="absolute top-3 left-3 flex gap-1.5">
             {project.isFeatured ? <Badge variant="glass">Featured</Badge> : null}
             {project.isPinned ? (
@@ -36,6 +38,7 @@ export function ProjectCard({ project, priority = false, headingLevel = 3 }: { p
                 <Pin aria-hidden /> Selected
               </Badge>
             ) : null}
+            {project.status !== "live" ? <Badge variant="glass">{STATUS_LABEL[project.status]}</Badge> : null}
           </div>
         ) : null}
         <span aria-hidden className="glass-float absolute right-3 bottom-3 grid size-9 place-items-center rounded-full text-fg opacity-0 transition-[opacity,translate] duration-(--duration-base) ease-spring group-hover:opacity-100 [@media(hover:hover)]:translate-y-1 group-hover:translate-y-0">
