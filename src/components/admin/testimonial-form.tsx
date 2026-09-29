@@ -11,11 +11,13 @@ export function TestimonialForm({
   t,
   photo,
   clientOptions,
+  projectOptions,
 }: {
   action: FormAction;
   t?: typeof testimonials.$inferSelect | null;
   photo?: AdminMedia | null;
   clientOptions: { id: string; name: string }[];
+  projectOptions: { id: string; title: string }[];
 }) {
   return (
     <AdminForm action={action} submitLabel={t ? "Save testimonial" : "Add testimonial"}>
@@ -28,6 +30,7 @@ export function TestimonialForm({
           <TextField name="company" label="Company" defaultValue={t?.company} />
         </div>
         <SelectField name="clientId" label="Client (optional)" defaultValue={t?.clientId ?? ""} options={[{ value: "", label: "—" }, ...clientOptions.map((c) => ({ value: c.id, label: c.name }))]} />
+        <SelectField name="projectId" label="About this project (optional)" defaultValue={t?.projectId ?? ""} options={[{ value: "", label: "—" }, ...projectOptions.map((p) => ({ value: p.id, label: p.title }))]} hint="Shows this testimonial on the project's case study page." />
         <MediaField name="photoMediaId" label="Author photo (optional)" defaultMedia={photo} uploadBucket="media-library" />
         <SwitchField name="consentToPublish" label="The author agreed to publication" defaultChecked={t?.consentToPublish ?? false} />
       </FormSection>
