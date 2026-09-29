@@ -3,7 +3,8 @@ import "server-only";
 import { asc, eq, inArray } from "drizzle-orm";
 import { cache } from "react";
 
-import { serviceFeatures, services } from "@/db/schema";
+import { serviceAddOns, serviceFeatures, services } from "@/db/schema";
+import { parseVideoEmbed, type Embed } from "@/lib/embeds";
 
 import { withPublicDb } from "./db";
 import { isPublic } from "./filters";
@@ -15,16 +16,28 @@ export type ServiceSummary = {
   title: string;
   summary: string;
   icon: string;
+  startingAtPrice: string;
   isFeatured: boolean;
   updatedAt: Date;
 };
 
 export type ServiceDetail = ServiceSummary & {
   description: string;
+  timelineEstimate: string;
+  idealFor: string;
+  techStack: string[];
+  engagementTerms: string;
+  slaNotes: string;
+  comparisonNotes: string;
+  processNotes: string;
+  technicalNotes: string;
+  trainingAndDocs: string;
+  videoEmbed: Embed | null;
   seoTitle: string | null;
   seoDescription: string | null;
   cover: MediaDTO | null;
   features: { title: string; description: string }[];
+  addOns: { title: string; description: string; priceNote: string }[];
 };
 
 const summaryCols = {
@@ -33,6 +46,7 @@ const summaryCols = {
   title: services.title,
   summary: services.summary,
   icon: services.icon,
+  startingAtPrice: services.startingAtPrice,
   isFeatured: services.isFeatured,
   updatedAt: services.updatedAt,
 };
@@ -50,21 +64,42 @@ export const listPublishedServices = cache(async (opts: { featuredOnly?: boolean
 export const getPublishedService = cache(async (slug: string): Promise<ServiceDetail | null> =>
   withPublicDb(null, async (db) => {
     const [row] = await db
-      .select({ ...summaryCols, description: services.description, seoTitle: services.seoTitle, seoDescription: services.seoDescription, coverMediaId: services.coverMediaId })
+      .select({
+        ...summaryCols,
+        description: services.description,
+        timelineEstimate: services.timelineEstimate,
+        idealFor: services.idealFor,
+        techStack: services.techStack,
+        videoUrl: services.videoUrl,
+        engagementTerms: services.engagementTerms,
+        slaNotes: services.slaNotes,
+        comparisonNotes: services.comparisonNotes,
+        processNotes: services.processNotes,
+        technicalNotes: services.technicalNotes,
+        trainingAndDocs: services.trainingAndDocs,
+        seoTitle: services.seoTitle,
+        seoDescription: services.seoDescription,
+        coverMediaId: services.coverMediaId,
+      })
       .from(services)
       .where(isPublic(services, eq(services.slug, slug)))
       .limit(1);
     if (!row) return null;
-    const [features, media] = await Promise.all([
+    const [features, addOns, media] = await Promise.all([
       db
         .select({ title: serviceFeatures.title, description: serviceFeatures.description })
         .from(serviceFeatures)
         .where(eq(serviceFeatures.serviceId, row.id))
         .orderBy(asc(serviceFeatures.sortOrder)),
+      db
+        .select({ title: serviceAddOns.title, description: serviceAddOns.description, priceNote: serviceAddOns.priceNote })
+        .from(serviceAddOns)
+        .where(eq(serviceAddOns.serviceId, row.id))
+        .orderBy(asc(serviceAddOns.sortOrder)),
       loadPublicMedia(db, [row.coverMediaId]),
     ]);
-    const { coverMediaId, ...rest } = row;
-    return { ...rest, features, cover: coverMediaId ? (media.get(coverMediaId) ?? null) : null };
+    const { coverMediaId, videoUrl, ...rest } = row;
+    return { ...rest, features, addOns, videoEmbed: parseVideoEmbed(videoUrl), cover: coverMediaId ? (media.get(coverMediaId) ?? null) : null };
   }),
 );
 
