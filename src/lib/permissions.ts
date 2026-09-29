@@ -42,6 +42,7 @@ export const PERMISSIONS = [
   "testimonials.moderate",
   "faqs.write",
   "links.write",
+  "newsletter.manage",
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -82,6 +83,7 @@ const MANAGER: Permission[] = [
   "testimonials.moderate",
   "faqs.write",
   "links.write",
+  "newsletter.manage",
 ];
 
 export const DEFAULT_ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
