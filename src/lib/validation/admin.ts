@@ -2,7 +2,7 @@ import "@/lib/zod-config";
 
 import { z } from "zod";
 
-import { contentPlatform, inquiryPriority, inquiryStatus, projectMediaType } from "@/db/schema";
+import { contentPlatform, inquiryPriority, inquiryStatus, projectMediaType, projectStatus } from "@/db/schema";
 import { ROLES } from "@/lib/permissions";
 
 /* ----------------------------- field helpers ----------------------------- */
@@ -129,8 +129,11 @@ export const projectSchema = z.object({
   summary: optText(500),
   category: optText(60),
   clientName: optText(120),
+  clientLogoMediaId: optUuid,
   industry: optText(80),
   projectYear: optInt(1990, 2100),
+  durationLabel: optText(60),
+  status: z.enum(projectStatus.enumValues).default("live"),
   projectUrl: optUrl,
   repositoryUrl: optUrl,
   coverMediaId: optUuid,
@@ -140,11 +143,19 @@ export const projectSchema = z.object({
   architecture: optText(20000),
   implementation: optText(20000),
   results: optText(20000),
+  challenges: optText(20000),
+  lessonsLearned: optText(20000),
+  scalabilityNotes: optText(20000),
+  securityMeasures: optText(20000),
+  feedbackProcess: optText(20000),
+  futureRoadmap: optText(20000),
+  roiSummary: optText(20000),
   ...seo,
   ...flags,
   isPinned: checkbox,
   technologies: stringList(30, 40),
   topics: stringList(20, 40),
+  integrations: stringList(20, 60),
   metrics: jsonArray(z.object({ label: title(80), value: title(40), description: optText(200) }), 12),
   features: jsonArray(z.object({ title: title(120), description: optText(400) }), 20),
   team: jsonArray(z.object({ teamMemberId: z.uuid(), roleOnProject: optText(80) }), 20),
