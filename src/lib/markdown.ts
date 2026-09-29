@@ -1,9 +1,9 @@
 /**
  * Minimal, safe Markdown → HTML renderer for CMS long-form fields.
  * Supports: ## / ### headings, paragraphs, - / 1. lists, **bold**, *italic*,
- * `code`, [links](https://…). ALL input is HTML-escaped first; only the tags
- * produced here can appear in the output. Links are restricted to http(s),
- * mailto and internal paths.
+ * `code`, ```fenced code blocks```, [links](https://…). ALL input is
+ * HTML-escaped first; only the tags produced here can appear in the output.
+ * Links are restricted to http(s), mailto and internal paths.
  */
 import { safeHttpUrl, safeInternalPath } from "./url-safety";
 
@@ -42,6 +42,7 @@ export function renderMarkdown(src: string | null | undefined): string {
   const html: string[] = [];
   let para: string[] = [];
   let list: { type: "ul" | "ol"; items: string[] } | null = null;
+  let code: string[] | null = null;
 
   const flushPara = () => {
     if (para.length) html.push(`<p>${inline(para.join(" "))}</p>`);
@@ -54,6 +55,21 @@ export function renderMarkdown(src: string | null | undefined): string {
 
   for (const raw of lines) {
     const line = raw.trimEnd();
+    if (code) {
+      if (/^\s*```\s*$/.test(line)) {
+        html.push(`<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`);
+        code = null;
+      } else {
+        code.push(raw);
+      }
+      continue;
+    }
+    if (/^\s*```/.test(line)) {
+      flushPara();
+      flushList();
+      code = [];
+      continue;
+    }
     const heading = line.match(/^(#{2,4})\s+(.+)$/);
     const ul = line.match(/^\s*[-*]\s+(.+)$/);
     const ol = line.match(/^\s*\d+[.)]\s+(.+)$/);
@@ -80,6 +96,7 @@ export function renderMarkdown(src: string | null | undefined): string {
   }
   flushPara();
   flushList();
+  if (code) html.push(`<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`);
   return html.join("\n");
 }
 
