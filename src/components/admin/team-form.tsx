@@ -44,7 +44,13 @@ export function TeamForm({ action, data, canWrite, canPublish }: { action: FormA
             <SwitchField name="isFeatured" label="Core team (homepage)" defaultChecked={m?.isFeatured} disabled={!canPublish} />
           </FormSection>
           <FormSection title="Photo">
-            <MediaField name="photoMediaId" label="Portrait" defaultMedia={data?.photo} uploadBucket="team-images" hint="Square or 3:4 portrait." />
+            <MediaField
+              name="photoMediaId"
+              label="Portrait"
+              defaultMedia={data?.photo}
+              uploadBucket="team-images"
+              hint="Square or 3:4 portrait, e.g. 1000×1000 or 1200×1600px. JPG/PNG/WebP up to 6 MB — a phone photo straight off the camera is usually much bigger than needed and will upload/load slower, so resize it first if you can."
+            />
           </FormSection>
         </div>
       </div>
