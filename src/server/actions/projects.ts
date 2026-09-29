@@ -27,8 +27,11 @@ async function save(staff: Staff, id: string | null, fd: FormData): Promise<Resu
     summary: input.summary,
     category: input.category,
     clientName: input.clientName,
+    clientLogoMediaId: input.clientLogoMediaId,
     industry: input.industry,
     projectYear: input.projectYear,
+    durationLabel: input.durationLabel,
+    status: input.status,
     projectUrl: input.projectUrl,
     repositoryUrl: input.repositoryUrl,
     coverMediaId: input.coverMediaId,
@@ -38,6 +41,13 @@ async function save(staff: Staff, id: string | null, fd: FormData): Promise<Resu
     architecture: input.architecture,
     implementation: input.implementation,
     results: input.results,
+    challenges: input.challenges,
+    lessonsLearned: input.lessonsLearned,
+    scalabilityNotes: input.scalabilityNotes,
+    securityMeasures: input.securityMeasures,
+    feedbackProcess: input.feedbackProcess,
+    futureRoadmap: input.futureRoadmap,
+    roiSummary: input.roiSummary,
     seoTitle: input.seoTitle,
     seoDescription: input.seoDescription,
   };
@@ -71,6 +81,7 @@ async function save(staff: Staff, id: string | null, fd: FormData): Promise<Resu
     const tags = [
       ...dedupe(input.technologies).map((label, i) => ({ projectId: pid!, kind: "technology" as const, label, slug: slugify(label), sortOrder: i })),
       ...dedupe(input.topics).map((label, i) => ({ projectId: pid!, kind: "topic" as const, label, slug: slugify(label), sortOrder: i })),
+      ...dedupe(input.integrations).map((label, i) => ({ projectId: pid!, kind: "integration" as const, label, slug: slugify(label), sortOrder: i })),
     ].filter((t) => t.slug);
     if (tags.length) await tx.insert(projectTags).values(tags);
     if (input.metrics.length) await tx.insert(projectMetrics).values(input.metrics.map((m, i) => ({ ...m, projectId: pid!, sortOrder: i })));
