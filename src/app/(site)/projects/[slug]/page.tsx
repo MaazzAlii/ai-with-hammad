@@ -1,5 +1,6 @@
 import { ArrowRight, ArrowUpRight, Code2, FileText, Link2 } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -7,8 +8,10 @@ import { JsonLd } from "@/components/site/json-ld";
 import { Markdown } from "@/components/site/markdown";
 import { MediaGallery } from "@/components/site/media-gallery";
 import { MediaImage } from "@/components/site/media-image";
+import { PrintButton } from "@/components/site/print-button";
 import { ProjectCard } from "@/components/site/project-card";
 import { Breadcrumb, PageHeader, Section, SectionHeading } from "@/components/site/section";
+import { Stars } from "@/components/portal/star-rating";
 import { VideoEmbed } from "@/components/site/video-embed";
 import { VideoPlayer } from "@/components/site/video-player";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +49,16 @@ const NARRATIVE = [
   ["architecture", "Architecture"],
   ["implementation", "Implementation"],
   ["results", "Results"],
+  ["challenges", "Challenges faced"],
+  ["lessonsLearned", "Lessons learned"],
+  ["roiSummary", "ROI"],
+  ["scalabilityNotes", "Scalability"],
+  ["securityMeasures", "Security & data privacy"],
+  ["feedbackProcess", "Client feedback loop"],
+  ["futureRoadmap", "What's next"],
 ] as const;
+
+const STATUS_LABEL: Record<string, string> = { live: "Live", in_progress: "In progress", archived: "Archived" };
 
 export default async function ProjectPage(props: PageProps<"/projects/[slug]">) {
   const { slug } = await props.params;
@@ -62,10 +74,12 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
   const docs = project.media.filter((m) => m.kind === "document" || m.kind === "link");
   const techs = project.tags.filter((t) => t.kind === "technology");
   const topics = project.tags.filter((t) => t.kind === "topic");
+  const integrations = project.tags.filter((t) => t.kind === "integration");
   const facts = [
     ["Client", project.clientName],
     ["Industry", project.industry],
     ["Year", project.projectYear ? String(project.projectYear) : ""],
+    ["Duration", project.durationLabel],
     ["Category", project.category],
   ].filter(([, v]) => v);
   const toGallery = (list: typeof images) =>
@@ -104,10 +118,18 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
         breadcrumb={
           <>
             <Breadcrumb href="/projects" label="Projects" current={project.title} />
-            {project.category ? <p className="eyebrow mb-3">{project.category}</p> : null}
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              {project.category ? <p className="eyebrow mb-0">{project.category}</p> : null}
+              {project.status !== "live" ? <Badge>{STATUS_LABEL[project.status]}</Badge> : null}
+            </div>
           </>
         }
       >
+        {project.clientLogo ? (
+          <div className="mt-6">
+            <Image src={project.clientLogo.url} alt={project.clientName || "Client"} width={project.clientLogo.width ?? 140} height={project.clientLogo.height ?? 36} className="h-8 w-auto object-contain opacity-90" unoptimized={project.clientLogo.mimeType === "image/svg+xml"} />
+          </div>
+        ) : null}
         {project.projectUrl || project.repositoryUrl ? (
           <div className="mt-8 flex flex-wrap gap-2.5">
             {project.projectUrl ? (
@@ -120,8 +142,11 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
                 <Code2 aria-hidden /> Source
               </a>
             ) : null}
+            <PrintButton />
           </div>
-        ) : null}
+        ) : (
+          <div className="mt-8"><PrintButton /></div>
+        )}
       </PageHeader>
       {project.cover ? (
         <div className="container-page mt-8 sm:mt-10">
@@ -166,6 +191,25 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
                   </div>
                 ))}
               </dl>
+            </section>
+          ) : null}
+
+          {project.testimonials.length ? (
+            <section aria-labelledby="sec-quote" className="space-y-6">
+              <h2 id="sec-quote" className="text-[1.625rem]">What the client said</h2>
+              {project.testimonials.map((t) => (
+                <figure key={t.id} className="glass-panel rounded-card p-6 sm:p-8">
+                  <Stars rating={t.rating} />
+                  <blockquote className="mt-4 text-lg leading-relaxed text-fg">&ldquo;{t.quote}&rdquo;</blockquote>
+                  <figcaption className="mt-4 flex items-center gap-3">
+                    {t.photo ? <MediaImage media={t.photo} alt="" ratio="1/1" rounded={false} className="size-10 shrink-0 rounded-full" sizes="40px" /> : null}
+                    <span>
+                      <span className="block text-sm font-medium text-fg">{t.authorName}</span>
+                      {t.authorTitle || t.company ? <span className="block text-xs text-muted">{[t.authorTitle, t.company].filter(Boolean).join(" · ")}</span> : null}
+                    </span>
+                  </figcaption>
+                </figure>
+              ))}
             </section>
           ) : null}
 
@@ -245,6 +289,12 @@ export default async function ProjectPage(props: PageProps<"/projects/[slug]">) 
             <div>
               <h2 className="label-caps mb-3">Topics</h2>
               <ul className="flex flex-wrap gap-1.5">{topics.map((t) => <li key={t.slug}><Badge>{t.label}</Badge></li>)}</ul>
+            </div>
+          ) : null}
+          {integrations.length ? (
+            <div>
+              <h2 className="label-caps mb-3">Integrations</h2>
+              <ul className="flex flex-wrap gap-1.5">{integrations.map((t) => <li key={t.slug}><Badge>{t.label}</Badge></li>)}</ul>
             </div>
           ) : null}
           {project.services.length ? (
