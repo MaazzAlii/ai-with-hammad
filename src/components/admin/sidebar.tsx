@@ -14,6 +14,7 @@ import {
   Inbox,
   LayoutDashboard,
   Link2,
+  Mail,
   Menu,
   PlaySquare,
   ScrollText,
@@ -56,6 +57,7 @@ const ICONS: Record<string, LucideIcon> = {
   faqs: HelpCircle,
   links: Link2,
   status: Activity,
+  newsletter: Mail,
 };
 
 export function AdminSidebar({ groups, user, newInquiries, unreadMessages = 0 }: { groups: { group: string; items: AdminNavItem[] }[]; user: { email: string; role: string }; newInquiries: number; unreadMessages?: number }) {
