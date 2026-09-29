@@ -49,7 +49,7 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
     assistant: parseSettings("assistant", byKey.get("assistant")),
   };
   const recipients = ((byKey.get("internal.notifications") as { inquiryRecipients?: string[] } | undefined)?.inquiryRecipients ?? []).join("\n");
-  const media = await getMediaMany([s.general.logoMediaId, s.seo.ogImageMediaId, s.home.heroMediaId]);
+  const media = await getMediaMany([s.general.logoMediaId, s.general.logoDarkMediaId, s.seo.ogImageMediaId, s.home.heroMediaId]);
   const m = (id: string | null) => (id ? (media.get(id) ?? null) : null);
   const str = (v: Settings<"sponsorship">["audience"]["ageRanges"]) => v.map((x) => ({ label: x.label, percent: String(x.percent) }));
 
@@ -70,7 +70,20 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <TextField name="siteName" label="Site name" required defaultValue={s.general.siteName} />
               <TextField name="tagline" label="Tagline" defaultValue={s.general.tagline} />
               <TextAreaField name="description" label="Organisation description" rows={3} defaultValue={s.general.description} hint="Used in the footer, sponsorship page and Organization structured data." />
-              <MediaField name="logoMediaId" label="Logo (also used on the loading screen)" defaultMedia={m(s.general.logoMediaId)} uploadBucket="site-assets" />
+              <MediaField
+                name="logoMediaId"
+                label="Logo (also used on the loading screen)"
+                defaultMedia={m(s.general.logoMediaId)}
+                uploadBucket="site-assets"
+                hint="Transparent PNG or SVG, roughly square or wide (e.g. 512×512 or 512×128px). Up to 10 MB — it's shown small (32px), so a huge original only slows down the upload."
+              />
+              <MediaField
+                name="logoDarkMediaId"
+                label="Dark mode logo (optional)"
+                defaultMedia={m(s.general.logoDarkMediaId)}
+                uploadBucket="site-assets"
+                hint="Shown instead of the logo above when a visitor switches to dark mode (e.g. a light/white version for a dark background). Leave empty to reuse the same logo in both themes."
+              />
             </FormSection>
             <FormSection title="Contact details" description="Shown on the contact page, footer, client portal and WhatsApp button." className="mt-6">
               <div className="grid gap-5 sm:grid-cols-2">
@@ -91,12 +104,23 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <TextField name="heroEyebrow" label="Eyebrow" defaultValue={s.home.heroEyebrow} />
               <TextField name="heroTitle" label="Headline" defaultValue={s.home.heroTitle} />
               <TextAreaField name="heroSubtitle" label="Subheading" rows={2} defaultValue={s.home.heroSubtitle} />
-              <MediaField name="heroMediaId" label="Hero image (optional)" defaultMedia={m(s.home.heroMediaId)} uploadBucket="site-assets" />
+              <MediaField
+                name="heroMediaId"
+                label="Hero image (optional)"
+                defaultMedia={m(s.home.heroMediaId)}
+                uploadBucket="site-assets"
+                hint="Landscape, roughly 4:3 (e.g. 1600×1200px). JPG/PNG/WebP up to 10 MB — around 1–3 MB is plenty for a sharp, fast-loading hero."
+              />
               <div className="grid gap-5 sm:grid-cols-2">
                 <TextField name="primaryCtaLabel" label="Primary button" defaultValue={s.home.primaryCtaLabel} />
                 <TextField name="primaryCtaHref" label="Primary link" defaultValue={s.home.primaryCtaHref} />
                 <TextField name="secondaryCtaLabel" label="Secondary button" defaultValue={s.home.secondaryCtaLabel} />
                 <TextField name="secondaryCtaHref" label="Secondary link" defaultValue={s.home.secondaryCtaHref} />
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <TextField name="bookingUrl" label="Booking link (Calendly, Cal.com, etc.)" type="url" defaultValue={s.home.bookingUrl} placeholder="https://cal.com/your-name/intro" hint="Shown as a hero button when set. Leave empty to hide." />
+                <TextField name="pricingFrom" label="Pricing anchor" defaultValue={s.home.pricingFrom} placeholder="Projects start at $1,500" hint="Short line near the hero CTAs. Leave empty to hide." />
+                <TextField name="availabilityStatus" label="Availability note" defaultValue={s.home.availabilityStatus} placeholder="Accepting 2 new projects for December" hint="Leave empty to hide." />
               </div>
             </FormSection>
             <FormSection title="Positioning" className="mt-6">
@@ -108,8 +132,23 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <RepeaterField name="process" label="Process steps" columns={titled} defaultValue={s.home.process} max={8} />
               <TextAreaField name="techStack" label="Tech stack strip" rows={4} defaultValue={s.home.techStack.join("\n")} hint="One technology per line — only tools you actually use. Leave empty to hide." />
             </FormSection>
+            <FormSection title="Why us" description="Optional comparison table. Leave all rows empty to hide the section." className="mt-6">
+              <RepeaterField
+                name="comparison"
+                label="Comparison rows"
+                columns={[
+                  { key: "label", label: "What matters" },
+                  { key: "us", label: "Us" },
+                  { key: "freelancer", label: "A freelancer" },
+                  { key: "agency", label: "A big agency" },
+                ]}
+                defaultValue={s.home.comparison}
+                max={10}
+              />
+            </FormSection>
             <FormSection title="Sections" className="mt-6">
               <SwitchField name="showFaq" label="Show the FAQ section on the homepage" defaultChecked={s.home.showFaq} hint="Questions are managed in Admin → FAQs." />
+              <SwitchField name="showClientLogos" label="Show the client logo strip" defaultChecked={s.home.showClientLogos} hint="Built from published logos in Admin → Sponsorship → Partners." />
             </FormSection>
           </AdminForm>
         ) : null}
