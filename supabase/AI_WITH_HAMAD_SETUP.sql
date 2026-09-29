@@ -206,6 +206,17 @@ create table if not exists public.services (
   description     text        not null default '',
   icon            text        not null default 'sparkles',
   cover_media_id  uuid        references public.media_assets (id) on delete set null,
+  starting_at_price   text    not null default '',
+  timeline_estimate   text    not null default '',
+  ideal_for           text    not null default '',
+  tech_stack          text[]  not null default '{}',
+  video_url           text,
+  engagement_terms    text    not null default '',
+  sla_notes           text    not null default '',
+  comparison_notes    text    not null default '',
+  process_notes       text    not null default '',
+  technical_notes     text    not null default '',
+  training_and_docs   text    not null default '',
   seo_title       text,
   seo_description text,
   is_published    boolean     not null default false,
@@ -230,6 +241,17 @@ create table if not exists public.service_features (
   created_at  timestamptz not null default now()
 );
 create index if not exists service_features_service_idx on public.service_features (service_id, sort_order);
+
+create table if not exists public.service_add_ons (
+  id          uuid primary key default gen_random_uuid(),
+  service_id  uuid        not null references public.services (id) on delete cascade,
+  title       text        not null,
+  description text        not null default '',
+  price_note  text        not null default '',
+  sort_order  integer     not null default 0,
+  created_at  timestamptz not null default now()
+);
+create index if not exists service_add_ons_service_idx on public.service_add_ons (service_id, sort_order);
 
 -- 3.4 Team -------------------------------------------------------------------
 create table if not exists public.team_members (
@@ -998,7 +1020,7 @@ declare t text;
 begin
   foreach t in array array[
     'roles','permissions','role_permissions','profiles','media_assets',
-    'services','service_features','team_members','team_social_links',
+    'services','service_features','service_add_ons','team_members','team_social_links',
     'projects','project_media','project_metrics','project_tags','project_features',
     'project_team_members','project_services',
     'social_platforms','content_items','content_metrics',
@@ -1083,6 +1105,9 @@ revoke all on function private.apply_content_policies(text, text, text, text) fr
 select private.apply_content_policies('services',
   'is_published and deleted_at is null', 'services.write', 'services.delete');
 select private.apply_content_policies('service_features',
+  'exists (select 1 from public.services s where s.id = service_id and s.is_published and s.deleted_at is null)',
+  'services.write', 'services.write');
+select private.apply_content_policies('service_add_ons',
   'exists (select 1 from public.services s where s.id = service_id and s.is_published and s.deleted_at is null)',
   'services.write', 'services.write');
 
