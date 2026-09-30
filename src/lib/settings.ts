@@ -66,6 +66,12 @@ export const settingsSchemas = {
     body: z.string().max(8000).default(""),
     values: z.array(titled).max(12).default([]),
   }),
+  team: z.object({
+    philosophyTitle: z.string().max(140).default(""),
+    philosophyBody: z.string().max(2000).default(""),
+    openRoles: z.array(z.object({ title: z.string().max(120), body: z.string().max(600), applyUrl: z.union([z.literal(""), z.url()]) })).max(10).default([]),
+    cultureMediaIds: z.array(z.uuid()).max(20).default([]),
+  }),
   seo: z.object({
     defaultTitle: z.string().max(70).default("AI With Hamad"),
     defaultDescription: z.string().max(170).default(""),
