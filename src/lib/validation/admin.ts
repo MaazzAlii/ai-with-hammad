@@ -243,6 +243,7 @@ export const packageSchema = z.object({
   summary: optText(600),
   deliverables: stringList(20, 160),
   platforms: z.preprocess((v) => (Array.isArray(v) ? v : typeof v === "string" && v ? [v] : []), z.array(z.enum(contentPlatform.enumValues)).max(7)),
+  exclusivityNotes: optText(600),
   isPublished: checkbox,
 });
 
@@ -266,6 +267,7 @@ export const partnerSchema = z.object({
   websiteUrl: optUrl,
   description: optText(1000),
   campaignSummary: optText(1000),
+  resultHeadline: optText(120),
   partneredOn: optDate,
   isPublished: checkbox,
 });
