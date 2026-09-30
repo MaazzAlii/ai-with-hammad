@@ -108,6 +108,10 @@ export const settingsSchemas = {
     /** Extra rules for the assistant, e.g. "Never quote prices — offer a call instead." Server-side only. */
     instructions: z.string().max(2000).default(""),
   }),
+  content: z.object({
+    contributeBody: z.string().max(600).default(""),
+    contributeUrl: z.union([z.literal(""), z.url()]).default(""),
+  }),
   contact: z.object({
     intro: z.string().max(600).default(""),
     budgets: z.array(z.string().max(60)).max(12).default([]),
