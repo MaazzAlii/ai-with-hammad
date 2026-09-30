@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { AdminForm } from "@/components/admin/admin-form";
 import { FormSection, SwitchField, TextAreaField, TextField } from "@/components/admin/fields";
-import { MediaField } from "@/components/admin/media-picker";
+import { MediaField, MediaListField } from "@/components/admin/media-picker";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { Alert } from "@/components/ui/misc";
 import { RepeaterField } from "@/components/admin/repeater";
@@ -21,6 +21,7 @@ const TABS = [
   ["general", "General"],
   ["home", "Homepage"],
   ["about", "About"],
+  ["team", "Team page"],
   ["seo", "SEO"],
   ["social", "Social links"],
   ["sponsorship", "Sponsorship & audience"],
@@ -42,6 +43,7 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
     general: parseSettings("general", byKey.get("general")),
     home: parseSettings("home", byKey.get("home")),
     about: parseSettings("about", byKey.get("about")),
+    team: parseSettings("team", byKey.get("team")),
     seo: parseSettings("seo", byKey.get("seo")),
     social: parseSettings("social", byKey.get("social")),
     sponsorship: parseSettings("sponsorship", byKey.get("sponsorship")),
@@ -49,8 +51,9 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
     assistant: parseSettings("assistant", byKey.get("assistant")),
   };
   const recipients = ((byKey.get("internal.notifications") as { inquiryRecipients?: string[] } | undefined)?.inquiryRecipients ?? []).join("\n");
-  const media = await getMediaMany([s.general.logoMediaId, s.general.logoDarkMediaId, s.seo.ogImageMediaId, s.home.heroMediaId]);
+  const media = await getMediaMany([s.general.logoMediaId, s.general.logoDarkMediaId, s.seo.ogImageMediaId, s.home.heroMediaId, ...s.team.cultureMediaIds]);
   const m = (id: string | null) => (id ? (media.get(id) ?? null) : null);
+  const cultureMedia = s.team.cultureMediaIds.map((id) => media.get(id)).filter((x): x is NonNullable<typeof x> => Boolean(x));
   const str = (v: Settings<"sponsorship">["audience"]["ageRanges"]) => v.map((x) => ({ label: x.label, percent: String(x.percent) }));
 
   return (
@@ -159,6 +162,27 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <TextAreaField name="intro" label="Intro" rows={3} defaultValue={s.about.intro} />
               <TextAreaField name="body" label="Body" rows={10} defaultValue={s.about.body} hint="Markdown supported." />
               <RepeaterField name="values" label="Principles" columns={titled} defaultValue={s.about.values} />
+            </FormSection>
+          </AdminForm>
+        ) : null}
+        {tab === "team" ? (
+          <AdminForm action={saveSettings.bind(null, "team")}>
+            <FormSection title="Our philosophy" description="Company-wide 'how we think' section shown on the Team page. Leave blank to hide.">
+              <TextField name="philosophyTitle" label="Title" defaultValue={s.team.philosophyTitle} placeholder="How we think" />
+              <TextAreaField name="philosophyBody" label="Text" rows={4} defaultValue={s.team.philosophyBody} />
+            </FormSection>
+            <FormSection title="Open roles" description="Only add real openings — this section is hidden entirely when empty." className="mt-6">
+              <RepeaterField
+                name="openRoles"
+                label="Roles"
+                addLabel="Add role"
+                columns={[{ key: "title", label: "Title" }, { key: "body", label: "Summary", type: "textarea" }, { key: "applyUrl", label: "Apply link", type: "url" }]}
+                defaultValue={s.team.openRoles}
+                max={10}
+              />
+            </FormSection>
+            <FormSection title="Culture photos" description="A few real photos of the team/workspace. Leave empty to hide." className="mt-6">
+              <MediaListField name="cultureMediaIds" label="Photos" defaultMedia={cultureMedia} uploadBucket="media-library" />
             </FormSection>
           </AdminForm>
         ) : null}
