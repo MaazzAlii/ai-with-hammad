@@ -9,7 +9,7 @@ import { Table, Td, Th } from "@/components/ui/misc";
 import { formatDate } from "@/lib/utils";
 import { addContentMetrics, updateContentItem } from "@/server/actions/content";
 import { can, requirePagePermission } from "@/server/auth/session";
-import { getContentForEdit, listSocialAdmin } from "@/server/dal/admin/cms";
+import { getContentForEdit, listSocialAdmin, teamOptions } from "@/server/dal/admin/cms";
 import { PLATFORM_LABELS } from "@/server/dal/public/content";
 
 export const metadata = { title: "Edit content" };
@@ -19,7 +19,7 @@ export default async function EditContentPage(props: PageProps<"/admin/content/[
   const staff = await requirePagePermission("cms.read");
   const data = /^[0-9a-f-]{36}$/.test(id) ? await getContentForEdit(id) : null;
   if (!data) notFound();
-  const platforms = await listSocialAdmin();
+  const [platforms, team] = await Promise.all([listSocialAdmin(), teamOptions()]);
   const canWrite = can(staff, "content.write");
   return (
     <>
@@ -33,7 +33,7 @@ export default async function EditContentPage(props: PageProps<"/admin/content/[
           </>
         }
       />
-      <ContentForm action={updateContentItem.bind(null, id)} data={data} canWrite={canWrite} canPublish={can(staff, "content.publish")} platforms={platforms.map((p) => ({ id: p.id, label: `${PLATFORM_LABELS[p.platform]} @${p.handle}` }))} />
+      <ContentForm action={updateContentItem.bind(null, id)} data={data} canWrite={canWrite} canPublish={can(staff, "content.publish")} platforms={platforms.map((p) => ({ id: p.id, label: `${PLATFORM_LABELS[p.platform]} @${p.handle}` }))} teamOptions={team} />
       <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <section>
           <h2 className="mb-3 font-semibold">Metric history</h2>
