@@ -448,18 +448,32 @@ create table if not exists public.social_platforms (
 );
 select private.ensure_updated_at_trigger('public.social_platforms');
 
+do $$ begin
+  create type public.content_type as enum ('video', 'article');
+exception when duplicate_object then null; end $$;
+do $$ begin
+  create type public.content_difficulty as enum ('beginner', 'intermediate', 'advanced');
+exception when duplicate_object then null; end $$;
+
 create table if not exists public.content_items (
   id                  uuid primary key default gen_random_uuid(),
   slug                text        not null check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
   title               text        not null,
+  content_type        public.content_type not null default 'video',
   platform            public.content_platform not null,
   social_platform_id  uuid        references public.social_platforms (id) on delete set null,
-  url                 text        not null check (url ~* '^https://'),
+  url                 text        check (url is null or url ~* '^https://'),
   embed_url           text        check (embed_url is null or embed_url ~* '^https://'),
   thumbnail_media_id  uuid        references public.media_assets (id) on delete set null,
   description         text        not null default '',
+  body_md             text        not null default '',
   published_date      date,
   category            text        not null default '',
+  difficulty          public.content_difficulty,
+  duration_minutes    integer     check (duration_minutes is null or duration_minutes > 0),
+  author_team_member_id uuid      references public.team_members (id) on delete set null,
+  resource_media_id   uuid        references public.media_assets (id) on delete set null,
+  resource_label      text        not null default '',
   is_featured         boolean     not null default false,
   is_high_performing  boolean     not null default false,
   is_campaign         boolean     not null default false,
