@@ -77,7 +77,7 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
         mediaKitPdfMediaId: nullable(o.mediaKitPdfMediaId),
       };
     case "contact":
-      return { intro: o.intro, budgets: lines(o.budgets), timelines: lines(o.timelines), showFaq: on(o.showFaq) };
+      return { intro: o.intro, budgets: lines(o.budgets), timelines: lines(o.timelines), departments: lines(o.departments), responseTime: o.responseTime, showFaq: on(o.showFaq) };
     case "assistant":
       return { enabled: on(o.enabled), greeting: o.greeting, instructions: o.instructions };
     case "internal.notifications":
