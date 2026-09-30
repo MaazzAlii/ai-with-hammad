@@ -21,6 +21,7 @@ export const testimonialSubmitSchema = z.object({
 export const manualTestimonialSchema = testimonialSubmitSchema.extend({
   clientId: z.preprocess((v) => (v === "" ? null : v), z.uuid().nullable()).optional().default(null),
   projectId: z.preprocess((v) => (v === "" ? null : v), z.uuid().nullable()).optional().default(null),
+  sponsorshipPartnerId: z.preprocess((v) => (v === "" ? null : v), z.uuid().nullable()).optional().default(null),
   photoMediaId: z.preprocess((v) => (v === "" ? null : v), z.uuid().nullable()).optional().default(null),
 });
 
