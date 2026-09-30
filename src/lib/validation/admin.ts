@@ -2,7 +2,7 @@ import "@/lib/zod-config";
 
 import { z } from "zod";
 
-import { contentPlatform, inquiryPriority, inquiryStatus, projectMediaType, projectStatus } from "@/db/schema";
+import { contentPlatform, inquiryPriority, inquiryStatus, projectMediaType, projectStatus, teamMemberType } from "@/db/schema";
 import { ROLES } from "@/lib/permissions";
 
 /* ----------------------------- field helpers ----------------------------- */
@@ -111,9 +111,17 @@ export const teamMemberSchema = z.object({
   photoMediaId: optUuid,
   skills: stringList(30, 50),
   location: optText(120),
+  timezone: optText(60),
+  languages: stringList(15, 40),
+  certifications: stringList(20, 60),
+  email: z.preprocess(emptyToNull, z.email().nullable()).optional().default(null),
+  funFact: optText(200),
+  philosophy: optText(600),
+  memberType: z.enum(teamMemberType.enumValues).default("team"),
   websiteUrl: optUrl,
   ...flags,
   links: jsonArray(z.object({ platform: title(30), url: httpUrl, label: optText(60) }), 12),
+  appearances: jsonArray(z.object({ title: title(160), url: z.preprocess(emptyToNull, httpUrl.nullable()).optional().default(null), venue: optText(120), appearedOn: optDate }), 20),
 });
 
 /* -------------------------------- projects -------------------------------- */
