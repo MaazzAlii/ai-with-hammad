@@ -22,6 +22,7 @@ import {
   sponsorshipPackageRates,
   sponsorshipPackages,
   sponsorshipPartners,
+  teamAppearances,
   teamMembers,
   teamSocialLinks,
 } from "@/db/schema";
@@ -94,9 +95,12 @@ export async function listTeamAdmin() {
 export async function getTeamMemberForEdit(id: string) {
   const [m] = await db().select().from(teamMembers).where(eq(teamMembers.id, id));
   if (!m || m.deletedAt) return null;
-  const links = await db().select().from(teamSocialLinks).where(eq(teamSocialLinks.teamMemberId, id)).orderBy(asc(teamSocialLinks.sortOrder));
+  const [links, appearances] = await Promise.all([
+    db().select().from(teamSocialLinks).where(eq(teamSocialLinks.teamMemberId, id)).orderBy(asc(teamSocialLinks.sortOrder)),
+    db().select().from(teamAppearances).where(eq(teamAppearances.teamMemberId, id)).orderBy(asc(teamAppearances.sortOrder)),
+  ]);
   const mediaMap = await getMediaMany([m.photoMediaId]);
-  return { member: m, links, photo: m.photoMediaId ? (mediaMap.get(m.photoMediaId) ?? null) : null };
+  return { member: m, links, appearances, photo: m.photoMediaId ? (mediaMap.get(m.photoMediaId) ?? null) : null };
 }
 
 /* content */
