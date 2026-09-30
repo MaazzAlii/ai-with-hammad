@@ -17,7 +17,7 @@ const csp = [
   `media-src 'self' blob: ${supabaseOrigin}`,
   "font-src 'self'",
   `connect-src 'self' ${supabaseOrigin} ${supabaseWs} https://vitals.vercel-insights.com https://va.vercel-scripts.com https://challenges.cloudflare.com`,
-  "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com https://www.instagram.com https://www.facebook.com https://www.linkedin.com",
+  "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com https://www.instagram.com https://www.facebook.com https://www.linkedin.com https://www.google.com",
   "frame-ancestors 'none'",
   "form-action 'self'",
   "base-uri 'self'",
