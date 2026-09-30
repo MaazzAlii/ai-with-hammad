@@ -25,6 +25,9 @@ export const contactInquirySchema = z.object({
   serviceId: z.union([z.literal(""), z.uuid()]).optional().default(""),
   budget: optionalText(60),
   timeline: optionalText(60),
+  department: optionalText(60),
+  wantsNda: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()).optional().default(false),
+  briefUrl: optionalText(300).refine((v) => v === "" || /^https?:\/\/\S+\.\S+/.test(v), "Please enter a full URL starting with https://"),
   message: text(5000).min(20, "Please tell us a little more (at least 20 characters)"),
 });
 
