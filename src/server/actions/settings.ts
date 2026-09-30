@@ -44,6 +44,8 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
       };
     case "about":
       return { ...o, values: json(o.values) };
+    case "team":
+      return { ...o, openRoles: json(o.openRoles), cultureMediaIds: json(o.cultureMediaIds) };
     case "seo":
       return { ...o, ogImageMediaId: nullable(o.ogImageMediaId) };
     case "social":
@@ -69,7 +71,7 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
 }
 
 const notificationsSchema = z.object({ inquiryRecipients: z.array(z.email()).max(10) });
-const keySchema = z.enum(["general", "home", "about", "seo", "social", "sponsorship", "contact", "assistant", "internal.notifications"]);
+const keySchema = z.enum(["general", "home", "about", "team", "seo", "social", "sponsorship", "contact", "assistant", "internal.notifications"]);
 
 export async function saveSettings(keyRaw: string, _prev: unknown, fd: FormData): Promise<ActionResult<{ id?: string }>> {
   return runAction(async () => {
