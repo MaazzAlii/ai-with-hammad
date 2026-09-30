@@ -22,6 +22,7 @@ const TABS = [
   ["home", "Homepage"],
   ["about", "About"],
   ["team", "Team page"],
+  ["content", "Tutorials page"],
   ["seo", "SEO"],
   ["social", "Social links"],
   ["sponsorship", "Sponsorship & audience"],
@@ -44,6 +45,7 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
     home: parseSettings("home", byKey.get("home")),
     about: parseSettings("about", byKey.get("about")),
     team: parseSettings("team", byKey.get("team")),
+    content: parseSettings("content", byKey.get("content")),
     seo: parseSettings("seo", byKey.get("seo")),
     social: parseSettings("social", byKey.get("social")),
     sponsorship: parseSettings("sponsorship", byKey.get("sponsorship")),
@@ -183,6 +185,14 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
             </FormSection>
             <FormSection title="Culture photos" description="A few real photos of the team/workspace. Leave empty to hide." className="mt-6">
               <MediaListField name="cultureMediaIds" label="Photos" defaultMedia={cultureMedia} uploadBucket="media-library" />
+            </FormSection>
+          </AdminForm>
+        ) : null}
+        {tab === "content" ? (
+          <AdminForm action={saveSettings.bind(null, "content")}>
+            <FormSection title="Contribute / guest post" description="Only shown when both fields are filled in.">
+              <TextAreaField name="contributeBody" label="Pitch" rows={3} defaultValue={s.content.contributeBody} placeholder="Building something interesting with AI? Pitch us a guest tutorial." />
+              <TextField name="contributeUrl" label="Link" defaultValue={s.content.contributeUrl} placeholder="/contact or an https:// link" hint="An internal path (e.g. /contact) or a full https:// link — not a mailto: link." />
             </FormSection>
           </AdminForm>
         ) : null}
