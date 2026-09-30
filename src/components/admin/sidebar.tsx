@@ -17,6 +17,7 @@ import {
   Mail,
   Menu,
   PlaySquare,
+  ShieldCheck,
   ScrollText,
   Settings,
   Share2,
@@ -58,6 +59,7 @@ const ICONS: Record<string, LucideIcon> = {
   links: Link2,
   status: Activity,
   newsletter: Mail,
+  security: ShieldCheck,
 };
 
 export function AdminSidebar({ groups, user, newInquiries, unreadMessages = 0 }: { groups: { group: string; items: AdminNavItem[] }[]; user: { email: string; role: string }; newInquiries: number; unreadMessages?: number }) {
