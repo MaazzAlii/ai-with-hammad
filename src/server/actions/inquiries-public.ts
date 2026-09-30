@@ -88,6 +88,9 @@ export async function submitContactInquiry(raw: unknown): Promise<ActionResult<{
         serviceLabel,
         budget: input.budget,
         timeline: input.timeline,
+        department: input.department,
+        wantsNda: input.wantsNda,
+        briefUrl: input.briefUrl || null,
         message: input.message,
         // The site assistant's "share your details" form reuses this pipeline.
         sourcePath: (raw as { source?: unknown } | null)?.source === "assistant" ? "/assistant" : "/contact",
@@ -102,7 +105,19 @@ export async function submitContactInquiry(raw: unknown): Promise<ActionResult<{
     after(async () => {
       const mail = inquiryNotification(
         "contact",
-        { Name: input.name, Email: input.email, Company: input.company, Phone: input.phone, Service: serviceLabel, Budget: input.budget, Timeline: input.timeline, Message: input.message },
+        {
+          Name: input.name,
+          Email: input.email,
+          Company: input.company,
+          Phone: input.phone,
+          Service: serviceLabel,
+          Department: input.department,
+          Budget: input.budget,
+          Timeline: input.timeline,
+          NDA: input.wantsNda ? "Requested" : "",
+          Brief: input.briefUrl,
+          Message: input.message,
+        },
         `/admin/inquiries/contact/${id}`,
       );
       const result = await sendEmailSafely({ to: await notificationRecipients(), subject: mail.subject, text: mail.text, replyTo: input.email });
