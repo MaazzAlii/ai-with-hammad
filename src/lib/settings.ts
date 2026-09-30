@@ -133,6 +133,8 @@ export const settingsSchemas = {
     intro: z.string().max(600).default(""),
     budgets: z.array(z.string().max(60)).max(12).default([]),
     timelines: z.array(z.string().max(60)).max(12).default([]),
+    departments: z.array(z.string().max(60)).max(10).default([]),
+    responseTime: z.string().max(120).default(""),
     /** Show the FAQ section on the contact page. */
     showFaq: z.boolean().default(true),
   }),
