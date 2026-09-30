@@ -69,6 +69,8 @@ export type AppRole = (typeof appRole.enumValues)[number];
 export type InquiryStatus = (typeof inquiryStatus.enumValues)[number];
 export type InquiryPriority = (typeof inquiryPriority.enumValues)[number];
 export type ContentPlatform = (typeof contentPlatform.enumValues)[number];
+export type ContentType = (typeof contentType.enumValues)[number];
+export type ContentDifficulty = (typeof contentDifficulty.enumValues)[number];
 export type MediaKind = (typeof mediaKind.enumValues)[number];
 export type ProjectMediaType = (typeof projectMediaType.enumValues)[number];
 export type NavLocation = (typeof navLocation.enumValues)[number];
@@ -419,22 +421,32 @@ export const socialPlatforms = pgTable("social_platforms", {
   updatedAt: updatedAt(),
 });
 
+export const contentType = pgEnum("content_type", ["video", "article"]);
+export const contentDifficulty = pgEnum("content_difficulty", ["beginner", "intermediate", "advanced"]);
+
 export const contentItems = pgTable("content_items", {
   id: id(),
   slug: text("slug").notNull(),
   title: text("title").notNull(),
+  contentType: contentType("content_type").notNull().default("video"),
   platform: contentPlatform("platform").notNull(),
   socialPlatformId: uuid("social_platform_id").references(() => socialPlatforms.id, {
     onDelete: "set null",
   }),
-  url: text("url").notNull(),
+  url: text("url"),
   embedUrl: text("embed_url"),
   thumbnailMediaId: uuid("thumbnail_media_id").references(() => mediaAssets.id, {
     onDelete: "set null",
   }),
   description: text("description").notNull().default(""),
+  bodyMd: text("body_md").notNull().default(""),
   publishedDate: date("published_date"),
   category: text("category").notNull().default(""),
+  difficulty: contentDifficulty("difficulty"),
+  durationMinutes: integer("duration_minutes"),
+  authorTeamMemberId: uuid("author_team_member_id").references(() => teamMembers.id, { onDelete: "set null" }),
+  resourceMediaId: uuid("resource_media_id").references(() => mediaAssets.id, { onDelete: "set null" }),
+  resourceLabel: text("resource_label").notNull().default(""),
   isFeatured: boolean("is_featured").notNull().default(false),
   isHighPerforming: boolean("is_high_performing").notNull().default(false),
   isCampaign: boolean("is_campaign").notNull().default(false),
