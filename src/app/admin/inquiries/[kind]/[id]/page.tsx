@@ -24,7 +24,17 @@ export default async function InquiryPage(props: PageProps<"/admin/inquiries/[ki
   const canWrite = can(staff, "inquiries.write");
   const fields: [string, string][] =
     data.kind === "contact"
-      ? [["Email", r.email], ["Company", r.company], ["Phone", (r as { phone: string }).phone], ["Service", (r as { serviceLabel: string }).serviceLabel], ["Budget", (r as { budget: string }).budget], ["Timeline", r.timeline]]
+      ? [
+          ["Email", r.email],
+          ["Company", r.company],
+          ["Phone", (r as { phone: string }).phone],
+          ["Service", (r as { serviceLabel: string }).serviceLabel],
+          ["Department", (r as { department: string }).department],
+          ["Budget", (r as { budget: string }).budget],
+          ["Timeline", r.timeline],
+          ["NDA requested", (r as { wantsNda: boolean }).wantsNda ? "Yes" : ""],
+          ["Brief", (r as { briefUrl: string | null }).briefUrl ?? ""],
+        ]
       : [
           ["Email", r.email],
           ["Company", r.company],
