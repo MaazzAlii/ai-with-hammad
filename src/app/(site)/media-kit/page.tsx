@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Download } from "lucide-react";
+
 import { JsonLd } from "@/components/site/json-ld";
 import { PrintButton } from "@/components/site/print-button";
 import { Section } from "@/components/site/section";
-import { AudienceBlock, hasAudienceData, CategoriesBlock, FormatsBlock, PartnersBlock, PlatformsBlock, TopContentBlock } from "@/components/site/sponsorship-sections";
+import {
+  AudienceBlock,
+  hasAudienceData,
+  CategoriesBlock,
+  CreativeProcessBlock,
+  FormatsBlock,
+  PartnersBlock,
+  PlatformsBlock,
+  SponsorTestimonialsBlock,
+  TopContentBlock,
+  UpcomingTopicsBlock,
+} from "@/components/site/sponsorship-sections";
 import { buttonVariants } from "@/components/ui/button";
 import { breadcrumbLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
 import { groupContent, listActivePlatforms, listPublishedContent } from "@/server/dal/public/content";
 import { getPublicSettings, getSiteMedia } from "@/server/dal/public/site";
-import { listPublishedPackages, listPublishedPartners } from "@/server/dal/public/sponsorship";
+import { getMediaKitFile, listPublishedPackages, listPublishedPartners, listSponsorshipTestimonials } from "@/server/dal/public/sponsorship";
 
 export const revalidate = 3600;
 
@@ -24,14 +37,16 @@ export async function generateMetadata(): Promise<Metadata> {
  * rules in globals.css) so a PDF can be produced from this page later.
  */
 export default async function MediaKitPage() {
-  const [{ sponsorship: s, general }, media, platforms, content, packages, partners] = await Promise.all([
+  const [{ sponsorship: s, general }, media, platforms, content, packages, partners, sponsorTestimonials] = await Promise.all([
     getPublicSettings(),
     getSiteMedia(),
     listActivePlatforms(),
     listPublishedContent(),
     listPublishedPackages(),
     listPublishedPartners(),
+    listSponsorshipTestimonials(),
   ]);
+  const mediaKitPdf = await getMediaKitFile(s.mediaKitPdfMediaId);
   const top = groupContent(content, "high-performing", 6).length ? groupContent(content, "high-performing", 6) : groupContent(content, "featured", 6);
   return (
     <div className="print-plain">
@@ -42,7 +57,14 @@ export default async function MediaKitPage() {
             <h1 className="text-[2.5rem] sm:text-6xl">{general.siteName}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted sm:text-xl">{general.tagline}</p>
           </div>
-          <PrintButton />
+          <div className="no-print flex flex-wrap gap-2.5">
+            {mediaKitPdf ? (
+              <a href={mediaKitPdf.url} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "secondary" })}>
+                <Download aria-hidden /> Download PDF
+              </a>
+            ) : null}
+            <PrintButton />
+          </div>
         </div>
       </header>
       <Section aria-labelledby="mk-about">
@@ -63,7 +85,10 @@ export default async function MediaKitPage() {
       {s.contentCategories.length ? <Section><CategoriesBlock categories={s.contentCategories} /></Section> : null}
       {top.length ? <Section><TopContentBlock items={top} title="Top-performing content" /></Section> : null}
       {partners.length ? <Section className="print-break"><PartnersBlock partners={partners} /></Section> : null}
+      {sponsorTestimonials.length ? <Section><SponsorTestimonialsBlock items={sponsorTestimonials} /></Section> : null}
       {s.formats.length || packages.length ? <Section><FormatsBlock formats={s.formats} packages={packages} ratesNotice={s.ratesNotice} /></Section> : null}
+      {s.creativeProcess.length ? <Section><CreativeProcessBlock steps={s.creativeProcess} /></Section> : null}
+      {s.upcomingTopics.length ? <Section><UpcomingTopicsBlock topics={s.upcomingTopics} /></Section> : null}
       <Section aria-labelledby="mk-contact">
         <div className="glass-panel rounded-[2rem] p-8 sm:p-10">
           <h2 id="mk-contact" className="text-2xl sm:text-[2rem]">Contact</h2>
