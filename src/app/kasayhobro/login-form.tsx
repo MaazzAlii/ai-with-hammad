@@ -39,6 +39,10 @@ export function LoginForm({ next }: { next: string }) {
       <Field id="password" label="Password" error={state && !state.ok ? state.fieldErrors?.password?.[0] : undefined}>
         <Input name="password" type="password" autoComplete="current-password" required />
       </Field>
+      <label className="flex items-center gap-2.5 text-sm text-muted">
+        <input type="checkbox" name="rememberMe" value="on" defaultChecked className="size-4 accent-[var(--color-accent)]" />
+        Keep me signed in on this device
+      </label>
       <Captcha idPrefix="login-captcha" resetKey={state} error={state && !state.ok ? state.fieldErrors?.captchaAnswer?.[0] : undefined} />
       <Button type="submit" size="lg" className="w-full" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</Button>
       <button type="button" onClick={() => setMode("reset")} className="w-full rounded-full py-2 text-sm text-muted transition-colors hover:text-fg">Forgot password?</button>
