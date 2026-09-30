@@ -43,7 +43,15 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
         showClientLogos: on(o.showClientLogos),
       };
     case "about":
-      return { ...o, values: json(o.values) };
+      return {
+        ...o,
+        values: json(o.values),
+        timeline: json(o.timeline),
+        awards: json(o.awards),
+        press: json(o.press),
+        investors: json(o.investors),
+        showPartnerLogos: on(o.showPartnerLogos),
+      };
     case "team":
       return { ...o, openRoles: json(o.openRoles), cultureMediaIds: json(o.cultureMediaIds) };
     case "content":
