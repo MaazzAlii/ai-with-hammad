@@ -1,10 +1,11 @@
-import { ArrowUpRight, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ChevronRight, PlaySquare } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BrandIcon } from "@/components/site/brand-icon";
 import { LogoMark } from "@/components/site/logo";
 import { MediaImage } from "@/components/site/media-image";
+import { NewsletterForm } from "@/components/site/newsletter-form";
 import { RevealObserver } from "@/components/site/reveal-observer";
 import { initials } from "@/components/site/team-card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+import { listPublishedContent } from "@/server/dal/public/content";
 import { getLinkPage, type BioLinkDTO } from "@/server/dal/public/links";
 import { getPublicSettings, getSiteMedia } from "@/server/dal/public/site";
 
@@ -72,7 +74,8 @@ function SocialRow({ items, label }: { items: { key: string; href: string; name:
 }
 
 export default async function LinksPage() {
-  const [{ general }, media, data] = await Promise.all([getPublicSettings(), getSiteMedia(), getLinkPage()]);
+  const [{ general }, media, data, content] = await Promise.all([getPublicSettings(), getSiteMedia(), getLinkPage(), listPublishedContent()]);
+  const latest = [...content].sort((a, b) => (b.publishedDate ?? "").localeCompare(a.publishedDate ?? ""))[0];
   const empty = !data.featured.length && !data.links.length && !data.partners.length && !data.socials.length && !data.people.length;
   return (
     <main className="page-enter mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pt-[max(2.5rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
@@ -85,6 +88,23 @@ export default async function LinksPage() {
           <SocialRow label="Social profiles" items={data.socials.map((s) => ({ key: s.icon || s.title, href: href(s), name: s.title }))} />
         </div>
       </header>
+
+      {latest ? (
+        <section aria-label="Latest content" data-reveal="item" className="mt-8">
+          <a href={`/content/${latest.slug}`} target="_blank" rel="noopener" className="group lift glass-panel flex min-h-18 items-center gap-3.5 rounded-[1.25rem] p-4">
+            <span className="grid size-11 shrink-0 place-items-center rounded-[0.85rem] bg-accent text-accent-fg">
+              <PlaySquare aria-hidden className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-2">
+                <span className="truncate text-[1.0625rem] font-semibold text-fg">{latest.title}</span>
+                <Badge className="shrink-0">Latest</Badge>
+              </span>
+            </span>
+            <ArrowUpRight aria-hidden className="size-4 shrink-0 text-subtle transition-transform duration-(--duration-base) ease-spring group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
+        </section>
+      ) : null}
 
       {data.featured.length ? (
         <section aria-label="Featured" data-reveal="group" className="mt-8 space-y-3">
@@ -149,6 +169,14 @@ export default async function LinksPage() {
       ) : null}
 
       {empty ? <p className="mt-10 text-center text-sm text-muted">Links will appear here soon.</p> : null}
+
+      <section aria-label="Newsletter" data-reveal="item" className="glass-card mt-8 rounded-[1.75rem] p-5 text-center">
+        <h2 className="text-base font-semibold text-fg">Get new content by email</h2>
+        <p className="mt-1 text-sm text-muted">No spam — just new builds and breakdowns.</p>
+        <div className="mt-4">
+          <NewsletterForm />
+        </div>
+      </section>
 
       <footer className="mt-auto pt-12 text-center">
         <div className="flex flex-col gap-2.5 sm:flex-row sm:justify-center">
