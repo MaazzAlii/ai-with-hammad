@@ -92,14 +92,20 @@ export const settingsSchemas = {
         ageRanges: z.array(z.object({ label: z.string().max(30), percent: z.coerce.number().min(0).max(100) })).max(12).default([]),
         topCountries: z.array(z.object({ label: z.string().max(60), percent: z.coerce.number().min(0).max(100) })).max(12).default([]),
         genderSplit: z.array(z.object({ label: z.string().max(30), percent: z.coerce.number().min(0).max(100) })).max(6).default([]),
+        jobTitles: z.array(z.object({ label: z.string().max(60), percent: z.coerce.number().min(0).max(100) })).max(12).default([]),
         asOf: z.string().max(20).nullable().default(null),
       })
-      .default({ ageRanges: [], topCountries: [], genderSplit: [], asOf: null }),
+      .default({ ageRanges: [], topCountries: [], genderSplit: [], jobTitles: [], asOf: null }),
     contentCategories: z.array(z.string().max(60)).max(20).default([]),
     formats: z.array(titled).max(12).default([]),
     whyPartner: z.array(titled).max(12).default([]),
+    creativeProcess: z.array(titled).max(8).default([]),
+    upcomingTopics: z.array(z.object({ title: z.string().max(120), month: z.string().max(30) })).max(12).default([]),
     ratesNotice: z.string().max(200).default("Partnership rates are available upon request."),
     totalReach: nonNegativeInt.nullable().default(null),
+    monthlyViews: nonNegativeInt.nullable().default(null),
+    avgOpenRate: z.string().max(20).default(""),
+    mediaKitPdfMediaId: z.uuid().nullable().default(null),
   }),
   /** Site assistant (chat + voice). The key lives in the MISTRAL_API_KEY env var. */
   assistant: z.object({
