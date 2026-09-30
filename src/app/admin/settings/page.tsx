@@ -53,7 +53,7 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
     assistant: parseSettings("assistant", byKey.get("assistant")),
   };
   const recipients = ((byKey.get("internal.notifications") as { inquiryRecipients?: string[] } | undefined)?.inquiryRecipients ?? []).join("\n");
-  const media = await getMediaMany([s.general.logoMediaId, s.general.logoDarkMediaId, s.seo.ogImageMediaId, s.home.heroMediaId, ...s.team.cultureMediaIds]);
+  const media = await getMediaMany([s.general.logoMediaId, s.general.logoDarkMediaId, s.seo.ogImageMediaId, s.home.heroMediaId, s.sponsorship.mediaKitPdfMediaId, ...s.team.cultureMediaIds]);
   const m = (id: string | null) => (id ? (media.get(id) ?? null) : null);
   const cultureMedia = s.team.cultureMediaIds.map((id) => media.get(id)).filter((x): x is NonNullable<typeof x> => Boolean(x));
   const str = (v: Settings<"sponsorship">["audience"]["ageRanges"]) => v.map((x) => ({ label: x.label, percent: String(x.percent) }));
@@ -221,12 +221,34 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <TextAreaField name="contentCategories" label="Content categories" rows={4} defaultValue={s.sponsorship.contentCategories.join("\n")} hint="One per line" />
               <RepeaterField name="formats" label="Partnership formats (shown when no packages are published)" columns={titled} defaultValue={s.sponsorship.formats} />
               <RepeaterField name="whyPartner" label="Why partner with us" columns={titled} defaultValue={s.sponsorship.whyPartner} />
+              <RepeaterField name="creativeProcess" label="Creative process (how we integrate brands)" columns={titled} defaultValue={s.sponsorship.creativeProcess} max={8} />
+              <RepeaterField
+                name="upcomingTopics"
+                label="Content calendar (upcoming topics)"
+                addLabel="Add topic"
+                columns={[{ key: "title", label: "Topic" }, { key: "month", label: "When", placeholder: "e.g. November" }]}
+                defaultValue={s.sponsorship.upcomingTopics}
+                max={12}
+              />
+              <MediaField
+                name="mediaKitPdfMediaId"
+                label="Media kit PDF (optional)"
+                defaultMedia={m(s.sponsorship.mediaKitPdfMediaId)}
+                kind="document"
+                uploadBucket="sponsorship-media"
+                hint="A real, pre-made PDF brands can download directly. The page can also always be printed to PDF without this."
+              />
             </FormSection>
             <FormSection title="Audience" description="Enter real figures from platform analytics only. Empty sections are hidden on the site." className="mt-6">
               <TextAreaField name="audienceSummary" label="Audience summary" rows={3} defaultValue={s.sponsorship.audienceSummary} />
+              <div className="grid gap-5 sm:grid-cols-2">
+                <TextField name="monthlyViews" label="Monthly views (optional)" type="number" defaultValue={s.sponsorship.monthlyViews} />
+                <TextField name="avgOpenRate" label="Avg. newsletter/email open rate (optional)" defaultValue={s.sponsorship.avgOpenRate} placeholder="e.g. 42%" />
+              </div>
               <RepeaterField name="ageRanges" label="Age ranges (%)" columns={pct} defaultValue={str(s.sponsorship.audience.ageRanges)} max={12} />
               <RepeaterField name="topCountries" label="Top countries (%)" columns={pct} defaultValue={str(s.sponsorship.audience.topCountries)} max={12} />
               <RepeaterField name="genderSplit" label="Gender split (%)" columns={pct} defaultValue={str(s.sponsorship.audience.genderSplit)} max={6} />
+              <RepeaterField name="jobTitles" label="Job titles (%)" columns={pct} defaultValue={str(s.sponsorship.audience.jobTitles)} max={12} />
               <TextField name="asOf" label="Audience data as of" type="date" defaultValue={s.sponsorship.audience.asOf} />
             </FormSection>
           </AdminForm>
