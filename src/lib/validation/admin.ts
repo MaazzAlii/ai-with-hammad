@@ -2,7 +2,7 @@ import "@/lib/zod-config";
 
 import { z } from "zod";
 
-import { contentPlatform, inquiryPriority, inquiryStatus, projectMediaType, projectStatus, teamMemberType } from "@/db/schema";
+import { contentDifficulty, contentPlatform, contentType, inquiryPriority, inquiryStatus, projectMediaType, projectStatus, teamMemberType } from "@/db/schema";
 import { ROLES } from "@/lib/permissions";
 
 /* ----------------------------- field helpers ----------------------------- */
@@ -185,23 +185,35 @@ export const projectSchema = z.object({
 
 /* -------------------------------- content --------------------------------- */
 
-export const contentItemSchema = z.object({
-  title: title(),
-  slug,
-  platform: z.enum(contentPlatform.enumValues),
-  socialPlatformId: optUuid,
-  url: httpsUrl,
-  embedUrl: optHttpsUrl,
-  thumbnailMediaId: optUuid,
-  description: optText(5000),
-  publishedDate: optDate,
-  category: optText(60),
-  ...flags,
-  isHighPerforming: checkbox,
-  isCampaign: checkbox,
-  isCaseStudy: checkbox,
-  performanceRank: optInt(1, 10000),
-});
+export const contentItemSchema = z
+  .object({
+    title: title(),
+    slug,
+    contentType: z.enum(contentType.enumValues).default("video"),
+    platform: z.enum(contentPlatform.enumValues),
+    socialPlatformId: optUuid,
+    url: z.preprocess(emptyToNull, httpsUrl.nullable()).optional().default(null),
+    embedUrl: optHttpsUrl,
+    thumbnailMediaId: optUuid,
+    description: optText(5000),
+    bodyMd: optText(30000),
+    publishedDate: optDate,
+    category: optText(60),
+    difficulty: z.preprocess(emptyToNull, z.enum(contentDifficulty.enumValues).nullable()).optional().default(null),
+    durationMinutes: optInt(1, 600),
+    authorTeamMemberId: optUuid,
+    resourceMediaId: optUuid,
+    resourceLabel: optText(120),
+    ...flags,
+    isHighPerforming: checkbox,
+    isCampaign: checkbox,
+    isCaseStudy: checkbox,
+    performanceRank: optInt(1, 10000),
+  })
+  .superRefine((v, ctx) => {
+    if (v.contentType === "video" && !v.url) ctx.addIssue({ code: "custom", message: "A URL is required for video content", path: ["url"] });
+    if (v.contentType === "article" && !v.bodyMd.trim()) ctx.addIssue({ code: "custom", message: "Write the article body for written tutorials", path: ["bodyMd"] });
+  });
 
 export const contentMetricsSchema = z.object({
   views: optInt(0, 1e13),
