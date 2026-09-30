@@ -27,6 +27,7 @@ export function PackageForm({ action, pkg, canWrite, canPublish }: { action: For
             ))}
           </div>
         </fieldset>
+        <TextAreaField name="exclusivityNotes" label="Exclusivity (optional)" rows={2} defaultValue={pkg?.exclusivityNotes} placeholder="e.g. Category-exclusive for the campaign period" />
         <SwitchField name="isPublished" label="Published" defaultChecked={pkg?.isPublished} disabled={!canPublish} />
       </FormSection>
     </AdminForm>
@@ -61,6 +62,7 @@ export function PartnerForm({ action, partner, logo, canWrite, canPublish }: { a
         </div>
         <TextAreaField name="description" label="About the partner" rows={3} defaultValue={partner?.description} />
         <TextAreaField name="campaignSummary" label="Campaign summary" rows={3} defaultValue={partner?.campaignSummary} />
+        <TextField name="resultHeadline" label="Result headline (optional)" defaultValue={partner?.resultHeadline} placeholder="e.g. 40K impressions, 3.2% CTR" hint="Only real, reportable numbers." />
         <MediaField
           name="logoMediaId"
           label="Logo"
