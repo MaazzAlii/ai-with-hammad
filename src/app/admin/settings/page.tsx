@@ -164,6 +164,44 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               <TextAreaField name="intro" label="Intro" rows={3} defaultValue={s.about.intro} />
               <TextAreaField name="body" label="Body" rows={10} defaultValue={s.about.body} hint="Markdown supported." />
               <RepeaterField name="values" label="Principles" columns={titled} defaultValue={s.about.values} />
+              <SwitchField name="showPartnerLogos" label="Show the 'Trusted by' logo strip" defaultChecked={s.about.showPartnerLogos} hint="Reuses published logos from Admin → Sponsorship → Partners." />
+            </FormSection>
+            <FormSection title="Our story, mission & philosophy" description="All optional — each section only shows once you write something here." className="mt-6">
+              <TextAreaField name="storyBody" label="Our story" rows={5} defaultValue={s.about.storyBody} hint="Why you started, what problem you saw. Markdown supported." />
+              <TextAreaField name="missionBody" label="Mission" rows={3} defaultValue={s.about.missionBody} />
+              <TextAreaField name="visionBody" label="Vision" rows={3} defaultValue={s.about.visionBody} />
+              <TextAreaField name="whyAiBody" label="Why AI?" rows={4} defaultValue={s.about.whyAiBody} hint="Your philosophy on AI's role in business." />
+            </FormSection>
+            <FormSection title="Timeline & recognition" description="Only add real, verifiable milestones and awards." className="mt-6">
+              <RepeaterField
+                name="timeline"
+                label="Company timeline"
+                addLabel="Add milestone"
+                columns={[{ key: "year", label: "Year" }, { key: "title", label: "Milestone" }, { key: "body", label: "Detail", type: "textarea" }]}
+                defaultValue={s.about.timeline}
+                max={20}
+              />
+              <RepeaterField name="awards" label="Awards & recognitions" columns={titled} defaultValue={s.about.awards} max={12} />
+              <RepeaterField
+                name="press"
+                label="Press & media mentions"
+                addLabel="Add mention"
+                columns={[{ key: "outlet", label: "Outlet" }, { key: "title", label: "Headline" }, { key: "url", label: "Link", type: "url" }]}
+                defaultValue={s.about.press}
+                max={20}
+              />
+            </FormSection>
+            <FormSection title="Community, impact & investors" description="All optional." className="mt-6">
+              <TextAreaField name="communityBody" label="Community involvement" rows={3} defaultValue={s.about.communityBody} />
+              <TextAreaField name="impactBody" label="Environmental / social impact" rows={3} defaultValue={s.about.impactBody} />
+              <RepeaterField
+                name="investors"
+                label="Investors (if any)"
+                addLabel="Add investor"
+                columns={[{ key: "name", label: "Name" }, { key: "url", label: "Link", type: "url" }]}
+                defaultValue={s.about.investors}
+                max={20}
+              />
             </FormSection>
           </AdminForm>
         ) : null}
