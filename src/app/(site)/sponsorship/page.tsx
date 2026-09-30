@@ -3,14 +3,26 @@ import Link from "next/link";
 
 import { JsonLd } from "@/components/site/json-ld";
 import { PageHeader, Section } from "@/components/site/section";
-import { AudienceBlock, hasAudienceData, CategoriesBlock, FormatsBlock, PartnersBlock, PlatformsBlock, TopContentBlock, WhyPartnerBlock } from "@/components/site/sponsorship-sections";
+import {
+  AudienceBlock,
+  hasAudienceData,
+  CategoriesBlock,
+  CreativeProcessBlock,
+  FormatsBlock,
+  PartnersBlock,
+  PlatformsBlock,
+  SponsorTestimonialsBlock,
+  TopContentBlock,
+  UpcomingTopicsBlock,
+  WhyPartnerBlock,
+} from "@/components/site/sponsorship-sections";
 import { SponsorshipForm } from "@/components/site/sponsorship-form";
 import { buttonVariants } from "@/components/ui/button";
 import { breadcrumbLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
 import { groupContent, listActivePlatforms, listPublishedContent } from "@/server/dal/public/content";
 import { getPublicSettings } from "@/server/dal/public/site";
-import { listPublishedPackages, listPublishedPartners } from "@/server/dal/public/sponsorship";
+import { listPublishedPackages, listPublishedPartners, listSponsorshipTestimonials } from "@/server/dal/public/sponsorship";
 
 export const revalidate = 3600;
 
@@ -24,12 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SponsorshipPage() {
-  const [{ sponsorship: s, general }, platforms, content, packages, partners] = await Promise.all([
+  const [{ sponsorship: s, general }, platforms, content, packages, partners, sponsorTestimonials] = await Promise.all([
     getPublicSettings(),
     listActivePlatforms(),
     listPublishedContent(),
     listPublishedPackages(),
     listPublishedPartners(),
+    listSponsorshipTestimonials(),
   ]);
   const top = groupContent(content, "high-performing", 3);
   const campaign = groupContent(content, "campaign", 3);
@@ -56,7 +69,10 @@ export default async function SponsorshipPage() {
       {top.length ? <Section><TopContentBlock items={top} title="Top-performing content" /></Section> : null}
       {campaign.length ? <Section><TopContentBlock items={campaign} title="Campaign examples" /></Section> : null}
       {partners.length ? <Section><PartnersBlock partners={partners} /></Section> : null}
+      {sponsorTestimonials.length ? <Section><SponsorTestimonialsBlock items={sponsorTestimonials} /></Section> : null}
       {s.formats.length || packages.length ? <Section><FormatsBlock formats={s.formats} packages={packages} ratesNotice={s.ratesNotice} /></Section> : null}
+      {s.creativeProcess.length ? <Section><CreativeProcessBlock steps={s.creativeProcess} /></Section> : null}
+      {s.upcomingTopics.length ? <Section><UpcomingTopicsBlock topics={s.upcomingTopics} /></Section> : null}
       {s.whyPartner.length ? <Section><WhyPartnerBlock items={s.whyPartner} /></Section> : null}
       <Section id="inquiry" aria-labelledby="inquiry-title">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
