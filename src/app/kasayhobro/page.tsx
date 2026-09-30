@@ -34,6 +34,13 @@ export default async function LoginPage(props: PageProps<"/kasayhobro">) {
     >
       {error ? <Alert tone="danger" className="mb-6">{error}</Alert> : null}
       <LoginForm next={typeof sp.next === "string" ? sp.next : ""} />
+      <p className="mt-8 text-center text-xs text-subtle">
+        <Link href="/privacy-policy" className="hover:text-fg">Privacy</Link>
+        {" · "}
+        <Link href="/terms" className="hover:text-fg">Terms</Link>
+        {" · "}
+        <Link href="/contact" className="hover:text-fg">Need help?</Link>
+      </p>
     </AuthShell>
   );
 }
