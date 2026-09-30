@@ -8,7 +8,10 @@ import { PLATFORM_LABELS, type ContentCardDTO } from "@/server/dal/public/conten
 
 import { MediaImage } from "./media-image";
 
+const DIFFICULTY_LABEL: Record<string, string> = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
+
 export function ContentCard({ item }: { item: ContentCardDTO }) {
+  const isArticle = item.contentType === "article";
   const portrait = item.embed?.aspect === "portrait";
   const ratio = portrait ? "3/4" : "16/9";
   const frame = "relative overflow-hidden rounded-media bg-surface-3 shadow-[inset_0_0_0_1px_var(--glass-line)]";
@@ -30,10 +33,12 @@ export function ContentCard({ item }: { item: ContentCardDTO }) {
         ) : (
           <div className={`${frame} bg-linear-to-br from-surface-2 to-surface-3`} style={{ aspectRatio: ratio }} />
         )}
-        <Badge variant="glass" className="absolute top-3 left-3">{PLATFORM_LABELS[item.platform]}</Badge>
-        <span aria-hidden className="glass-float absolute top-1/2 left-1/2 grid size-12 -translate-1/2 place-items-center rounded-full text-fg transition-transform duration-(--duration-slow) ease-spring group-hover:scale-110">
-          <Play className="ml-0.5 size-5 fill-current" />
-        </span>
+        <Badge variant="glass" className="absolute top-3 left-3">{isArticle ? "Tutorial" : PLATFORM_LABELS[item.platform]}</Badge>
+        {isArticle ? null : (
+          <span aria-hidden className="glass-float absolute top-1/2 left-1/2 grid size-12 -translate-1/2 place-items-center rounded-full text-fg transition-transform duration-(--duration-slow) ease-spring group-hover:scale-110">
+            <Play className="ml-0.5 size-5 fill-current" />
+          </span>
+        )}
       </div>
       <h3 className="mt-3.5 px-0.5 text-base leading-snug font-semibold tracking-tight text-fg">
         <Link href={`/content/${item.slug}`} className="after:absolute after:inset-0 after:rounded-media">
@@ -42,6 +47,8 @@ export function ContentCard({ item }: { item: ContentCardDTO }) {
       </h3>
       <div className="mt-1.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 px-0.5 text-xs text-subtle tabular-nums">
         {item.publishedDate ? <time dateTime={item.publishedDate}>{formatDate(item.publishedDate)}</time> : null}
+        {item.difficulty ? <span className="normal-case">{DIFFICULTY_LABEL[item.difficulty]}</span> : null}
+        {item.durationMinutes ? <span>{item.durationMinutes} min {isArticle ? "read" : "watch"}</span> : null}
         {item.metrics?.views != null ? (
           <span className="inline-flex items-center gap-1">
             <Eye aria-hidden className="size-3.5" /> {formatCompactNumber(item.metrics.views)} <span className="sr-only">views</span>
