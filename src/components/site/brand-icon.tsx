@@ -1,5 +1,5 @@
 import { CalendarDays, Globe, Link2, Mail, Newspaper, ShoppingBag, type LucideIcon } from "lucide-react";
-import { siFacebook, siGithub, siInstagram, siTiktok, siWhatsapp, siX, siYoutube } from "simple-icons";
+import { siDiscord, siFacebook, siGithub, siInstagram, siProducthunt, siSpotify, siTiktok, siWhatsapp, siX, siYoutube } from "simple-icons";
 
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,10 @@ const BRANDS: Record<string, { path: string; title: string }> = {
   github: siGithub,
   facebook: siFacebook,
   whatsapp: siWhatsapp,
+  discord: siDiscord,
+  spotify: siSpotify,
+  podcast: siSpotify,
+  producthunt: siProducthunt,
 };
 
 const GENERIC: Record<string, LucideIcon> = {
@@ -20,6 +24,7 @@ const GENERIC: Record<string, LucideIcon> = {
   email: Mail,
   newsletter: Newspaper,
   shop: ShoppingBag,
+  merch: ShoppingBag,
   calendar: CalendarDays,
 };
 
