@@ -3,7 +3,13 @@ import type { Permission } from "@/lib/permissions";
 export type AdminNavItem = { href: string; label: string; icon: string; permission: Permission };
 
 export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
-  { group: "Overview", items: [{ href: "/admin", label: "Dashboard", icon: "dashboard", permission: "cms.read" }] },
+  {
+    group: "Overview",
+    items: [
+      { href: "/admin", label: "Dashboard", icon: "dashboard", permission: "cms.read" },
+      { href: "/admin/security", label: "Security", icon: "security", permission: "cms.read" },
+    ],
+  },
   {
     group: "Content",
     items: [
