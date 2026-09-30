@@ -12,12 +12,14 @@ export function TestimonialForm({
   photo,
   clientOptions,
   projectOptions,
+  partnerOptions,
 }: {
   action: FormAction;
   t?: typeof testimonials.$inferSelect | null;
   photo?: AdminMedia | null;
   clientOptions: { id: string; name: string }[];
   projectOptions: { id: string; title: string }[];
+  partnerOptions: { id: string; name: string }[];
 }) {
   return (
     <AdminForm action={action} submitLabel={t ? "Save testimonial" : "Add testimonial"}>
@@ -31,6 +33,7 @@ export function TestimonialForm({
         </div>
         <SelectField name="clientId" label="Client (optional)" defaultValue={t?.clientId ?? ""} options={[{ value: "", label: "—" }, ...clientOptions.map((c) => ({ value: c.id, label: c.name }))]} />
         <SelectField name="projectId" label="About this project (optional)" defaultValue={t?.projectId ?? ""} options={[{ value: "", label: "—" }, ...projectOptions.map((p) => ({ value: p.id, label: p.title }))]} hint="Shows this testimonial on the project's case study page." />
+        <SelectField name="sponsorshipPartnerId" label="From this brand/sponsor (optional)" defaultValue={t?.sponsorshipPartnerId ?? ""} options={[{ value: "", label: "—" }, ...partnerOptions.map((p) => ({ value: p.id, label: p.name }))]} hint="Shows this testimonial on the Sponsorship page." />
         <MediaField name="photoMediaId" label="Author photo (optional)" defaultMedia={photo} uploadBucket="media-library" />
         <SwitchField name="consentToPublish" label="The author agreed to publication" defaultChecked={t?.consentToPublish ?? false} />
       </FormSection>
