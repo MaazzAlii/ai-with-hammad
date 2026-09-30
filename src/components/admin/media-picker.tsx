@@ -1,7 +1,7 @@
 "use client";
 
 import { ImagePlus, Search, X } from "lucide-react";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -128,6 +128,52 @@ export function MediaField({
       {hint ? <p className="text-xs text-subtle">{hint}</p> : null}
       {error ? <p className="text-xs text-danger">{error}</p> : null}
       <MediaPickerDialog open={open} onOpenChange={setOpen} onSelect={setMedia} kind={kind} uploadBucket={uploadBucket} />
+    </div>
+  );
+}
+
+/** Form field storing a list of image ids (e.g. a small photo gallery) in a hidden JSON input. */
+export function MediaListField({
+  name,
+  label,
+  defaultMedia = [],
+  uploadBucket,
+  hint,
+  max = 20,
+}: {
+  name: string;
+  label: string;
+  defaultMedia?: AdminMedia[];
+  uploadBucket?: BucketId;
+  hint?: string;
+  max?: number;
+}) {
+  const [items, setItems] = useState<AdminMedia[]>(defaultMedia);
+  const [open, setOpen] = useState(false);
+  const error = useFieldError(name);
+  const ids = useMemo(() => JSON.stringify(items.map((m) => m.id)), [items]);
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-sm font-medium">{label}</span>
+      <input type="hidden" name={name} value={ids} />
+      <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
+        {items.map((m) => (
+          <div key={m.id} className="relative">
+            <MediaThumb media={m} />
+            <Button type="button" variant="ghost" size="icon" aria-label={`Remove ${m.filename}`} className="absolute top-1 right-1 size-6 bg-bg/80 text-muted hover:bg-danger-soft hover:text-danger" onClick={() => setItems((r) => r.filter((x) => x.id !== m.id))}>
+              <X className="size-3.5" />
+            </Button>
+          </div>
+        ))}
+        {items.length < max ? (
+          <button type="button" onClick={() => setOpen(true)} className="grid aspect-square place-items-center rounded-control border border-dashed border-border text-muted hover:border-accent hover:text-accent" aria-label="Add photo">
+            <ImagePlus className="size-5" />
+          </button>
+        ) : null}
+      </div>
+      {hint ? <p className="text-xs text-subtle">{hint}</p> : null}
+      {error ? <p className="text-xs text-danger">{error}</p> : null}
+      <MediaPickerDialog open={open} onOpenChange={setOpen} onSelect={(m) => setItems((r) => (r.some((x) => x.id === m.id) ? r : [...r, m]))} kind="image" uploadBucket={uploadBucket} />
     </div>
   );
 }
