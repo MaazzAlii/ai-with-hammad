@@ -295,8 +295,10 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
           <AdminForm action={saveSettings.bind(null, "contact")}>
             <FormSection title="Contact form">
               <TextAreaField name="intro" label="Intro" rows={3} defaultValue={s.contact.intro} />
+              <TextField name="responseTime" label="Response time expectation" defaultValue={s.contact.responseTime} placeholder="e.g. We reply within 24 hours" hint="Only state a promise you can keep. Leave empty to hide." />
               <TextAreaField name="budgets" label="Budget options" rows={5} defaultValue={s.contact.budgets.join("\n")} hint="One per line. Leave empty to hide the field." />
               <TextAreaField name="timelines" label="Timeline options" rows={4} defaultValue={s.contact.timelines.join("\n")} />
+              <TextAreaField name="departments" label="Departments" rows={4} defaultValue={s.contact.departments.join("\n")} hint="One per line, e.g. Sales, Support, Press. Leave empty to hide the field." />
               <SwitchField name="showFaq" label="Show the FAQ section on the contact page" defaultChecked={s.contact.showFaq} />
             </FormSection>
           </AdminForm>
