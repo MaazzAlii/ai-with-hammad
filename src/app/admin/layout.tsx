@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { ADMIN_NAV } from "@/components/admin/nav";
 import { AdminSidebar } from "@/components/admin/sidebar";
+import { IdleTimeout } from "@/components/admin/idle-timeout";
 import { getDb } from "@/db";
 import { contactInquiries, sponsorshipInquiries } from "@/db/schema";
 import { AppToaster } from "@/components/ui/app-toaster";
@@ -39,6 +40,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
       <AppToaster />
+      <IdleTimeout />
     </div>
   );
 }
