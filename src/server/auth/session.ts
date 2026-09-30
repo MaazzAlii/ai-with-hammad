@@ -33,6 +33,11 @@ export const getCurrentStaff = cache(async (): Promise<Staff | null> => {
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) return null;
 
+  // If this account has a verified 2FA factor, the session must have completed that
+  // second step (AAL2) — a stolen/leftover password-only session cookie is not enough.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") return null;
+
   const db = getDb();
   const rows = await db
     .select({
@@ -76,9 +81,22 @@ export async function authorize(permission: Permission): Promise<Staff> {
 /** For admin pages/layouts: redirects instead of throwing. */
 export async function requireStaff(): Promise<Staff> {
   const staff = await getCurrentStaff();
-  if (!staff) redirect("/kasayhobro");
+  if (!staff) {
+    // Distinguish "not signed in" from "signed in but the 2FA step isn't done yet" so the
+    // person lands on the code-entry screen instead of being asked for their password again.
+    if (await isMfaPending()) redirect("/kasayhobro/verify");
+    redirect("/kasayhobro");
+  }
   if (!staff.isActive || !staff.permissions.has("cms.read")) redirect("/kasayhobro?error=inactive");
   return staff;
+}
+
+/** True when the signed-in user has a verified 2FA factor but hasn't completed the AAL2 step yet. */
+export async function isMfaPending(): Promise<boolean> {
+  if (!isSupabaseConfigured()) return false;
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  return Boolean(data && data.nextLevel === "aal2" && data.currentLevel !== "aal2");
 }
 
 export async function requirePagePermission(permission: Permission): Promise<Staff> {
