@@ -115,8 +115,13 @@ export async function getContentForEdit(id: string) {
   const [c] = await db().select().from(contentItems).where(eq(contentItems.id, id));
   if (!c || c.deletedAt) return null;
   const metrics = await db().select().from(contentMetrics).where(eq(contentMetrics.contentItemId, id)).orderBy(desc(contentMetrics.capturedAt)).limit(20);
-  const mediaMap = await getMediaMany([c.thumbnailMediaId]);
-  return { item: c, metrics, thumbnail: c.thumbnailMediaId ? (mediaMap.get(c.thumbnailMediaId) ?? null) : null };
+  const mediaMap = await getMediaMany([c.thumbnailMediaId, c.resourceMediaId]);
+  return {
+    item: c,
+    metrics,
+    thumbnail: c.thumbnailMediaId ? (mediaMap.get(c.thumbnailMediaId) ?? null) : null,
+    resource: c.resourceMediaId ? (mediaMap.get(c.resourceMediaId) ?? null) : null,
+  };
 }
 export async function listSocialAdmin() {
   return db().select().from(socialPlatforms).orderBy(asc(socialPlatforms.sortOrder));
