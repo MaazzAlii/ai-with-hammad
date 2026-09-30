@@ -1,12 +1,15 @@
-import { ChevronRight, Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { CalendarClock, ChevronRight, Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import type { Metadata } from "next";
 
 import { ContactForm } from "@/components/site/contact-form";
 import { FaqList } from "@/components/site/faq";
 import { JsonLd } from "@/components/site/json-ld";
+import { MapEmbed } from "@/components/site/map-embed";
+import { NewsletterForm } from "@/components/site/newsletter-form";
 import { PageHeader, Section, SectionHeading } from "@/components/site/section";
 import { breadcrumbLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
+import { safeHref } from "@/lib/url-safety";
 import { listPublishedServices } from "@/server/dal/public/services";
 import { getPublicSettings } from "@/server/dal/public/site";
 import { listPublishedFaqs } from "@/server/dal/public/testimonials";
@@ -25,16 +28,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ContactPage(props: PageProps<"/contact">) {
   const sp = await props.searchParams;
-  const [{ contact, general }, services, faqs] = await Promise.all([getPublicSettings(), listPublishedServices(), listPublishedFaqs()]);
+  const [{ contact, general, home }, services, faqs] = await Promise.all([getPublicSettings(), listPublishedServices(), listPublishedFaqs()]);
   const wa = whatsappLink(general.whatsapp, general.whatsappMessage);
   const preselected = typeof sp.service === "string" && services.some((s) => s.id === sp.service) ? sp.service : "";
+  const bookingHref = safeHref(home.bookingUrl);
   return (
     <>
       <PageHeader eyebrow="Contact" title="Start a project" description={contact.intro} />
       <Section>
         <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] lg:gap-8">
           <div className="glass-panel rounded-[1.75rem] p-5 sm:p-8">
-            <ContactForm services={services.map((s) => ({ id: s.id, title: s.title }))} budgets={contact.budgets} timelines={contact.timelines} defaultServiceId={preselected} />
+            <ContactForm services={services.map((s) => ({ id: s.id, title: s.title }))} budgets={contact.budgets} timelines={contact.timelines} departments={contact.departments} defaultServiceId={preselected} />
           </div>
           <aside className="space-y-4">
             <div className="glass-card rounded-card p-6 sm:p-7">
@@ -47,7 +51,20 @@ export default async function ContactPage(props: PageProps<"/contact">) {
                   </li>
                 ))}
               </ol>
+              {contact.responseTime ? <p className="mt-5 border-t border-(--glass-line) pt-4 text-sm font-medium text-accent">{contact.responseTime}</p> : null}
             </div>
+            {bookingHref ? (
+              <a href={bookingHref} target="_blank" rel="noopener noreferrer" className="group glass-card lift flex items-center gap-4 rounded-card p-5 sm:p-6">
+                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+                  <CalendarClock aria-hidden className="size-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold text-fg">Book a 15-min call</span>
+                  <span className="block text-sm text-muted">Skip the form — pick a time directly.</span>
+                </span>
+                <ChevronRight aria-hidden className="size-4 shrink-0 text-subtle transition-transform duration-(--duration-base) ease-spring group-hover:translate-x-0.5" />
+              </a>
+            ) : null}
             {wa ? (
               <a href={wa} target="_blank" rel="noopener noreferrer" className="group glass-card lift flex items-center gap-4 rounded-card p-5 sm:p-6">
                 <span className="grid size-11 shrink-0 place-items-center rounded-full bg-whatsapp text-whatsapp-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.35)]">
@@ -88,9 +105,21 @@ export default async function ContactPage(props: PageProps<"/contact">) {
                 ) : null}
               </ul>
             ) : null}
+            <div className="glass-card rounded-card p-6 sm:p-7">
+              <h2 className="text-base font-semibold tracking-tight">Stay in the loop</h2>
+              <p className="mt-2 text-sm text-muted">Occasional notes on what we&apos;re building. No spam.</p>
+              <div className="mt-4">
+                <NewsletterForm />
+              </div>
+            </div>
           </aside>
         </div>
       </Section>
+      {general.address ? (
+        <Section aria-label="Office location">
+          <MapEmbed address={general.address} />
+        </Section>
+      ) : null}
       {faqs.length && contact.showFaq ? (
         <Section aria-labelledby="contact-faq">
           <SectionHeading id="contact-faq" eyebrow="FAQ" title="Common questions" />
