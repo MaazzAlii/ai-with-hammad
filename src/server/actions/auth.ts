@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -20,14 +21,20 @@ const signInSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email")),
   password: z.string().min(1, "Enter your password").max(200),
   next: z.string().max(300).optional(),
+  rememberMe: z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean()).optional().default(true),
 });
 
 const GENERIC = "Incorrect email or password.";
 
 export async function signIn(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
-  const parsed = signInSchema.safeParse({ email: formData.get("email"), password: formData.get("password"), next: formData.get("next") ?? undefined });
+  const parsed = signInSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+    next: formData.get("next") ?? undefined,
+    rememberMe: formData.get("rememberMe") ?? undefined,
+  });
   if (!parsed.success) return fail("Please check the form.", z.flattenError(parsed.error).fieldErrors);
-  const { email, password, next } = parsed.data;
+  const { email, password, next, rememberMe } = parsed.data;
   if (!(await verifyCaptcha(Object.fromEntries(formData), await clientIp()))) return fail(CAPTCHA_ERROR, { captchaAnswer: [CAPTCHA_ERROR] });
   const meta = await requestMeta();
   if (!(await rateLimit(`login:ip:${meta.ipHash}`, 10, 600)) || !(await rateLimit(`login:email:${email}`, 8, 900))) {
@@ -52,6 +59,16 @@ export async function signIn(_prev: ActionResult | null, formData: FormData): Pr
   }
   await db.update(profiles).set({ lastSignInAt: new Date() }).where(eq(profiles.id, profile.id));
   await audit({ id: data.user.id, email }, { action: "auth.login", entityType: "auth", summary: "Signed in", ipHash: meta.ipHash });
+
+  // "Keep me signed in" unchecked → the admin layout signs the person out after ~30 idle minutes.
+  const jar = await cookies();
+  if (rememberMe) jar.delete("aiwh_idle");
+  else jar.set("aiwh_idle", "1", { httpOnly: false, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/admin", maxAge: 60 * 60 * 24 * 30 });
+
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+    redirect(`/kasayhobro/verify?next=${encodeURIComponent(safeNextPath(next))}`);
+  }
   redirect(safeNextPath(next));
 }
 
