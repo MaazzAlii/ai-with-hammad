@@ -56,12 +56,17 @@ function shape(key: SettingsKey | "internal.notifications", o: Record<string, un
       return {
         intro: o.intro,
         audienceSummary: o.audienceSummary,
-        audience: { ageRanges: json(o.ageRanges), topCountries: json(o.topCountries), genderSplit: json(o.genderSplit), asOf: nullable(o.asOf) },
+        audience: { ageRanges: json(o.ageRanges), topCountries: json(o.topCountries), genderSplit: json(o.genderSplit), jobTitles: json(o.jobTitles), asOf: nullable(o.asOf) },
         contentCategories: lines(o.contentCategories),
         formats: json(o.formats),
         whyPartner: json(o.whyPartner),
+        creativeProcess: json(o.creativeProcess),
+        upcomingTopics: json(o.upcomingTopics),
         ratesNotice: o.ratesNotice,
         totalReach: null,
+        monthlyViews: o.monthlyViews,
+        avgOpenRate: o.avgOpenRate,
+        mediaKitPdfMediaId: nullable(o.mediaKitPdfMediaId),
       };
     case "contact":
       return { intro: o.intro, budgets: lines(o.budgets), timelines: lines(o.timelines), showFaq: on(o.showFaq) };
