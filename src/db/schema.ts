@@ -222,6 +222,8 @@ export const serviceAddOns = pgTable("service_add_ons", {
 // ---------------------------------------------------------------------------
 // Team
 // ---------------------------------------------------------------------------
+export const teamMemberType = pgEnum("team_member_type", ["team", "advisor"]);
+
 export const teamMembers = pgTable("team_members", {
   id: id(),
   slug: text("slug").notNull(),
@@ -232,6 +234,13 @@ export const teamMembers = pgTable("team_members", {
   photoMediaId: uuid("photo_media_id").references(() => mediaAssets.id, { onDelete: "set null" }),
   skills: text("skills").array().notNull().default(sql`'{}'::text[]`),
   location: text("location").notNull().default(""),
+  timezone: text("timezone").notNull().default(""),
+  languages: text("languages").array().notNull().default(sql`'{}'::text[]`),
+  certifications: text("certifications").array().notNull().default(sql`'{}'::text[]`),
+  email: text("email"),
+  funFact: text("fun_fact").notNull().default(""),
+  philosophy: text("philosophy").notNull().default(""),
+  memberType: teamMemberType("member_type").notNull().default("team"),
   websiteUrl: text("website_url"),
   isPublished: boolean("is_published").notNull().default(false),
   publishedAt: ts("published_at"),
@@ -252,6 +261,20 @@ export const teamSocialLinks = pgTable("team_social_links", {
   platform: text("platform").notNull(),
   url: text("url").notNull(),
   label: text("label").notNull().default(""),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: createdAt(),
+});
+
+/** Talks, podcasts, interviews a team member has appeared on. */
+export const teamAppearances = pgTable("team_appearances", {
+  id: id(),
+  teamMemberId: uuid("team_member_id")
+    .notNull()
+    .references(() => teamMembers.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  url: text("url"),
+  venue: text("venue").notNull().default(""),
+  appearedOn: date("appeared_on"),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: createdAt(),
 });
