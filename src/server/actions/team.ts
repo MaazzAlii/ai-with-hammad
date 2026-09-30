@@ -3,7 +3,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 
 import { getDb } from "@/db";
-import { teamMembers, teamSocialLinks } from "@/db/schema";
+import { teamAppearances, teamMembers, teamSocialLinks } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { formDataToObject } from "@/lib/form-data";
 import { teamMemberSchema } from "@/lib/validation/admin";
@@ -20,7 +20,7 @@ async function save(id: string | null, fd: FormData): Promise<Result> {
   const staff = await authorize("team.write");
   const input = teamMemberSchema.parse(formDataToObject(fd));
   const canPublish = staff.permissions.has("team.publish");
-  const { links, isPublished, isFeatured, ...base } = input;
+  const { links, appearances, isPublished, isFeatured, ...base } = input;
   const flags = canPublish ? { isPublished, isFeatured } : {};
   const mid = await getDb().transaction(async (tx) => {
     let mid = id;
@@ -37,11 +37,13 @@ async function save(id: string | null, fd: FormData): Promise<Result> {
         .set({ ...base, ...fixed, ...flags, ...(canPublish && isPublished && !ex.publishedAt ? { publishedAt: new Date() } : {}) })
         .where(eq(teamMembers.id, mid));
       await tx.delete(teamSocialLinks).where(eq(teamSocialLinks.teamMemberId, mid));
+      await tx.delete(teamAppearances).where(eq(teamAppearances.teamMemberId, mid));
     } else {
       const [row] = await tx.insert(teamMembers).values({ ...base, ...flags, ...(canPublish && isPublished ? { publishedAt: new Date() } : {}) }).returning({ id: teamMembers.id });
       mid = row!.id;
     }
     if (links.length) await tx.insert(teamSocialLinks).values(links.map((l, i) => ({ ...l, teamMemberId: mid!, sortOrder: i })));
+    if (appearances.length) await tx.insert(teamAppearances).values(appearances.map((a, i) => ({ ...a, teamMemberId: mid!, sortOrder: i })));
     return mid;
   });
   if (!mid) return fail("Team member not found.");
