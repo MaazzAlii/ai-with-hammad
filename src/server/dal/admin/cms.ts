@@ -64,6 +64,9 @@ export async function serviceOptions() {
 export async function projectOptions() {
   return db().select({ id: projects.id, title: projects.title }).from(projects).where(isNull(projects.deletedAt)).orderBy(asc(projects.sortOrder));
 }
+export async function sponsorshipPartnerOptions() {
+  return db().select({ id: sponsorshipPartners.id, name: sponsorshipPartners.name }).from(sponsorshipPartners).where(isNull(sponsorshipPartners.deletedAt)).orderBy(asc(sponsorshipPartners.sortOrder));
+}
 
 /* services */
 export async function listServicesAdmin() {
