@@ -1,4 +1,4 @@
-import { ArrowUpRight, Globe, MapPin } from "lucide-react";
+import { ArrowUpRight, Clock, Globe, Mail, MapPin, Mic } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -74,16 +74,40 @@ export default async function TeamMemberPage(props: PageProps<"/team/[slug]">) {
             {member.roleTitle ? <p className="mt-3 text-xl text-muted">{member.roleTitle}</p> : null}
             <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
               {member.location ? <span className="inline-flex items-center gap-1.5"><MapPin aria-hidden className="size-4" /> {member.location}</span> : null}
+              {member.timezone ? <span className="inline-flex items-center gap-1.5"><Clock aria-hidden className="size-4" /> {member.timezone}</span> : null}
               {member.websiteUrl ? (
                 <a href={member.websiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 transition-colors hover:text-fg"><Globe aria-hidden className="size-4" /> Website</a>
               ) : null}
             </div>
+            {member.email ? (
+              <a href={`mailto:${member.email}`} className={buttonVariants({ variant: "secondary", size: "sm", className: "mt-5" })}>
+                <Mail aria-hidden /> Contact {member.name.split(" ")[0]}
+              </a>
+            ) : null}
             {member.bio ? <p className="mt-7 max-w-2xl text-lg leading-relaxed text-fg">{member.bio}</p> : null}
+            {member.philosophy ? (
+              <blockquote className="glass-card mt-6 max-w-2xl rounded-card border-l-2 border-accent p-5 text-fg italic">&ldquo;{member.philosophy}&rdquo;</blockquote>
+            ) : null}
             {member.longBio ? <Markdown source={member.longBio} className="mt-6" /> : null}
+            {member.funFact ? (
+              <p className="mt-6 max-w-2xl text-sm text-muted"><span className="font-medium text-fg">Fun fact:</span> {member.funFact}</p>
+            ) : null}
             {member.skills.length ? (
               <div className="mt-10">
                 <h2 className="label-caps mb-3">Skills</h2>
                 <ul className="flex flex-wrap gap-1.5">{member.skills.map((s) => <li key={s}><Badge>{s}</Badge></li>)}</ul>
+              </div>
+            ) : null}
+            {member.certifications.length ? (
+              <div className="mt-6">
+                <h2 className="label-caps mb-3">Certifications</h2>
+                <ul className="flex flex-wrap gap-1.5">{member.certifications.map((c) => <li key={c}><Badge>{c}</Badge></li>)}</ul>
+              </div>
+            ) : null}
+            {member.languages.length ? (
+              <div className="mt-6">
+                <h2 className="label-caps mb-3">Languages</h2>
+                <p className="text-sm text-muted">{member.languages.join(", ")}</p>
               </div>
             ) : null}
             {socials.length ? (
@@ -101,6 +125,26 @@ export default async function TeamMemberPage(props: PageProps<"/team/[slug]">) {
                         {s.label}
                         <ArrowUpRight aria-hidden className="opacity-50 transition-[opacity,translate] duration-(--duration-base) ease-spring group-hover/s:translate-x-0.5 group-hover/s:-translate-y-0.5 group-hover/s:opacity-100" />
                       </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {member.appearances.length ? (
+              <div className="mt-10">
+                <h2 className="label-caps mb-3">Speaking & appearances</h2>
+                <ul className="space-y-3">
+                  {member.appearances.map((a, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-sm">
+                      <Mic aria-hidden className="mt-0.5 size-4 shrink-0 text-subtle" />
+                      <span>
+                        {a.url ? (
+                          <a href={a.url} target="_blank" rel="noopener noreferrer" className="font-medium text-fg underline decoration-1 underline-offset-2 hover:text-accent">{a.title}</a>
+                        ) : (
+                          <span className="font-medium text-fg">{a.title}</span>
+                        )}
+                        {a.venue || a.appearedOn ? <span className="text-muted"> — {[a.venue, a.appearedOn].filter(Boolean).join(", ")}</span> : null}
+                      </span>
                     </li>
                   ))}
                 </ul>
