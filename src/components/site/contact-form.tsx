@@ -23,11 +23,13 @@ export function ContactForm({
   services,
   budgets,
   timelines,
+  departments,
   defaultServiceId = "",
 }: {
   services: { id: string; title: string }[];
   budgets: string[];
   timelines: string[];
+  departments: string[];
   defaultServiceId?: string;
 }) {
   const [pending, startTransition] = useTransition();
@@ -44,7 +46,7 @@ export function ContactForm({
 
   const form = useForm<In & { website_url_confirm?: string }, unknown, Out>({
     resolver: zodResolver(contactInquirySchema),
-    defaultValues: { name: "", email: "", company: "", phone: "", serviceId: defaultServiceId, budget: "", timeline: "", message: "" },
+    defaultValues: { name: "", email: "", company: "", phone: "", serviceId: defaultServiceId, budget: "", timeline: "", department: "", wantsNda: false, briefUrl: "", message: "" },
   });
   const { register, handleSubmit, formState, setError } = form;
   const e = formState.errors;
@@ -114,13 +116,23 @@ export function ContactForm({
         <Input type="tel" autoComplete="tel" {...register("phone")} />
       </Field>
       {services.length ? (
-        <Field id="serviceId" label="Service" error={e.serviceId?.message} className="sm:col-span-2">
+        <Field id="serviceId" label="Service" error={e.serviceId?.message} className={departments.length ? undefined : "sm:col-span-2"}>
           <NativeSelect {...register("serviceId")}>
             <option value="">Not sure yet</option>
             {services.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.title}
               </option>
+            ))}
+          </NativeSelect>
+        </Field>
+      ) : null}
+      {departments.length ? (
+        <Field id="department" label="Department" error={e.department?.message}>
+          <NativeSelect {...register("department")}>
+            <option value="">General</option>
+            {departments.map((d) => (
+              <option key={d}>{d}</option>
             ))}
           </NativeSelect>
         </Field>
@@ -148,6 +160,13 @@ export function ContactForm({
       <Field id="message" label="What would you like to build?" required error={e.message?.message} hint="The process, the tools involved and what success looks like." className="sm:col-span-2">
         <Textarea rows={6} {...register("message")} />
       </Field>
+      <Field id="briefUrl" label="Project brief link (optional)" error={e.briefUrl?.message} hint="A link to a doc, deck or drive folder — e.g. Google Drive or Notion." className="sm:col-span-2">
+        <Input type="url" placeholder="https://…" {...register("briefUrl")} />
+      </Field>
+      <label className="flex items-center gap-2.5 text-sm text-muted sm:col-span-2">
+        <input type="checkbox" className="size-4 accent-[var(--color-accent)]" {...register("wantsNda")} />
+        I may need an NDA before sharing further details
+      </label>
       <div className="sm:col-span-2">
         <Captcha resetKey={captchaKey} error={captchaError} idPrefix="contact-hp-captcha" />
       </div>
