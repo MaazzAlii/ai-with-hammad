@@ -1,5 +1,6 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Download } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ContentCard } from "@/components/site/content-card";
@@ -14,6 +15,8 @@ import { markdownToText } from "@/lib/markdown";
 import { buildMetadata } from "@/lib/seo";
 import { formatCompactNumber, formatDate } from "@/lib/utils";
 import { getPublishedContentItem, listPublishedContent, PLATFORM_LABELS } from "@/server/dal/public/content";
+
+const DIFFICULTY_LABEL: Record<string, string> = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
 
 export const revalidate = 3600;
 
@@ -38,7 +41,9 @@ export default async function ContentItemPage(props: PageProps<"/content/[slug]"
   const { slug } = await props.params;
   const item = await getPublishedContentItem(slug);
   if (!item) notFound();
-  const more = (await listPublishedContent()).filter((c) => c.id !== item.id && c.platform === item.platform).slice(0, 3);
+  const allOthers = (await listPublishedContent()).filter((c) => c.id !== item.id);
+  const sameCategory = item.category ? allOthers.filter((c) => c.category === item.category) : [];
+  const more = (sameCategory.length ? sameCategory : allOthers.filter((c) => c.platform === item.platform)).slice(0, 3);
   const thumb = item.thumbnail?.url ?? item.providerThumbnailUrl;
   const isVideo = item.embed && ["youtube", "vimeo", "tiktok"].includes(item.embed.provider);
   const m = item.metrics;
@@ -50,9 +55,13 @@ export default async function ContentItemPage(props: PageProps<"/content/[slug]"
     <article>
       <div className="container-page pt-12 pb-14 sm:pt-20 sm:pb-20">
         <Breadcrumb href="/content" label="Content" current={item.title} />
-        <p className="eyebrow mb-3">{PLATFORM_LABELS[item.platform]}{item.category ? ` · ${item.category}` : ""}</p>
+        <p className="eyebrow mb-3">{item.contentType === "article" ? "Tutorial" : PLATFORM_LABELS[item.platform]}{item.category ? ` · ${item.category}` : ""}</p>
         <h1 className="max-w-4xl text-[2.25rem] sm:text-5xl">{item.title}</h1>
-        {item.publishedDate ? <p className="mt-4 text-sm text-subtle">Published <time dateTime={item.publishedDate}>{formatDate(item.publishedDate)}</time></p> : null}
+        <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-subtle">
+          {item.publishedDate ? <span>Published <time dateTime={item.publishedDate}>{formatDate(item.publishedDate)}</time></span> : null}
+          {item.difficulty ? <span>{DIFFICULTY_LABEL[item.difficulty]}</span> : null}
+          {item.durationMinutes ? <span>{item.durationMinutes} min {item.contentType === "article" ? "read" : "watch"}</span> : null}
+        </p>
         <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-14">
           <div>
             {item.embed ? (
@@ -76,15 +85,42 @@ export default async function ContentItemPage(props: PageProps<"/content/[slug]"
               </div>
             ) : null}
             <Markdown source={item.description} />
-            <a href={item.url} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "secondary", className: "mt-8" })}>
-              View on {PLATFORM_LABELS[item.platform]} <ArrowUpRight aria-hidden />
-            </a>
+            <div className="mt-8 flex flex-wrap gap-2.5">
+              {item.url ? (
+                <a href={item.url} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "secondary" })}>
+                  View on {PLATFORM_LABELS[item.platform]} <ArrowUpRight aria-hidden />
+                </a>
+              ) : null}
+              {item.resource ? (
+                <a href={item.resource.url} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "secondary" })}>
+                  <Download aria-hidden /> {item.resourceLabel || "Download resource"}
+                </a>
+              ) : null}
+            </div>
+            {item.author ? (
+              <Link href={`/team/${item.author.slug}`} className="group mt-10 flex items-center gap-3">
+                {item.author.photo ? (
+                  <MediaImage media={item.author.photo} alt="" ratio="1/1" rounded={false} className="size-10 shrink-0 rounded-full" sizes="40px" />
+                ) : (
+                  <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent">{item.author.name.charAt(0)}</span>
+                )}
+                <span>
+                  <span className="block text-sm font-medium text-fg transition-colors group-hover:text-accent">{item.author.name}</span>
+                  {item.author.roleTitle ? <span className="block text-xs text-muted">{item.author.roleTitle}</span> : null}
+                </span>
+              </Link>
+            ) : null}
           </div>
         </div>
+        {item.contentType === "article" && item.bodyMd ? (
+          <div className="mt-14 max-w-3xl">
+            <Markdown source={item.bodyMd} />
+          </div>
+        ) : null}
       </div>
       {more.length ? (
         <Section aria-labelledby="more-content">
-          <SectionHeading id="more-content" eyebrow="More" title={`More on ${PLATFORM_LABELS[item.platform]}`} />
+          <SectionHeading id="more-content" eyebrow="More" title={sameCategory.length ? `More on ${item.category}` : `More on ${PLATFORM_LABELS[item.platform]}`} />
           <ul data-reveal="group" className="focus-group grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">{more.map((c) => <li key={c.id}><ContentCard item={c} /></li>)}</ul>
         </Section>
       ) : null}
