@@ -16,6 +16,13 @@ const PUBLIC_ACTIONS = new Set([
   "setPassword", // requires a valid session from the email link (checked with getUser)
   "clientSignIn",
   "getCaptchaChallenge",
+  // MFA actions manage the caller's own account only; each checks getUser()/getCurrentStaff() itself
+  // instead of a CMS permission (there's no "own account" permission to authorize against).
+  "startMfaEnrollment",
+  "confirmMfaEnrollment",
+  "unenrollMfaFactor",
+  "verifyMfaChallenge",
+  "getMfaStatus",
 ]);
 
 const dir = path.resolve(__dirname, "../../src/server/actions");
