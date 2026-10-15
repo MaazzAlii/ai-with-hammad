@@ -15,7 +15,7 @@ export async function legalMetadata(slug: string, fallbackTitle: string): Promis
   return buildMetadata({ title: doc?.title ?? fallbackTitle, description: `${doc?.title ?? fallbackTitle} for this website.`, path: `/${slug}` });
 }
 
-export async function LegalPage({ slug }: { slug: string }) {
+export async function LegalPage({ slug, children }: { slug: string; children?: React.ReactNode }) {
   const doc = await getLegalDocument(slug);
   if (!doc) notFound();
   const updated = doc.effectiveOn ?? doc.updatedAt.toISOString();
@@ -24,6 +24,7 @@ export async function LegalPage({ slug }: { slug: string }) {
       <PageHeader eyebrow="Legal" title={doc.title} description={`Last updated ${formatDate(updated)}`} />
       <Section>
         <Markdown source={doc.body} />
+        {children}
       </Section>
       <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: doc.title, path: `/${slug}` }])} />
     </>
