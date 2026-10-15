@@ -1,3 +1,4 @@
+import { CookiePreferenceButton } from "@/components/site/cookie-preference-button";
 import { LegalPage, legalMetadata } from "@/components/site/legal-page";
 
 export const revalidate = 3600;
@@ -7,5 +8,10 @@ export function generateMetadata() {
 }
 
 export default function Page() {
-  return <LegalPage slug="cookie-policy" />;
+  return (
+    <LegalPage slug="cookie-policy">
+      <CookiePreferenceButton />
+    </LegalPage>
+  );
 }
+
