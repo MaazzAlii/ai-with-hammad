@@ -31,6 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/privacy-policy", priority: 0.2, changeFrequency: "yearly" },
     { path: "/terms", priority: 0.2, changeFrequency: "yearly" },
     { path: "/cookie-policy", priority: 0.2, changeFrequency: "yearly" },
+    { path: "/sitemap", priority: 0.3, changeFrequency: "monthly" },
   ];
   return [
     ...staticRoutes.map((r) => ({ url: absoluteUrl(r.path), changeFrequency: r.changeFrequency, priority: r.priority })),
