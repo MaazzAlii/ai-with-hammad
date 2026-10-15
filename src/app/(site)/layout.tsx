@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { Assistant } from "@/components/site/assistant/assistant";
+import { CookieBanner } from "@/components/site/cookie-banner";
 import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { JsonLd } from "@/components/site/json-ld";
@@ -44,6 +45,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         location={general.location}
       />
       {wa ? <WhatsAppButton href={wa} /> : null}
+      <CookieBanner />
       {settings.assistant.enabled && serverEnv().mistralApiKey ? (
         <Assistant greeting={settings.assistant.greeting} siteName={general.siteName} hasWhatsapp={Boolean(wa)} />
       ) : null}
