@@ -1,8 +1,16 @@
 import type { MetadataRoute } from "next";
 
+import { publicEnv } from "@/lib/env";
+import { absoluteUrl } from "@/lib/seo";
+
 export default function robots(): MetadataRoute.Robots {
-  // Temporary: allow all bots to access the site for logo feedback
+  if (!publicEnv.allowIndexing) {
+    // Preview / staging deployments: keep everything out of search engines.
+    return { rules: [{ userAgent: "*", disallow: "/" }] };
+  }
   return {
-    rules: [{ userAgent: "*", disallow: [""] }],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/kasayhobro", "/login", "/auth/", "/api/", "/portal", "/go/"] }],
+    sitemap: absoluteUrl("/sitemap.xml"),
+    host: publicEnv.siteUrl,
   };
 }
