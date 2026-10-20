@@ -69,6 +69,16 @@ export async function POST(req: Request) {
     return new Response(stream, { headers });
   } catch (err) {
     console.error("[assistant] Agent execution failed:", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("401") || msg.toLowerCase().includes("unauthorized")) {
+      return json(502, "AI provider rejected the API key (401 Unauthorized). Please check your MISTRAL_API_KEY in Vercel.");
+    }
+    if (msg.includes("402") || msg.toLowerCase().includes("quota") || msg.toLowerCase().includes("insufficient")) {
+      return json(502, "AI quota or balance exceeded. Please check your Mistral AI account credits or billing tier.");
+    }
+    if (msg.includes("429") || msg.toLowerCase().includes("rate limit")) {
+      return json(429, "AI provider is busy or rate-limited. Please wait a moment and try again.");
+    }
     return json(502, "The assistant is unavailable right now. Please use the contact form or WhatsApp.");
   }
 }
