@@ -18,10 +18,15 @@ export class MistralProvider implements AIProvider {
   }
 
   private formatMessages(messages: ChatMessage[]) {
-    return messages.map((m) => {
+    const sanitized: Array<Record<string, unknown>> = [];
+
+    for (const m of messages) {
+      const content = (m.content || "").trim();
+      if (!content && (!m.toolCalls || m.toolCalls.length === 0)) continue;
+
       const base: Record<string, unknown> = {
         role: m.role,
-        content: m.content,
+        content: content || " ",
       };
       if (m.name) base.name = m.name;
       if (m.toolCallId) base.tool_call_id = m.toolCallId;
@@ -35,8 +40,22 @@ export class MistralProvider implements AIProvider {
           },
         }));
       }
-      return base;
-    });
+
+      // Mistral strictly enforces alternating roles. Merge consecutive messages with the same role.
+      const last = sanitized[sanitized.length - 1];
+      if (last && last.role === base.role && !last.tool_calls && !base.tool_calls) {
+        last.content = `${last.content}\n\n${base.content}`;
+      } else {
+        sanitized.push(base);
+      }
+    }
+
+    // Must end with a user or tool message, not an empty or trailing assistant
+    while (sanitized.length > 0 && sanitized[sanitized.length - 1].role === "assistant") {
+      sanitized.pop();
+    }
+
+    return sanitized;
   }
 
   async chat(messages: ChatMessage[], options: ChatCompletionOptions = {}): Promise<ChatCompletionResponse> {
