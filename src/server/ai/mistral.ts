@@ -12,8 +12,11 @@ export class MistralProvider implements AIProvider {
   }
 
   private getApiKey(): string {
-    const key = serverEnv().mistralApiKey;
-    if (!key) throw new Error("MISTRAL_API_KEY is not configured");
+    const raw = serverEnv().mistralApiKey;
+    if (!raw) throw new Error("MISTRAL_API_KEY is not configured");
+    const cleaned = raw.trim().replace(/[\r\n\t]/g, " ");
+    const key = cleaned.split(/\s+/).filter(Boolean)[0];
+    if (!key) throw new Error("MISTRAL_API_KEY is empty");
     return key;
   }
 
