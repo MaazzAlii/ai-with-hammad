@@ -48,6 +48,18 @@ const serverSchema = z.object({
   IP_HASH_SALT: trimmed,
   MISTRAL_API_KEY: trimmed,
   MISTRAL_MODEL: trimmed,
+  MISTRAL_CHAT_MODEL: trimmed,
+  MISTRAL_EMBEDDING_MODEL: trimmed,
+  XAI_API_KEY: trimmed,
+  XAI_CHAT_MODEL: trimmed,
+  AI_PROVIDER: trimmed,
+  AI_FALLBACK_PROVIDER: trimmed,
+  AI_PROVIDER_PRIORITY: trimmed,
+  KNOWLEDGE_SOURCE_URL: trimmed,
+  VECTOR_DB_TYPE: trimmed,
+  RAG_TOP_K: trimmed,
+  RAG_RELEVANCE_THRESHOLD: trimmed,
+  CHAT_RATE_LIMIT: trimmed,
 });
 
 export type ServerEnv = {
@@ -60,6 +72,18 @@ export type ServerEnv = {
   /** Mistral key for the site assistant (chat + voice). Unset = assistant hidden. */
   mistralApiKey?: string;
   mistralModel: string;
+  mistralChatModel: string;
+  mistralEmbeddingModel: string;
+  xaiApiKey?: string;
+  xaiChatModel: string;
+  aiProvider: "mistral" | "xai";
+  aiFallbackProvider: "mistral" | "xai";
+  aiProviderPriority: string[];
+  knowledgeSourceUrl: string;
+  vectorDbType: "auto" | "pgvector" | "memory" | "file";
+  ragTopK: number;
+  ragRelevanceThreshold: number;
+  chatRateLimit: number;
 };
 
 let cached: ServerEnv | null = null;
@@ -78,6 +102,25 @@ export function serverEnv(): ServerEnv {
       throw new Error(`Missing required production environment variables: ${missing.join(", ")}`);
     }
   }
+
+  const aiProvider = (parsed.AI_PROVIDER === "xai" ? "xai" : "mistral") as "mistral" | "xai";
+  const aiFallbackProvider = (parsed.AI_FALLBACK_PROVIDER === "mistral" ? "mistral" : "xai") as "mistral" | "xai";
+  const priorityRaw = parsed.AI_PROVIDER_PRIORITY || "mistral,xai";
+  const aiProviderPriority = priorityRaw.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+
+  const parsedTopK = Number(parsed.RAG_TOP_K);
+  const ragTopK = Number.isFinite(parsedTopK) && parsedTopK > 0 ? parsedTopK : 4;
+
+  const parsedThreshold = Number(parsed.RAG_RELEVANCE_THRESHOLD);
+  const ragRelevanceThreshold = Number.isFinite(parsedThreshold) && parsedThreshold >= 0 ? parsedThreshold : 0.35;
+
+  const parsedRateLimit = Number(parsed.CHAT_RATE_LIMIT);
+  const chatRateLimit = Number.isFinite(parsedRateLimit) && parsedRateLimit > 0 ? parsedRateLimit : 20;
+
+  const vectorDbType = (["auto", "pgvector", "memory", "file"].includes(parsed.VECTOR_DB_TYPE ?? "")
+    ? parsed.VECTOR_DB_TYPE
+    : "auto") as "auto" | "pgvector" | "memory" | "file";
+
   cached = {
     databaseUrl: parsed.DATABASE_URL,
     supabaseSecretKey: parsed.SUPABASE_SECRET_KEY ?? parsed.SUPABASE_SERVICE_ROLE_KEY,
@@ -86,7 +129,19 @@ export function serverEnv(): ServerEnv {
     inquiryNotificationEmail: parsed.INQUIRY_NOTIFICATION_EMAIL,
     ipHashSalt: ipHashSalt || "local-development-salt",
     mistralApiKey: parsed.MISTRAL_API_KEY,
-    mistralModel: parsed.MISTRAL_MODEL ?? "mistral-small-latest",
+    mistralModel: parsed.MISTRAL_CHAT_MODEL ?? parsed.MISTRAL_MODEL ?? "mistral-large-latest",
+    mistralChatModel: parsed.MISTRAL_CHAT_MODEL ?? parsed.MISTRAL_MODEL ?? "mistral-large-latest",
+    mistralEmbeddingModel: parsed.MISTRAL_EMBEDDING_MODEL ?? "mistral-embed",
+    xaiApiKey: parsed.XAI_API_KEY,
+    xaiChatModel: parsed.XAI_CHAT_MODEL ?? "grok-2-latest",
+    aiProvider,
+    aiFallbackProvider,
+    aiProviderPriority: aiProviderPriority.length ? aiProviderPriority : ["mistral", "xai"],
+    knowledgeSourceUrl: parsed.KNOWLEDGE_SOURCE_URL ?? publicEnv.siteUrl,
+    vectorDbType,
+    ragTopK,
+    ragRelevanceThreshold,
+    chatRateLimit,
   };
   return cached;
 }
