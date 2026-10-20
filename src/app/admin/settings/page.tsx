@@ -309,10 +309,14 @@ export default async function SettingsPage(props: PageProps<"/admin/settings">) 
               title="Site assistant (chat + voice)"
               description="The “Ask us” button on every page. It answers only from your published services, work, FAQs and team, and turns interested visitors into inquiries."
             >
-              {serverEnv().mistralApiKey ? (
-                <Alert tone="success">Mistral is connected (model: {serverEnv().mistralModel}).</Alert>
+              {serverEnv().mistralApiKey || serverEnv().xaiApiKey ? (
+                <Alert tone="success">
+                  AI connected: {serverEnv().mistralApiKey ? `Mistral (${serverEnv().mistralModel})` : ""}
+                  {serverEnv().mistralApiKey && serverEnv().xaiApiKey ? " with " : ""}
+                  {serverEnv().xaiApiKey ? `xAI/Grok fallback (${serverEnv().xaiChatModel})` : ""}
+                </Alert>
               ) : (
-                <Alert tone="warning">Not connected: add MISTRAL_API_KEY in Vercel → Environment Variables and redeploy. The button stays hidden until then.</Alert>
+                <Alert tone="warning">Not connected: add MISTRAL_API_KEY (or XAI_API_KEY) in Vercel → Environment Variables and redeploy. The button stays hidden until then.</Alert>
               )}
               <SwitchField name="enabled" label="Show the assistant on the website" defaultChecked={s.assistant.enabled} />
               <TextAreaField name="greeting" label="Greeting" rows={2} defaultValue={s.assistant.greeting} hint="The first message visitors see." />
