@@ -86,6 +86,13 @@ export type ServerEnv = {
   chatRateLimit: number;
 };
 
+function sanitizeApiKey(val?: string): string | undefined {
+  if (!val) return undefined;
+  const cleaned = val.trim().replace(/[\r\n\t]/g, " ");
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  return parts[0] || undefined;
+}
+
 let cached: ServerEnv | null = null;
 
 export function serverEnv(): ServerEnv {
@@ -128,11 +135,11 @@ export function serverEnv(): ServerEnv {
     emailFrom: parsed.EMAIL_FROM,
     inquiryNotificationEmail: parsed.INQUIRY_NOTIFICATION_EMAIL,
     ipHashSalt: ipHashSalt || "local-development-salt",
-    mistralApiKey: parsed.MISTRAL_API_KEY,
+    mistralApiKey: sanitizeApiKey(parsed.MISTRAL_API_KEY),
     mistralModel: parsed.MISTRAL_CHAT_MODEL ?? parsed.MISTRAL_MODEL ?? "mistral-small-latest",
     mistralChatModel: parsed.MISTRAL_CHAT_MODEL ?? parsed.MISTRAL_MODEL ?? "mistral-small-latest",
     mistralEmbeddingModel: parsed.MISTRAL_EMBEDDING_MODEL ?? "mistral-embed",
-    xaiApiKey: parsed.XAI_API_KEY,
+    xaiApiKey: sanitizeApiKey(parsed.XAI_API_KEY),
     xaiChatModel: parsed.XAI_CHAT_MODEL ?? "grok-2-latest",
     aiProvider,
     aiFallbackProvider,
