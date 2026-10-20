@@ -154,8 +154,8 @@ export default async function SitemapPage() {
                       <span className="font-semibold text-fg group-hover:text-accent transition-colors">{project.title}</span>
                       <ArrowRight className="size-4 text-subtle transition-transform group-hover:translate-x-1 group-hover:text-accent" />
                     </div>
-                    {project.client ? (
-                      <p className="mt-1 text-[0.8125rem] font-medium text-accent">{project.client}</p>
+                    {project.category ? (
+                      <p className="mt-1 text-[0.8125rem] font-medium text-accent">{project.category}</p>
                     ) : null}
                     {project.summary ? (
                       <p className="mt-1.5 text-xs leading-relaxed text-muted line-clamp-2">{project.summary}</p>
@@ -184,8 +184,8 @@ export default async function SitemapPage() {
                       <span className="font-semibold text-fg group-hover:text-accent transition-colors line-clamp-1">{item.title}</span>
                       <ArrowRight className="size-4 shrink-0 text-subtle transition-transform group-hover:translate-x-1 group-hover:text-accent" />
                     </div>
-                    {item.summary ? (
-                      <p className="mt-1.5 text-xs leading-relaxed text-muted line-clamp-2">{item.summary}</p>
+                    {item.description ? (
+                      <p className="mt-1.5 text-xs leading-relaxed text-muted line-clamp-2">{item.description}</p>
                     ) : null}
                   </Link>
                 ))}
@@ -211,7 +211,7 @@ export default async function SitemapPage() {
                       <span className="font-semibold text-fg group-hover:text-accent transition-colors">{member.name}</span>
                       <ArrowRight className="size-4 text-subtle transition-transform group-hover:translate-x-1 group-hover:text-accent" />
                     </div>
-                    <p className="mt-1 text-xs text-muted">{member.role}</p>
+                    <p className="mt-1 text-xs text-muted">{member.roleTitle}</p>
                   </Link>
                 ))}
               </div>
