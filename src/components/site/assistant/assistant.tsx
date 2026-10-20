@@ -54,7 +54,7 @@ export function Assistant({
   const [leadOpen, setLeadOpen] = useState(false);
   const [hasLeadInvite, setHasLeadInvite] = useState(false);
   const [leadDone, setLeadDone] = useState<string | null>(null);
-  const [speakOn, setSpeakOn] = useState(false);
+  const [speakOn, setSpeakOn] = useState(true);
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const [listening, setListening] = useState(false);
   const [handsFree, setHandsFree] = useState(false);
@@ -72,7 +72,14 @@ export function Assistant({
   useEffect(() => {
     const t = setTimeout(() => {
       setVoiceIn(recognitionSupported());
-      setVoiceOut(speechSupported());
+      const hasSpeech = speechSupported();
+      setVoiceOut(hasSpeech);
+      try {
+        const isMuted = sessionStorage.getItem("assistant_muted") === "1";
+        setSpeakOn(!isMuted && hasSpeech);
+      } catch {
+        setSpeakOn(hasSpeech);
+      }
     }, 0);
     return () => clearTimeout(t);
   }, []);
@@ -340,13 +347,22 @@ export function Assistant({
                     stopSpeaking();
                     setSpeakingIdx(null);
                   }
-                  setSpeakOn((v) => !v);
+                  setSpeakOn((v) => {
+                    const next = !v;
+                    try {
+                      if (!next) sessionStorage.setItem("assistant_muted", "1");
+                      else sessionStorage.removeItem("assistant_muted");
+                    } catch {
+                      // ignore
+                    }
+                    return next;
+                  });
                 }}
                 aria-pressed={speakOn}
-                aria-label={speakOn ? "Turn off auto-voice replies" : "Turn on auto-voice replies"}
-                title={speakOn ? "Voice replies auto-read: On" : "Voice replies auto-read: Off"}
+                aria-label={speakOn ? "Mute audio replies" : "Unmute audio replies"}
+                title={speakOn ? "Voice audio: Unmuted (click to mute)" : "Voice audio: Muted (click to unmute)"}
                 className={cn(
-                  "pressable grid size-8 place-items-center rounded-full",
+                  "pressable grid size-8 place-items-center rounded-full transition-colors",
                   speakOn ? "bg-accent-soft text-accent" : "text-subtle hover:bg-fg/[0.06] hover:text-fg",
                 )}
               >
