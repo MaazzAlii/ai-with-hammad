@@ -38,6 +38,7 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
     group: "Site",
     items: [
       { href: "/admin/settings", label: "Settings", icon: "settings", permission: "settings.write" },
+      { href: "/admin/knowledge", label: "AI Knowledge", icon: "knowledge", permission: "settings.write" },
       { href: "/admin/navigation", label: "Navigation", icon: "navigation", permission: "navigation.write" },
       { href: "/admin/legal", label: "Legal pages", icon: "legal", permission: "legal.write" },
     ],

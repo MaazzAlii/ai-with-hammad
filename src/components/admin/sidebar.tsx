@@ -2,6 +2,7 @@
 
 import {
   Activity,
+  Bot,
   Briefcase,
   Building2,
   HelpCircle,
@@ -48,6 +49,7 @@ const ICONS: Record<string, LucideIcon> = {
   media: ImageIcon,
   inquiries: Inbox,
   settings: Settings,
+  knowledge: Bot,
   navigation: Waypoints,
   legal: FileText,
   users: Shield,
