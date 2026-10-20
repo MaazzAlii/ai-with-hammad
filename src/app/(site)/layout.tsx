@@ -46,7 +46,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       />
       {wa ? <WhatsAppButton href={wa} /> : null}
       <CookieBanner />
-      {settings.assistant.enabled && serverEnv().mistralApiKey ? (
+      {settings.assistant.enabled && (serverEnv().mistralApiKey || serverEnv().xaiApiKey) ? (
         <Assistant greeting={settings.assistant.greeting} siteName={general.siteName} hasWhatsapp={Boolean(wa)} />
       ) : null}
       <RevealObserver />
