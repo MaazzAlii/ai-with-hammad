@@ -43,7 +43,7 @@ export class MistralProvider implements AIProvider {
     const apiKey = this.getApiKey();
     const env = serverEnv();
     const preferredModel = options.model ?? env.mistralChatModel ?? "mistral-small-latest";
-    const candidateModels = Array.from(new Set([preferredModel, "mistral-small-latest", "open-mistral-7b"]));
+    const candidateModels = Array.from(new Set([preferredModel, "open-mistral-nemo", "mistral-small-latest", "ministral-8b-latest", "open-mistral-7b"]));
 
     let lastError: unknown = null;
 
@@ -137,7 +137,7 @@ export class MistralProvider implements AIProvider {
     const apiKey = this.getApiKey();
     const env = serverEnv();
     const preferredModel = options.model ?? env.mistralChatModel ?? "mistral-small-latest";
-    const candidateModels = Array.from(new Set([preferredModel, "mistral-small-latest", "open-mistral-7b"]));
+    const candidateModels = Array.from(new Set([preferredModel, "open-mistral-nemo", "mistral-small-latest", "ministral-8b-latest", "open-mistral-7b"]));
 
     let lastError: unknown = null;
 
