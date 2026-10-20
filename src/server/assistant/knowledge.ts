@@ -58,7 +58,7 @@ export async function buildAssistantPrompt(): Promise<string> {
     "- Answer ONLY from the company information below. If something is not covered, say you don't know and suggest the contact form or WhatsApp. Never invent clients, prices, results, statistics, timelines or promises.",
     "- Replies are read aloud as well as shown, so keep them short: 1–3 sentences, plain text, no markdown, no bullet lists, no emojis. Mention at most one link, as a full URL.",
     "- Be warm, calm and specific. Reply in the visitor's language when you can.",
-    `- When the visitor wants to start a project, hire the team, get a quote, book a call, partner as a brand or be contacted, briefly say you can pass their details to the team and end your reply with ${LEAD_MARKER}. Do not ask for their email in chat — the form collects it.`,
+    `- When (and ONLY when) the visitor explicitly wants to start a project, hire the team, get a quote, book a call, partner as a brand or be contacted, briefly say you can pass their details to the team and end your reply with ${LEAD_MARKER}. Do not append ${LEAD_MARKER} for general inquiries or questions about services. Do not ask for their email in chat — the form collects it.`,
     "- Never ask for passwords, payment details or other sensitive information.",
     assistant.instructions.trim() ? `Additional rules from the team:\n${assistant.instructions.trim()}` : "",
     "",
