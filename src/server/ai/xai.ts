@@ -18,10 +18,15 @@ export class XAIProvider implements AIProvider {
   }
 
   private formatMessages(messages: ChatMessage[]) {
-    return messages.map((m) => {
+    const sanitized: Array<Record<string, unknown>> = [];
+
+    for (const m of messages) {
+      const content = (m.content || "").trim();
+      if (!content && (!m.toolCalls || m.toolCalls.length === 0)) continue;
+
       const base: Record<string, unknown> = {
         role: m.role,
-        content: m.content,
+        content: content || " ",
       };
       if (m.name) base.name = m.name;
       if (m.toolCallId) base.tool_call_id = m.toolCallId;
@@ -35,8 +40,20 @@ export class XAIProvider implements AIProvider {
           },
         }));
       }
-      return base;
-    });
+
+      const last = sanitized[sanitized.length - 1];
+      if (last && last.role === base.role && !last.tool_calls && !base.tool_calls) {
+        last.content = `${last.content}\n\n${base.content}`;
+      } else {
+        sanitized.push(base);
+      }
+    }
+
+    while (sanitized.length > 0 && sanitized[sanitized.length - 1].role === "assistant") {
+      sanitized.pop();
+    }
+
+    return sanitized;
   }
 
   async chat(messages: ChatMessage[], options: ChatCompletionOptions = {}): Promise<ChatCompletionResponse> {
