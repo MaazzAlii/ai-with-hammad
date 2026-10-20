@@ -12,8 +12,11 @@ export class XAIProvider implements AIProvider {
   }
 
   private getApiKey(): string {
-    const key = serverEnv().xaiApiKey;
-    if (!key) throw new Error("XAI_API_KEY is not configured");
+    const raw = serverEnv().xaiApiKey;
+    if (!raw) throw new Error("XAI_API_KEY is not configured");
+    const cleaned = raw.trim().replace(/[\r\n\t]/g, " ");
+    const key = cleaned.split(/\s+/).filter(Boolean)[0];
+    if (!key) throw new Error("XAI_API_KEY is empty");
     return key;
   }
 
