@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp, Bot, ExternalLink, Mic, RotateCcw, Square, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowUp, Bot, ExternalLink, Mic, Pause, RotateCcw, Square, Volume2, VolumeX, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { renderMarkdown } from "@/lib/markdown";
@@ -55,6 +55,7 @@ export function Assistant({
   const [hasLeadInvite, setHasLeadInvite] = useState(false);
   const [leadDone, setLeadDone] = useState<string | null>(null);
   const [speakOn, setSpeakOn] = useState(false);
+  const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const [listening, setListening] = useState(false);
   const [handsFree, setHandsFree] = useState(false);
   const [voiceIn, setVoiceIn] = useState(false);
@@ -98,12 +99,28 @@ export function Assistant({
     setListening(false);
   }, []);
 
+  const playMessage = (index: number, text: string) => {
+    if (speakingIdx === index) {
+      stopSpeaking();
+      setSpeakingIdx(null);
+      return;
+    }
+    stopSpeaking();
+    setSpeakingIdx(index);
+    speak(
+      cleanAssistantText(text),
+      () => setSpeakingIdx((cur) => (cur === index ? null : cur)),
+      () => setSpeakingIdx(index),
+    );
+  };
+
   const close = () => {
     setOpen(false);
     handsFreeRef.current = false;
     setHandsFree(false);
     stopListening();
     stopSpeaking();
+    setSpeakingIdx(null);
     abortCurrentRequest();
   };
 
@@ -116,6 +133,8 @@ export function Assistant({
 
   const clearChat = () => {
     abortCurrentRequest();
+    stopSpeaking();
+    setSpeakingIdx(null);
     setMessages([]);
     setError(null);
     setLeadOpen(false);
@@ -125,6 +144,7 @@ export function Assistant({
 
   const startListening = useCallback(() => {
     stopSpeaking();
+    setSpeakingIdx(null);
     const r = createRecognition({
       onInterim: (t) => setInput(t),
       onFinal: (t) => {
@@ -137,8 +157,7 @@ export function Assistant({
         } else if (e !== "no-speech" && e !== "aborted") {
           setError("I couldn't hear that — please try again or type.");
         }
-        handsFreeRef.current = false;
-        setHandsFree(false);
+        setListening(false);
       },
       onEnd: () => setListening(false),
     });
@@ -153,6 +172,8 @@ export function Assistant({
   async function send(text: string) {
     const content = text.trim().slice(0, 1500);
     if (!content || busy) return;
+    stopSpeaking();
+    setSpeakingIdx(null);
     setError(null);
     setInput("");
     setLeadOpen(false);
@@ -212,15 +233,16 @@ export function Assistant({
       if (reply.includes(LEAD_MARKER)) {
         setHasLeadInvite(true);
       }
-      if (speakOn) speak(cleanAssistantText(reply), () => handsFreeRef.current && startListening());
-      else if (handsFreeRef.current) startListening();
+      if (speakOn) {
+        const assistantIdx = history.length;
+        playMessage(assistantIdx, reply);
+      }
     } catch (e) {
       if ((e as Error).name !== "AbortError") {
         setMessages((m) => (m.at(-1)?.role === "assistant" && !m.at(-1)?.content ? m.slice(0, -1) : m));
         setError(e instanceof Error ? e.message : "Something went wrong.");
       }
-      handsFreeRef.current = false;
-      setHandsFree(false);
+      stopListening();
     } finally {
       setBusy(false);
       abortCtrlRef.current = null;
@@ -228,16 +250,12 @@ export function Assistant({
   }
 
   const toggleMic = () => {
-    if (listening || handsFree) {
-      handsFreeRef.current = false;
-      setHandsFree(false);
+    if (listening) {
       stopListening();
-      stopSpeaking();
       return;
     }
-    handsFreeRef.current = true;
-    setHandsFree(true);
-    if (voiceOut) setSpeakOn(true);
+    stopSpeaking();
+    setSpeakingIdx(null);
     startListening();
   };
 
@@ -299,16 +317,34 @@ export function Assistant({
               </button>
             ) : null}
 
+            {voiceOut && speakingIdx !== null ? (
+              <button
+                type="button"
+                onClick={() => {
+                  stopSpeaking();
+                  setSpeakingIdx(null);
+                }}
+                className="pressable flex items-center gap-1 rounded-full bg-accent px-2 py-1 text-[0.6875rem] font-medium text-accent-fg shadow-xs hover:opacity-90"
+                title="Stop audio playback"
+              >
+                <Square aria-hidden className="size-2.5 fill-current" />
+                <span>Stop</span>
+              </button>
+            ) : null}
+
             {voiceOut ? (
               <button
                 type="button"
                 onClick={() => {
-                  if (speakOn) stopSpeaking();
+                  if (speakOn || speakingIdx !== null) {
+                    stopSpeaking();
+                    setSpeakingIdx(null);
+                  }
                   setSpeakOn((v) => !v);
                 }}
                 aria-pressed={speakOn}
-                aria-label={speakOn ? "Stop reading replies aloud" : "Read replies aloud"}
-                title={speakOn ? "Voice replies on" : "Voice replies off"}
+                aria-label={speakOn ? "Turn off auto-voice replies" : "Turn on auto-voice replies"}
+                title={speakOn ? "Voice replies auto-read: On" : "Voice replies auto-read: Off"}
                 className={cn(
                   "pressable grid size-8 place-items-center rounded-full",
                   speakOn ? "bg-accent-soft text-accent" : "text-subtle hover:bg-fg/[0.06] hover:text-fg",
@@ -330,8 +366,37 @@ export function Assistant({
 
           {/* Conversation messages */}
           <div ref={listRef} className="flex-1 space-y-3.5 overflow-y-auto overscroll-contain px-4 py-4" aria-live="polite">
-            <div className="glass-card max-w-[88%] rounded-[1.25rem] rounded-bl-md p-3.5 text-sm leading-relaxed text-fg border border-(--glass-line)">
-              {greeting}
+            <div className="glass-card max-w-[88%] rounded-[1.25rem] rounded-bl-md p-3.5 text-sm leading-relaxed text-fg border border-(--glass-line) space-y-2">
+              <p>{greeting}</p>
+              {voiceOut ? (
+                <button
+                  type="button"
+                  onClick={() => playMessage(-1, greeting)}
+                  aria-label={speakingIdx === -1 ? "Stop reading greeting" : "Listen to greeting"}
+                  className={cn(
+                    "pressable inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.6875rem] font-medium transition-colors",
+                    speakingIdx === -1
+                      ? "bg-accent text-accent-fg shadow-xs"
+                      : "bg-surface/75 text-subtle hover:text-fg border border-(--glass-line)",
+                  )}
+                >
+                  {speakingIdx === -1 ? (
+                    <>
+                      <span className="flex items-center gap-0.5">
+                        <span className="size-1 rounded-full bg-accent-fg animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="size-1 rounded-full bg-accent-fg animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="size-1 rounded-full bg-accent-fg animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </span>
+                      <span>Speaking…</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="size-3 shrink-0" />
+                      <span>Listen</span>
+                    </>
+                  )}
+                </button>
+              ) : null}
             </div>
 
             {!messages.length ? (
@@ -404,6 +469,39 @@ export function Assistant({
                       </div>
                     </div>
                   ) : null}
+
+                  {/* Audio Playback Status & Listen Button */}
+                  {voiceOut && m.content ? (
+                    <div className="pt-2 border-t border-(--glass-line)/50 flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => playMessage(i, m.content)}
+                        aria-label={speakingIdx === i ? "Stop reading reply" : "Listen to reply"}
+                        className={cn(
+                          "pressable inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.6875rem] font-medium transition-colors",
+                          speakingIdx === i
+                            ? "bg-accent text-accent-fg shadow-xs"
+                            : "bg-surface/75 text-subtle hover:text-fg hover:bg-surface border border-(--glass-line)",
+                        )}
+                      >
+                        {speakingIdx === i ? (
+                          <>
+                            <span className="flex items-center gap-0.5">
+                              <span className="size-1 rounded-full bg-accent-fg animate-bounce" style={{ animationDelay: "0ms" }} />
+                              <span className="size-1 rounded-full bg-accent-fg animate-bounce" style={{ animationDelay: "150ms" }} />
+                              <span className="size-1 rounded-full bg-accent-fg animate-bounce" style={{ animationDelay: "300ms" }} />
+                            </span>
+                            <span>Speaking… (tap to stop)</span>
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="size-3 shrink-0" />
+                            <span>Listen</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               ),
             )}
@@ -448,6 +546,46 @@ export function Assistant({
 
             {error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-xs text-fg">{error}</p> : null}
           </div>
+
+          {/* Active Listening Status Bar with Pause & Send */}
+          {listening ? (
+            <div className="flex items-center justify-between gap-2 border-t border-danger/30 bg-danger/10 px-4 py-2.5 text-xs backdrop-blur-sm animate-in fade-in slide-in-from-bottom-1 duration-200">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="relative flex size-2.5 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-danger opacity-75" />
+                  <span className="relative inline-flex size-2.5 rounded-full bg-danger" />
+                </span>
+                <span className="font-semibold text-danger">Listening:</span>
+                <span className="truncate text-fg font-medium">
+                  {input.trim() ? `"${input}"` : "Speak now…"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={stopListening}
+                  className="pressable inline-flex items-center gap-1 rounded-full border border-(--glass-line) bg-surface px-2.5 py-1 text-xs font-medium text-fg shadow-xs hover:bg-fg/[0.06]"
+                  title="Pause listening"
+                >
+                  <Pause className="size-3" />
+                  <span>Pause</span>
+                </button>
+                {input.trim() ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const text = input.trim();
+                      stopListening();
+                      if (text) void send(text);
+                    }}
+                    className="pressable inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-fg shadow-xs hover:opacity-90"
+                  >
+                    <span>Send</span>
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
 
           {/* Input & Controls */}
           <form
