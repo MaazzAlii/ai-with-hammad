@@ -184,9 +184,13 @@ export async function executeTool(
       const topic = String(args.topic ?? "").toLowerCase();
       const routes: Record<string, { title: string; url: string; description: string }> = {
         home: { title: "Home", url: `${site}/`, description: "Agency homepage, featured work, and overview" },
+        about: { title: "About", url: `${site}/about`, description: "About the studio, mission, and background" },
         services: { title: "Services", url: `${site}/services`, description: "All AI engineering and automation services" },
         projects: { title: "Projects & Case Studies", url: `${site}/projects`, description: "Client case studies and demonstrations" },
+        case: { title: "Projects & Case Studies", url: `${site}/projects`, description: "Client case studies and demonstrations" },
+        study: { title: "Projects & Case Studies", url: `${site}/projects`, description: "Client case studies and demonstrations" },
         content: { title: "Tutorials & Creator Content", url: `${site}/content`, description: "AI tutorials, videos, and guides" },
+        tutorial: { title: "Tutorials & Creator Content", url: `${site}/content`, description: "AI tutorials, videos, and guides" },
         team: { title: "Team", url: `${site}/team`, description: "Meet the founders and engineering leadership" },
         sponsorship: { title: "Sponsorship & Media Kit", url: `${site}/sponsorship`, description: "Brand partnerships and creator sponsorships" },
         contact: { title: "Contact Form", url: `${site}/contact`, description: "Inquiry and project booking form" },
