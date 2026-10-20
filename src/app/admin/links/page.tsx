@@ -51,9 +51,29 @@ function LinkFields({ link, people }: { link?: Row; people: { value: string; lab
         <TextField name="endsAt" type="datetime-local" label="Hide after (UTC, optional)" defaultValue={dt(link?.endsAt ?? null)} />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        <SwitchField name="isFeatured" label="Featured (large, at the top)" defaultChecked={link?.isFeatured ?? false} />
+        <SwitchField name="isFeatured" label="Featured / Sponsor highlight (large card at the very top of /links)" defaultChecked={link?.isFeatured ?? false} />
         <SwitchField name="isPublished" label="Published" defaultChecked={link?.isPublished ?? true} />
       </div>
+      {!link ? (
+        <div className="rounded-xl border border-(--glass-line) bg-fg/[0.02] p-4">
+          <label className="block text-sm font-medium text-fg">
+            Initial Placement
+          </label>
+          <p className="mt-0.5 text-xs text-subtle">
+            Choose where to place this new link. You can also reorder or jump to top anytime using the row buttons.
+          </p>
+          <div className="mt-2.5 flex flex-wrap gap-5">
+            <label className="flex items-center gap-2 text-sm text-fg cursor-pointer font-medium">
+              <input type="radio" name="placement" value="top" defaultChecked className="accent-accent size-4" />
+              <span>Top of the list (Priority #1)</span>
+            </label>
+            <label className="flex items-center gap-2 text-sm text-fg cursor-pointer font-medium">
+              <input type="radio" name="placement" value="bottom" className="accent-accent size-4" />
+              <span>Bottom of the list (Last)</span>
+            </label>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
@@ -84,7 +104,7 @@ export default async function LinksAdminPage() {
     <>
       <AdminPageHeader
         title="Link in bio"
-        description={`Your public link page for TikTok, Instagram and YouTube bios. ${totalClicks.toLocaleString()} tracked clicks so far. Drag to reorder.`}
+        description={`Your public link page for TikTok, Instagram and YouTube bios. ${totalClicks.toLocaleString()} tracked clicks so far. Use the Up/Down buttons, “Top” button, or drag-and-drop to adjust priority and rotation.`}
         actions={
           <Link href="/links" target="_blank" className={buttonVariants({ variant: "secondary", size: "sm" })}>
             Open /links <ExternalLink aria-hidden />
@@ -119,7 +139,7 @@ export default async function LinksAdminPage() {
                     label="link"
                     flags={[
                       { flag: "isPublished", value: l.isPublished, label: "Published", offLabel: "Hidden" },
-                      { flag: "isFeatured", value: l.isFeatured, label: "Featured", offLabel: "Not featured" },
+                      { flag: "isFeatured", value: l.isFeatured, label: "Featured / Sponsor", offLabel: "Standard" },
                     ]}
                   />
                 </summary>

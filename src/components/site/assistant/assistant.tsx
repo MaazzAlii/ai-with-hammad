@@ -191,7 +191,7 @@ export function Assistant({
     try {
       r.start();
       setListening(true);
-    } catch (err) {
+    } catch {
       // Mobile browsers (Android Chrome / iOS Safari) might require a brief delay to release audio
       setTimeout(() => {
         if (recognition.current !== r) return;
