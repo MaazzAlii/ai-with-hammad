@@ -10,6 +10,17 @@ import { AssistantLeadForm, type ChatMessage } from "./lead-form";
 import { createRecognition, recognitionSupported, speak, speechSupported, stopSpeaking, type Recognition } from "./voice";
 
 const LEAD_MARKER = "[[LEAD_FORM]]";
+
+function cleanAssistantText(text: string): string {
+  return text
+    .replace(/\[\[LEAD_FORM\]\]/g, "")
+    .replace(/\$\{siteUrl\}/g, "")
+    .replace(/\$\{site\}/g, "")
+    .replace(/\(\/case-studies\b/g, "(/projects")
+    .replace(/\(\/tutorials\b/g, "(/content")
+    .trim();
+}
+
 const SUGGESTIONS = [
   "What services do you offer?",
   "What AI case studies have you built?",
@@ -41,6 +52,7 @@ export function Assistant({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [leadOpen, setLeadOpen] = useState(false);
+  const [hasLeadInvite, setHasLeadInvite] = useState(false);
   const [leadDone, setLeadDone] = useState<string | null>(null);
   const [speakOn, setSpeakOn] = useState(false);
   const [listening, setListening] = useState(false);
@@ -107,6 +119,7 @@ export function Assistant({
     setMessages([]);
     setError(null);
     setLeadOpen(false);
+    setHasLeadInvite(false);
     setLeadDone(null);
   };
 
@@ -143,6 +156,7 @@ export function Assistant({
     setError(null);
     setInput("");
     setLeadOpen(false);
+    setHasLeadInvite(false);
 
     const history: ExtendedChatMessage[] = [...messagesRef.current, { role: "user", content }];
     setMessages([...history, { role: "assistant", content: "" }]);
@@ -159,7 +173,7 @@ export function Assistant({
         body: JSON.stringify({
           messages: history.map((m) => ({
             role: m.role,
-            content: m.content.replace(LEAD_MARKER, "").trim() || "…",
+            content: cleanAssistantText(m.content) || "…",
           })).slice(-12),
         }),
         signal: abortCtrl.signal,
@@ -195,8 +209,10 @@ export function Assistant({
       }
 
       if (!reply.trim()) throw new Error("No reply — please try again.");
-      if (reply.includes(LEAD_MARKER)) setLeadOpen(true);
-      if (speakOn) speak(reply, () => handsFreeRef.current && startListening());
+      if (reply.includes(LEAD_MARKER)) {
+        setHasLeadInvite(true);
+      }
+      if (speakOn) speak(cleanAssistantText(reply), () => handsFreeRef.current && startListening());
       else if (handsFreeRef.current) startListening();
     } catch (e) {
       if ((e as Error).name !== "AbortError") {
@@ -353,7 +369,7 @@ export function Assistant({
                     <div
                       className="prose-site text-sm text-fg space-y-1.5 [&>p]:leading-relaxed [&>ul]:list-disc [&>ul]:pl-4 [&>pre]:rounded-md [&>pre]:bg-bg [&>pre]:p-2.5 [&>pre]:text-xs [&>code]:rounded-sm [&>code]:bg-fg/[0.06] [&>code]:px-1 [&>code]:py-0.5 [&>code]:text-xs"
                       dangerouslySetInnerHTML={{
-                        __html: renderMarkdown(m.content.replace(LEAD_MARKER, "").trim()),
+                        __html: renderMarkdown(cleanAssistantText(m.content)),
                       }}
                     />
                   ) : (
@@ -400,9 +416,24 @@ export function Assistant({
                 onDone={(msg) => {
                   setLeadDone(msg);
                   setLeadOpen(false);
+                  setHasLeadInvite(false);
                 }}
                 onCancel={() => setLeadOpen(false)}
               />
+            ) : hasLeadInvite ? (
+              <div className="glass-card flex items-center justify-between gap-3 rounded-[1.25rem] border border-accent/40 bg-accent-soft/30 p-3.5 shadow-xs">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-fg">Ready to discuss your project?</p>
+                  <p className="text-[0.6875rem] text-subtle">Connect directly with our team.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setLeadOpen(true)}
+                  className="pressable shrink-0 rounded-full bg-accent px-3 py-1.5 text-xs font-medium text-accent-fg shadow-xs transition-opacity hover:opacity-90"
+                >
+                  Share details
+                </button>
+              </div>
             ) : !busy && !leadDone && messages.length >= 2 ? (
               <div className="flex justify-end pt-1">
                 <button
