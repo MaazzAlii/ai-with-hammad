@@ -15,13 +15,14 @@ export function CookieBanner() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) {
-      // Small delay for natural entrance after page load
-      const timer = setTimeout(() => setIsOpen(true), 750);
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => {
+      setMounted(true);
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        setIsOpen(true);
+      }
+    }, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
