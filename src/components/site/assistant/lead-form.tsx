@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 
 import { Captcha } from "@/components/forms/captcha";
@@ -15,7 +16,15 @@ export type ChatMessage = { role: "user" | "assistant"; content: string };
  * contact form (captcha, honeypot, min fill time, rate limit, stored first, email notification)
  * and saves the recent chat with the visitor's consent.
  */
-export function AssistantLeadForm({ messages, onDone }: { messages: ChatMessage[]; onDone: (message: string) => void }) {
+export function AssistantLeadForm({
+  messages,
+  onDone,
+  onCancel,
+}: {
+  messages: ChatMessage[];
+  onDone: (message: string) => void;
+  onCancel?: () => void;
+}) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0);
@@ -68,7 +77,19 @@ export function AssistantLeadForm({ messages, onDone }: { messages: ChatMessage[
 
   return (
     <form action={submit} className="glass-panel space-y-3 rounded-[1.25rem] p-4" noValidate>
-      <p className="text-sm font-semibold tracking-tight">Share your details with the team</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold tracking-tight">Share your details with the team</p>
+        {onCancel ? (
+          <button
+            type="button"
+            onClick={onCancel}
+            aria-label="Close form"
+            className="rounded-full p-1 text-muted hover:text-fg hover:bg-fg/5 transition-colors"
+          >
+            <X className="size-4" />
+          </button>
+        ) : null}
+      </div>
       {error ? <Alert tone="danger">{error}</Alert> : null}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
@@ -105,9 +126,16 @@ export function AssistantLeadForm({ messages, onDone }: { messages: ChatMessage[
           .
         </span>
       </label>
-      <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Sending…" : "Send to the team"}
-      </Button>
+      <div className="flex items-center gap-2">
+        {onCancel ? (
+          <Button type="button" variant="ghost" onClick={onCancel} className="flex-1">
+            Not now
+          </Button>
+        ) : null}
+        <Button type="submit" className="flex-1" disabled={pending}>
+          {pending ? "Sending…" : "Send to the team"}
+        </Button>
+      </div>
     </form>
   );
 }
