@@ -55,6 +55,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.56",
+    "@rolldown/binding-linux-x64-gnu": "^1.2.11",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.20.4",
