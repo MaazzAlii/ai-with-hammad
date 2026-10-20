@@ -142,6 +142,7 @@ export function Assistant({
     if (!content || busy) return;
     setError(null);
     setInput("");
+    setLeadOpen(false);
 
     const history: ExtendedChatMessage[] = [...messagesRef.current, { role: "user", content }];
     setMessages([...history, { role: "assistant", content: "" }]);
@@ -400,15 +401,18 @@ export function Assistant({
                   setLeadDone(msg);
                   setLeadOpen(false);
                 }}
+                onCancel={() => setLeadOpen(false)}
               />
-            ) : messages.length >= 2 ? (
-              <button
-                type="button"
-                onClick={() => setLeadOpen(true)}
-                className="text-xs font-medium text-accent hover:underline"
-              >
-                Want the team to follow up? Share your details
-              </button>
+            ) : !busy && !leadDone && messages.length >= 2 ? (
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={() => setLeadOpen(true)}
+                  className="text-xs font-medium text-accent hover:underline opacity-80 hover:opacity-100 transition-opacity"
+                >
+                  Want the team to follow up? Share your details
+                </button>
+              </div>
             ) : null}
 
             {error ? <p className="rounded-xl bg-danger-soft px-3 py-2 text-xs text-fg">{error}</p> : null}
