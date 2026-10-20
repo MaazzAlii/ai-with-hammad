@@ -58,8 +58,17 @@ export function speechSupported(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
+let currentUtterance: SpeechSynthesisUtterance | null = null;
+
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    // Prime voices cache for Chromium browsers
+  };
+}
+
 /** Prefer natural/neural voices in the visitor's language. */
 function pickVoice(): SpeechSynthesisVoice | undefined {
+  if (!speechSupported()) return undefined;
   const voices = window.speechSynthesis.getVoices();
   const lang = (navigator.language || "en-US").slice(0, 2).toLowerCase();
   const inLang = voices.filter((v) => v.lang.toLowerCase().startsWith(lang));
@@ -76,17 +85,37 @@ function pickVoice(): SpeechSynthesisVoice | undefined {
 export function speakable(text: string): string {
   return text
     .replace(/\[\[LEAD_FORM\]\]/g, "")
+    .replace(/\$\{siteUrl\}/g, "")
+    .replace(/\$\{site\}/g, "")
     .replace(/https?:\/\/\S+/g, "the link in the chat")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/[*_#`>]/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
 
-export function speak(text: string, onEnd: () => void): void {
-  if (!speechSupported()) return onEnd();
+export function isSpeaking(): boolean {
+  return speechSupported() && (window.speechSynthesis.speaking || Boolean(currentUtterance));
+}
+
+export function speak(
+  text: string,
+  onEnd?: () => void,
+  onStart?: () => void,
+): void {
+  if (!speechSupported()) {
+    onEnd?.();
+    return;
+  }
   const synth = window.speechSynthesis;
   synth.cancel();
-  const u = new SpeechSynthesisUtterance(speakable(text));
+  const clean = speakable(text);
+  if (!clean) {
+    onEnd?.();
+    return;
+  }
+  const u = new SpeechSynthesisUtterance(clean);
+  currentUtterance = u;
   const voice = pickVoice();
   if (voice) {
     u.voice = voice;
@@ -94,11 +123,21 @@ export function speak(text: string, onEnd: () => void): void {
   }
   u.rate = 1;
   u.pitch = 1;
-  u.onend = onEnd;
-  u.onerror = onEnd;
+  u.onstart = () => {
+    onStart?.();
+  };
+  const finish = () => {
+    currentUtterance = null;
+    onEnd?.();
+  };
+  u.onend = finish;
+  u.onerror = finish;
+  if (synth.paused) synth.resume();
   synth.speak(u);
 }
 
 export function stopSpeaking(): void {
+  currentUtterance = null;
   if (speechSupported()) window.speechSynthesis.cancel();
 }
+
