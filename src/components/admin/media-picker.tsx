@@ -1,14 +1,15 @@
 "use client";
 
-import { ImagePlus, Search, X } from "lucide-react";
+import { ImagePlus, Search, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input, Label, NativeSelect } from "@/components/ui/input";
 import type { BucketId } from "@/lib/media/buckets";
 import { cn } from "@/lib/utils";
-import { searchMedia } from "@/server/actions/media";
+import { deleteMedia, searchMedia } from "@/server/actions/media";
 import type { AdminMedia } from "@/server/dal/admin/media";
 
 import { useFieldError } from "./admin-form";
@@ -34,6 +35,8 @@ export function MediaPickerDialog({
   const [filter, setFilter] = useState<string>(kind ?? "");
   const [items, setItems] = useState<AdminMedia[]>([]);
   const [pending, start] = useTransition();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   const load = useCallback(
     () =>
       start(async () => {
@@ -46,12 +49,32 @@ export function MediaPickerDialog({
     if (open) load();
   }, [open, load]);
 
+  const handleDelete = async (m: AdminMedia) => {
+    if (!window.confirm(`Permanently delete "${m.filename}" from storage and library?`)) {
+      return;
+    }
+    setDeletingId(m.id);
+    try {
+      const res = await deleteMedia(m.id);
+      if (res.ok) {
+        toast.success(`Deleted ${m.filename}`);
+        setItems((prev) => prev.filter((item) => item.id !== m.id));
+      } else {
+        toast.error(res.error || "Failed to delete file");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete file");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent wide>
         <DialogHeader>
           <DialogTitle>Select media</DialogTitle>
-          <DialogDescription>Choose an existing file or upload a new one.</DialogDescription>
+          <DialogDescription>Choose an existing file, upload a new one, or delete unused files from library.</DialogDescription>
         </DialogHeader>
         <DialogBody className="space-y-5">
           <MediaUploader compact defaultBucket={uploadBucket} onUploaded={(m) => { onSelect(m); onOpenChange(false); }} />
@@ -73,10 +96,28 @@ export function MediaPickerDialog({
           </div>
           <ul className={cn("grid grid-cols-3 gap-3 sm:grid-cols-5 lg:grid-cols-6", pending && "opacity-60")}>
             {items.map((m) => (
-              <li key={m.id}>
-                <button type="button" onClick={() => { onSelect(m); onOpenChange(false); }} className="group w-full text-left" aria-label={`Select ${m.filename}`}>
+              <li key={m.id} className="group relative">
+                <button
+                  type="button"
+                  onClick={() => { onSelect(m); onOpenChange(false); }}
+                  className="w-full text-left rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  aria-label={`Select ${m.filename}`}
+                >
                   <MediaThumb media={m} className="transition-[border-color] group-hover:border-accent" />
-                  <span className="mt-1 block truncate text-xs text-muted">{m.filename}</span>
+                  <span className="mt-1 block truncate text-xs text-muted group-hover:text-fg">{m.filename}</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={deletingId === m.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void handleDelete(m);
+                  }}
+                  title="Delete from library"
+                  aria-label={`Delete ${m.filename} from library`}
+                  className="absolute top-1 right-1 grid size-7 place-items-center rounded-md bg-bg/90 text-subtle shadow-xs opacity-0 transition-all hover:bg-danger hover:text-white group-hover:opacity-100 focus:opacity-100 disabled:opacity-40"
+                >
+                  <Trash2 className="size-3.5" />
                 </button>
               </li>
             ))}
@@ -88,7 +129,7 @@ export function MediaPickerDialog({
   );
 }
 
-/** Form field storing a media id in a hidden input, with preview + pick/clear. */
+/** Form field storing a media id in a hidden input, with preview + pick/clear/delete. */
 export function MediaField({
   name,
   label,
@@ -106,7 +147,30 @@ export function MediaField({
 }) {
   const [media, setMedia] = useState<AdminMedia | null>(defaultMedia ?? null);
   const [open, setOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const error = useFieldError(name);
+
+  const handleDeleteFromLibrary = async () => {
+    if (!media) return;
+    if (!window.confirm(`Permanently delete "${media.filename}" from the media library and storage?`)) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      const res = await deleteMedia(media.id);
+      if (res.ok) {
+        toast.success(`Deleted ${media.filename} from library`);
+        setMedia(null);
+      } else {
+        toast.error(res.error || "Failed to delete file");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete file");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-sm font-medium">{label}</span>
@@ -118,9 +182,22 @@ export function MediaField({
             <ImagePlus /> {media ? "Change" : "Choose"}
           </Button>
           {media ? (
-            <Button type="button" size="sm" variant="ghost" onClick={() => setMedia(null)}>
-              <X /> Remove
-            </Button>
+            <>
+              <Button type="button" size="sm" variant="ghost" onClick={() => setMedia(null)} title="Unselect without deleting">
+                <X /> Remove
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={deleting}
+                onClick={handleDeleteFromLibrary}
+                className="text-danger hover:bg-danger-soft hover:text-danger"
+                title="Permanently delete this file from storage and database"
+              >
+                <Trash2 /> Delete
+              </Button>
+            </>
           ) : null}
         </div>
       </div>
