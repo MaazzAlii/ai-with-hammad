@@ -64,8 +64,8 @@ export class MistralProvider implements AIProvider {
   async chat(messages: ChatMessage[], options: ChatCompletionOptions = {}): Promise<ChatCompletionResponse> {
     const apiKey = this.getApiKey();
     const env = serverEnv();
-    const preferredModel = options.model ?? env.mistralChatModel ?? "mistral-small-latest";
-    const candidateModels = Array.from(new Set([preferredModel, "open-mistral-nemo", "mistral-small-latest", "ministral-8b-latest", "open-mistral-7b"]));
+    const preferredModel = options.model ?? env.mistralChatModel ?? "mistral-large-latest";
+    const candidateModels = Array.from(new Set([preferredModel, "mistral-large-latest", "open-mistral-nemo", "mistral-small-latest", "ministral-8b-latest"]));
 
     let lastError: unknown = null;
 
@@ -83,24 +83,35 @@ export class MistralProvider implements AIProvider {
         if (options.toolChoice) payload.tool_choice = options.toolChoice;
       }
 
-      const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify(payload),
-        signal: options.abortSignal ?? AbortSignal.timeout(45_000),
-      });
+      let res: Response | null = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify(payload),
+          signal: options.abortSignal ?? AbortSignal.timeout(45_000),
+        });
 
-      if (!res.ok) {
-        const errorText = await res.text().catch(() => "");
-        const err = new Error(`Mistral API error (${res.status}): ${errorText.slice(0, 300)}`);
-        (err as unknown as { status: number }).status = res.status;
+        if (res.status === 429 && attempt === 0) {
+          console.warn(`[mistral] Hit rate limit 429 on ${model}, waiting 1.5s before retry...`);
+          await new Promise((r) => setTimeout(r, 1500));
+          continue;
+        }
+        break;
+      }
+
+      if (!res || !res.ok) {
+        const status = res ? res.status : 500;
+        const errorText = res ? await res.text().catch(() => "") : "Network error";
+        const err = new Error(`Mistral API error (${status}): ${errorText.slice(0, 300)}`);
+        (err as unknown as { status: number }).status = status;
         lastError = err;
 
-        if ((res.status === 400 || res.status === 403 || res.status === 404 || res.status === 422) && i < candidateModels.length - 1) {
-          console.warn(`[mistral] Model ${model} returned HTTP ${res.status}, retrying with ${candidateModels[i + 1]}...`);
+        if ((status === 400 || status === 403 || status === 404 || status === 422 || status === 429) && i < candidateModels.length - 1) {
+          console.warn(`[mistral] Model ${model} returned HTTP ${status}, retrying with ${candidateModels[i + 1]}...`);
           continue;
         }
 
@@ -158,8 +169,8 @@ export class MistralProvider implements AIProvider {
   async chatStream(messages: ChatMessage[], options: ChatCompletionOptions = {}): Promise<ReadableStream<string>> {
     const apiKey = this.getApiKey();
     const env = serverEnv();
-    const preferredModel = options.model ?? env.mistralChatModel ?? "mistral-small-latest";
-    const candidateModels = Array.from(new Set([preferredModel, "open-mistral-nemo", "mistral-small-latest", "ministral-8b-latest", "open-mistral-7b"]));
+    const preferredModel = options.model ?? env.mistralChatModel ?? "mistral-large-latest";
+    const candidateModels = Array.from(new Set([preferredModel, "mistral-large-latest", "open-mistral-nemo", "mistral-small-latest", "ministral-8b-latest"]));
 
     let lastError: unknown = null;
 
@@ -173,24 +184,35 @@ export class MistralProvider implements AIProvider {
         stream: true,
       };
 
-      const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify(payload),
-        signal: options.abortSignal ?? AbortSignal.timeout(60_000),
-      });
+      let res: Response | null = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify(payload),
+          signal: options.abortSignal ?? AbortSignal.timeout(60_000),
+        });
 
-      if (!res.ok || !res.body) {
-        const errorText = await res.text().catch(() => "");
-        const err = new Error(`Mistral streaming error (${res.status}): ${errorText.slice(0, 300)}`);
-        (err as unknown as { status: number }).status = res.status;
+        if (res.status === 429 && attempt === 0) {
+          console.warn(`[mistral] Streaming hit rate limit 429 on ${model}, waiting 1.5s before retry...`);
+          await new Promise((r) => setTimeout(r, 1500));
+          continue;
+        }
+        break;
+      }
+
+      if (!res || !res.ok || !res.body) {
+        const status = res ? res.status : 500;
+        const errorText = res ? await res.text().catch(() => "") : "Network error";
+        const err = new Error(`Mistral streaming error (${status}): ${errorText.slice(0, 300)}`);
+        (err as unknown as { status: number }).status = status;
         lastError = err;
 
-        if ((res.status === 400 || res.status === 403 || res.status === 404 || res.status === 422) && i < candidateModels.length - 1) {
-          console.warn(`[mistral] Streaming model ${model} returned HTTP ${res.status}, retrying with ${candidateModels[i + 1]}...`);
+        if ((status === 400 || status === 403 || status === 404 || status === 422 || status === 429) && i < candidateModels.length - 1) {
+          console.warn(`[mistral] Streaming model ${model} returned HTTP ${status}, retrying with ${candidateModels[i + 1]}...`);
           continue;
         }
 
