@@ -1,13 +1,12 @@
 import Link from "next/link";
 
+import { MediaGridItem } from "@/components/admin/media-grid-item";
 import { MediaLibraryUploader } from "@/components/admin/media-library-uploader";
-import { MediaThumb } from "@/components/admin/media-thumb";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { EmptyState } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
 import { Input, NativeSelect } from "@/components/ui/input";
 import { BUCKET_IDS, BUCKETS, type BucketId } from "@/lib/media/buckets";
-import { formatBytes } from "@/lib/utils";
 import { can, requirePagePermission } from "@/server/auth/session";
 import { listMedia } from "@/server/dal/admin/media";
 
@@ -23,6 +22,7 @@ export default async function MediaLibraryPage(props: PageProps<"/admin/media">)
   const page = Math.max(1, Number(sp.page) || 1);
   const { items, total, pageSize } = await listMedia({ q, kind, bucket, sort, page });
   const uploadBuckets = BUCKET_IDS.filter((b) => b !== "site-assets" || can(staff, "settings.write"));
+  const canDelete = can(staff, "media.delete");
   const qs = (p: number) => {
     const s = new URLSearchParams();
     if (q) s.set("q", q);
@@ -64,11 +64,7 @@ export default async function MediaLibraryPage(props: PageProps<"/admin/media">)
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
           {items.map((m) => (
             <li key={m.id}>
-              <Link href={`/admin/media/${m.id}`} className="group block">
-                <MediaThumb media={m} className="transition-[border-color] group-hover:border-accent" />
-                <span className="mt-1.5 block truncate text-sm">{m.filename}</span>
-                <span className="block text-xs text-subtle">{formatBytes(m.sizeBytes)}{m.width ? ` · ${m.width}×${m.height}` : ""}{m.kind === "image" && !m.altText ? " · no alt" : ""}</span>
-              </Link>
+              <MediaGridItem media={m} canDelete={canDelete} />
             </li>
           ))}
         </ul>
