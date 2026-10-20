@@ -473,8 +473,8 @@ export function Assistant({
               }}
               rows={1}
               maxLength={1500}
-              placeholder={listening ? "Listening…" : "Ask about our services, projects, or team…"}
-              className="max-h-28 min-h-11 flex-1 resize-none rounded-[1.25rem] bg-fg/[0.045] px-4 py-3 text-sm text-fg shadow-[inset_0_0_0_1px_var(--glass-line)] placeholder:text-subtle focus-visible:bg-surface focus-visible:shadow-[inset_0_0_0_1px_var(--color-accent),0_0_0_4px_var(--color-accent-soft)] focus-visible:outline-none"
+              placeholder={listening ? "Listening…" : "Ask anything…"}
+              className="max-h-28 min-h-11 flex-1 resize-none rounded-[1.25rem] bg-fg/[0.045] px-4 py-2.5 text-sm leading-snug text-fg shadow-[inset_0_0_0_1px_var(--glass-line)] placeholder:text-subtle focus-visible:bg-surface focus-visible:shadow-[inset_0_0_0_1px_var(--color-accent),0_0_0_4px_var(--color-accent-soft)] focus-visible:outline-none"
             />
 
             {voiceIn ? (
