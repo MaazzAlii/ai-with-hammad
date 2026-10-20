@@ -18,6 +18,8 @@ function cleanAssistantText(text: string): string {
     .replace(/\$\{site\}/g, "")
     .replace(/\(\/case-studies\b/g, "(/projects")
     .replace(/\(\/tutorials\b/g, "(/content")
+    .replace(/([.:!])\s*([✅✔👉🔹▪▫•])\s*/g, "$1\n\n- ")
+    .replace(/^([✅✔👉🔹▪▫•])\s*/gm, "- ")
     .trim();
 }
 

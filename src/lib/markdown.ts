@@ -45,7 +45,7 @@ export function renderMarkdown(src: string | null | undefined): string {
   let code: string[] | null = null;
 
   const flushPara = () => {
-    if (para.length) html.push(`<p>${inline(para.join(" "))}</p>`);
+    if (para.length) html.push(`<p>${inline(para.join("<br />"))}</p>`);
     para = [];
   };
   const flushList = () => {
@@ -71,7 +71,7 @@ export function renderMarkdown(src: string | null | undefined): string {
       continue;
     }
     const heading = line.match(/^(#{2,4})\s+(.+)$/);
-    const ul = line.match(/^\s*[-*]\s+(.+)$/);
+    const ul = line.match(/^\s*(?:[-*•–—]|[✅✔👉🔹▪▫])\s*(.+)$/);
     const ol = line.match(/^\s*\d+[.)]\s+(.+)$/);
     if (!line.trim()) {
       flushPara();
