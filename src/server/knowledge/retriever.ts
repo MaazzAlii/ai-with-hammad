@@ -28,9 +28,10 @@ export async function hybridRetrieve(query: string, options: RetrievalOptions = 
     });
   }
 
-  // 2. Semantic vector search (if embedding provider is configured)
+  // 2. Semantic vector search (if embedding provider is configured and store has chunks)
+  const storeStatus = await store.getStatus().catch(() => ({ chunkCount: 0 }));
   const provider = getAIProvider();
-  if (provider.isConfigured()) {
+  if (provider.isConfigured() && storeStatus.chunkCount > 0) {
     try {
       const embeddings = await provider.embed([query]);
       if (embeddings.length > 0) {
