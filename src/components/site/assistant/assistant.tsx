@@ -54,7 +54,7 @@ export function Assistant({
   const [leadOpen, setLeadOpen] = useState(false);
   const [hasLeadInvite, setHasLeadInvite] = useState(false);
   const [leadDone, setLeadDone] = useState<string | null>(null);
-  const [speakOn, setSpeakOn] = useState(true);
+  const [speakOn, setSpeakOn] = useState(false);
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const [listening, setListening] = useState(false);
   const [handsFree, setHandsFree] = useState(false);
@@ -75,10 +75,10 @@ export function Assistant({
       const hasSpeech = speechSupported();
       setVoiceOut(hasSpeech);
       try {
-        const isMuted = sessionStorage.getItem("assistant_muted") === "1";
-        setSpeakOn(!isMuted && hasSpeech);
+        const userTurnedOn = sessionStorage.getItem("assistant_speak") === "1";
+        setSpeakOn(userTurnedOn && hasSpeech);
       } catch {
-        setSpeakOn(hasSpeech);
+        setSpeakOn(false);
       }
     }, 0);
     return () => clearTimeout(t);
@@ -101,8 +101,17 @@ export function Assistant({
   }, [open]);
 
   const stopListening = useCallback(() => {
-    recognition.current?.abort();
-    recognition.current = null;
+    if (recognition.current) {
+      try {
+        recognition.current.onresult = null;
+        recognition.current.onerror = null;
+        recognition.current.onend = null;
+        recognition.current.abort();
+      } catch {
+        // ignore
+      }
+      recognition.current = null;
+    }
     setListening(false);
   }, []);
 
@@ -152,33 +161,58 @@ export function Assistant({
   const startListening = useCallback(() => {
     stopSpeaking();
     setSpeakingIdx(null);
+    stopListening();
+
     const r = createRecognition({
       onInterim: (t) => setInput(t),
       onFinal: (t) => {
+        stopListening();
         setInput("");
         if (t) void send(t);
       },
       onError: (e) => {
+        stopListening();
         if (e === "not-allowed" || e === "service-not-allowed") {
           setError("Microphone access is blocked. Allow it in your browser, or type instead.");
         } else if (e !== "no-speech" && e !== "aborted") {
           setError("I couldn't hear that — please try again or type.");
         }
-        setListening(false);
       },
-      onEnd: () => setListening(false),
+      onEnd: () => {
+        stopListening();
+      },
     });
     if (!r) return;
     recognition.current = r;
     setError(null);
-    setListening(true);
-    r.start();
+
+    try {
+      r.start();
+      setListening(true);
+    } catch (err) {
+      // Mobile browsers (Android Chrome / iOS Safari) might require a brief delay to release audio
+      setTimeout(() => {
+        if (recognition.current !== r) return;
+        try {
+          r.start();
+          setListening(true);
+        } catch (retryErr) {
+          console.warn("Speech recognition failed to start:", retryErr);
+          stopListening();
+          setError("Microphone was busy. Please tap again.");
+        }
+      }, 120);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- send reads refs
-  }, []);
+  }, [stopListening]);
 
   async function send(text: string) {
     const content = text.trim().slice(0, 1500);
-    if (!content || busy) return;
+    if (!content) return;
+    if (busy) {
+      abortCurrentRequest();
+    }
+    stopListening();
     stopSpeaking();
     setSpeakingIdx(null);
     setError(null);
@@ -258,7 +292,12 @@ export function Assistant({
 
   const toggleMic = () => {
     if (listening) {
+      const pending = input.trim();
       stopListening();
+      if (pending) {
+        setInput("");
+        void send(pending);
+      }
       return;
     }
     stopSpeaking();
@@ -350,8 +389,8 @@ export function Assistant({
                   setSpeakOn((v) => {
                     const next = !v;
                     try {
-                      if (!next) sessionStorage.setItem("assistant_muted", "1");
-                      else sessionStorage.removeItem("assistant_muted");
+                      if (next) sessionStorage.setItem("assistant_speak", "1");
+                      else sessionStorage.removeItem("assistant_speak");
                     } catch {
                       // ignore
                     }
@@ -359,8 +398,8 @@ export function Assistant({
                   });
                 }}
                 aria-pressed={speakOn}
-                aria-label={speakOn ? "Mute audio replies" : "Unmute audio replies"}
-                title={speakOn ? "Voice audio: Unmuted (click to mute)" : "Voice audio: Muted (click to unmute)"}
+                aria-label={speakOn ? "Mute voice replies" : "Enable voice replies"}
+                title={speakOn ? "Voice audio replies: On (click to mute)" : "Voice audio replies: Off (click to enable speech)"}
                 className={cn(
                   "pressable grid size-8 place-items-center rounded-full transition-colors",
                   speakOn ? "bg-accent-soft text-accent" : "text-subtle hover:bg-fg/[0.06] hover:text-fg",

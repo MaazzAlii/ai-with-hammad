@@ -36,21 +36,67 @@ export function createRecognition(handlers: {
   const w = window as unknown as { SpeechRecognition?: RecognitionCtor; webkitSpeechRecognition?: RecognitionCtor };
   const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
   if (!Ctor) return null;
+
   const r = new Ctor();
   r.lang = navigator.language || "en-US";
   r.interimResults = true;
   r.continuous = false;
-  r.onresult = (e) => {
-    let interim = "";
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const res = e.results[i]!;
-      if (res.isFinal) handlers.onFinal(res[0].transcript.trim());
-      else interim += res[0].transcript;
+
+  let finalSent = false;
+  let accumulatedFinal = "";
+  let currentInterim = "";
+
+  const dispatchFinal = (text: string) => {
+    const trimmed = text.trim();
+    if (finalSent || !trimmed) return;
+    finalSent = true;
+    handlers.onFinal(trimmed);
+    try {
+      r.stop();
+    } catch {
+      // ignore
     }
-    if (interim) handlers.onInterim(interim);
   };
-  r.onerror = (e) => handlers.onError(e.error);
-  r.onend = () => handlers.onEnd();
+
+  r.onresult = (e) => {
+    currentInterim = "";
+    let finalChunk = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i];
+      if (!res) continue;
+      const transcript = res[0]?.transcript ?? "";
+      if (res.isFinal) {
+        finalChunk += (finalChunk ? " " : "") + transcript;
+      } else {
+        currentInterim += transcript;
+      }
+    }
+    if (finalChunk) {
+      accumulatedFinal = (accumulatedFinal ? accumulatedFinal + " " : "") + finalChunk;
+      dispatchFinal(accumulatedFinal);
+    } else if (currentInterim) {
+      handlers.onInterim(currentInterim);
+    }
+  };
+
+  r.onerror = (e) => {
+    // If a final transcript was already emitted, ignore trailing errors (e.g. no-speech or aborted on teardown)
+    if (finalSent) return;
+    handlers.onError(e.error);
+  };
+
+  r.onend = () => {
+    // Crucial for mobile Chrome/Safari: if the user finished speaking and onend fired
+    // without isFinal=true being set, send the captured text as final!
+    if (!finalSent) {
+      const fallback = (accumulatedFinal || currentInterim).trim();
+      if (fallback) {
+        dispatchFinal(fallback);
+      }
+    }
+    handlers.onEnd();
+  };
+
   return r;
 }
 
