@@ -3,6 +3,7 @@ import "server-only";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
+import { getPrebuiltChunks, getPrebuiltDocuments } from "./prebuilt-knowledge";
 import type { KnowledgeChunk, KnowledgeDocument } from "./types";
 
 export interface IVectorStore {
@@ -45,6 +46,8 @@ const STOP_WORDS = new Set([
   "a", "an", "the", "and", "or", "in", "on", "at", "to", "for", "of", "with",
   "is", "are", "was", "were", "it", "its", "that", "this", "by", "as", "from",
   "we", "our", "you", "your", "they", "them", "what", "how", "where", "who",
+  "can", "could", "tell", "about", "me", "do", "does", "did", "please", "know",
+  "want", "like", "give", "much", "many", "show", "some", "any",
 ]);
 
 export function tokenizeText(text: string): string[] {
@@ -84,6 +87,22 @@ export class LocalVectorStore implements IVectorStore {
       }
     } catch (e) {
       console.warn("[vector-store] Could not load persisted vector store, starting fresh:", e);
+    }
+
+    // Auto-seed with authoritative prebuilt knowledge if store has no chunks
+    if (this.chunks.size === 0) {
+      try {
+        const prebuiltDocs = getPrebuiltDocuments();
+        const prebuiltChunks = getPrebuiltChunks();
+        for (const doc of prebuiltDocs) {
+          this.documents.set(doc.id, doc);
+        }
+        for (const chunk of prebuiltChunks) {
+          this.chunks.set(chunk.id, chunk);
+        }
+      } catch (seedErr) {
+        console.warn("[vector-store] Could not auto-seed prebuilt knowledge:", seedErr);
+      }
     }
   }
 
@@ -195,6 +214,31 @@ export class LocalVectorStore implements IVectorStore {
     const queryTokens = tokenizeText(query);
     if (queryTokens.length === 0) return [];
 
+    // Domain synonym expansion for robust matching
+    const searchTerms = new Set<string>(queryTokens);
+    for (const qt of queryTokens) {
+      if (["owner", "founder", "founders", "creator", "boss", "leadership"].includes(qt)) {
+        searchTerms.add("founder");
+        searchTerms.add("founders");
+        searchTerms.add("hammadullah");
+        searchTerms.add("maaz");
+      }
+      if (["service", "services", "offer", "offerings", "skills", "capabilities"].includes(qt)) {
+        searchTerms.add("service");
+        searchTerms.add("workflow");
+        searchTerms.add("automation");
+        searchTerms.add("integrations");
+        searchTerms.add("agentic");
+      }
+      if (["contact", "reach", "email", "phone", "whatsapp", "call"].includes(qt)) {
+        searchTerms.add("contact");
+        searchTerms.add("whatsapp");
+      }
+      if (["hammad", "hamad"].includes(qt)) {
+        searchTerms.add("hammadullah");
+      }
+    }
+
     const results: Array<{ chunk: KnowledgeChunk; score: number }> = [];
 
     for (const chunk of this.chunks.values()) {
@@ -213,25 +257,25 @@ export class LocalVectorStore implements IVectorStore {
       let matches = 0;
       let matchedDistinct = 0;
 
-      for (const qt of queryTokens) {
+      for (const st of searchTerms) {
         let termMatches = 0;
 
         // Content match (weight 1.0)
         for (const ct of contentTokens) {
-          if (ct === qt) termMatches += 1;
-          else if (ct.includes(qt) || qt.includes(ct)) termMatches += 0.5;
+          if (ct === st) termMatches += 1;
+          else if (ct.includes(st) || st.includes(ct)) termMatches += 0.5;
         }
 
         // Title match (weight 3.0)
         for (const tt of titleTokens) {
-          if (tt === qt) termMatches += 3;
-          else if (tt.includes(qt)) termMatches += 1.5;
+          if (tt === st) termMatches += 3;
+          else if (tt.includes(st) || st.includes(tt)) termMatches += 1.5;
         }
 
         // Heading match (weight 2.0)
         for (const ht of headingsTokens) {
-          if (ht === qt) termMatches += 2;
-          else if (ht.includes(qt)) termMatches += 1;
+          if (ht === st) termMatches += 2;
+          else if (ht.includes(st) || st.includes(ht)) termMatches += 1;
         }
 
         if (termMatches > 0) {
@@ -242,7 +286,7 @@ export class LocalVectorStore implements IVectorStore {
 
       if (matches > 0) {
         // Normalize score between 0 and 1
-        const coverageRatio = matchedDistinct / queryTokens.length;
+        const coverageRatio = Math.min(matchedDistinct / queryTokens.length, 1);
         const rawScore = (coverageRatio * 0.7) + (Math.min(matches / 10, 1) * 0.3);
         results.push({ chunk, score: Math.min(rawScore, 1) });
       }
