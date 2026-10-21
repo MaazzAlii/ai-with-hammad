@@ -45,7 +45,7 @@ export function renderMarkdown(src: string | null | undefined): string {
   let code: string[] | null = null;
 
   const flushPara = () => {
-    if (para.length) html.push(`<p>${inline(para.join("<br />"))}</p>`);
+    if (para.length) html.push(`<p>${para.map((p) => inline(p)).join("<br />")}</p>`);
     para = [];
   };
   const flushList = () => {
