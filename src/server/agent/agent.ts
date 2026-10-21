@@ -73,9 +73,17 @@ export async function runAgent(
     content: `${baseSystemPrompt}${contextSection}`,
   };
 
-  // Keep last 10 messages for conversational context
-  const recentMessages = messages.slice(-10);
-  const promptMessages: ChatMessage[] = [fullSystemMessage, ...recentMessages];
+  // Keep last 10 messages for conversational context, strictly user/assistant with well-formed unicode
+  const cleanHistory = messages
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => ({
+      role: m.role,
+      content: typeof m.content === "string" ? (m.content.toWellFormed?.() ?? m.content).trim() : "",
+    }))
+    .filter((m) => m.content.length > 0)
+    .slice(-10);
+
+  const promptMessages: ChatMessage[] = [fullSystemMessage, ...cleanHistory];
 
   const completionOptions: ChatCompletionOptions = {
     temperature: 0.2,
