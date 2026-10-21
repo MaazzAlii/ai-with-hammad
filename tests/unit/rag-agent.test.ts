@@ -39,4 +39,16 @@ describe("RAG Agent Core", () => {
     expect(res.result).toContain("/contact");
     expect(res.citations?.[0].url).toContain("/contact");
   });
+
+  it("contains founders (Hammadullah, Maaz Ali) and core services in the system prompt", async () => {
+    const prompt = await buildAgentSystemPrompt();
+    expect(prompt).toContain("Hammadullah");
+    expect(prompt).toContain("Maaz Ali");
+    expect(prompt).toContain("n8n Workflow Automation");
+    expect(prompt).toContain("Custom API Integrations");
+    expect(prompt).toContain("Agentic AI Systems");
+    expect(prompt).toContain("OUT-OF-SCOPE & UNRELATED TOPIC HANDLING");
+    expect(prompt).toContain("CUSTOMER SERVICE & CONFLICT DE-ESCALATION");
+    expect(prompt).toContain("MULTILINGUAL SUPPORT");
+  });
 });
