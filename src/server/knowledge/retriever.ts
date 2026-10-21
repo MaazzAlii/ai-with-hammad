@@ -10,7 +10,7 @@ export async function hybridRetrieve(query: string, options: RetrievalOptions = 
   const store = getVectorStore();
   const env = serverEnv();
   const topK = options.topK ?? env.ragTopK ?? 4;
-  const threshold = options.threshold ?? env.ragRelevanceThreshold ?? 0.35;
+  const threshold = options.threshold ?? env.ragRelevanceThreshold ?? 0.2;
 
   const candidateMap = new Map<string, { chunk: SearchResult["chunk"]; semanticScore: number; lexicalScore: number }>();
 
