@@ -63,4 +63,14 @@ describe("RAG Assistant Scenarios & Robustness", () => {
     expect(prompt).toContain("MULTILINGUAL SUPPORT");
     expect(prompt).toContain("Always detect and reply in the same language");
   });
+
+  it("system prompt strictly bans mentioning Fiverr or Upwork and covers full website services", async () => {
+    const prompt = await buildAgentSystemPrompt();
+    expect(prompt).toContain("STRICT BAN ON THIRD-PARTY FREELANCE PLATFORMS");
+    expect(prompt).toContain("Fiverr, Upwork");
+    expect(prompt).toContain("Website & Portfolio Development & Optimization");
+    expect(prompt).toContain("Custom Backend & Full-Stack Engineering");
+    expect(prompt).toContain("COMPLEX, TECHNICAL, OR CUSTOM SOFTWARE INQUIRIES");
+    expect(prompt).toContain("+92 337 7233444");
+  });
 });
