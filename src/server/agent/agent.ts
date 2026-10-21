@@ -65,8 +65,8 @@ export async function runAgent(
   // 4. Assemble system prompt with grounding context
   const baseSystemPrompt = await buildAgentSystemPrompt();
   const contextSection = contextBlocks.length > 0
-    ? `\n\n## RETRIEVED WEBSITE EVIDENCE (Use this to answer):\n${contextBlocks.join("\n\n")}`
-    : "\n\n## RETRIEVED WEBSITE EVIDENCE:\n(No specific indexed documents matched this query. If the question is about the website, state that this information is not found on the site.)";
+    ? `\n\n## RETRIEVED WEBSITE EVIDENCE (Relevant indexed sections):\n${contextBlocks.join("\n\n")}`
+    : "\n\n## RETRIEVED WEBSITE EVIDENCE:\n(General inquiry. Use the Core Agency Knowledge in your system prompt to answer helpfully and accurately.)";
 
   const fullSystemMessage: ChatMessage = {
     role: "system",
