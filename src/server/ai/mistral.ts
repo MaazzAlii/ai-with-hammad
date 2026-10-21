@@ -23,13 +23,43 @@ export class MistralProvider implements AIProvider {
   private formatMessages(messages: ChatMessage[]) {
     const sanitized: Array<Record<string, unknown>> = [];
 
-    for (const m of messages) {
-      const content = (m.content || "").trim();
-      if (!content && (!m.toolCalls || m.toolCalls.length === 0)) continue;
+    // 1. Separate system messages from chat conversation
+    let systemContent = "";
+    const conversation: ChatMessage[] = [];
 
+    for (const m of messages) {
+      const rawText = m.content || "";
+      const cleaned = (typeof rawText.toWellFormed === "function" ? rawText.toWellFormed() : rawText)
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+        .trim();
+
+      if (m.role === "system") {
+        if (cleaned) {
+          systemContent = systemContent ? `${systemContent}\n\n${cleaned}` : cleaned;
+        }
+      } else {
+        conversation.push({
+          role: m.role,
+          content: cleaned || " ",
+          name: m.name,
+          toolCallId: m.toolCallId,
+          toolCalls: m.toolCalls,
+        });
+      }
+    }
+
+    if (systemContent) {
+      sanitized.push({
+        role: "system",
+        content: systemContent,
+      });
+    }
+
+    // 2. Format conversation messages with strict role alternation
+    for (const m of conversation) {
       const base: Record<string, unknown> = {
         role: m.role,
-        content: content || " ",
+        content: m.content || " ",
       };
       if (m.name) base.name = m.name;
       if (m.toolCallId) base.tool_call_id = m.toolCallId;
@@ -44,7 +74,6 @@ export class MistralProvider implements AIProvider {
         }));
       }
 
-      // Mistral strictly enforces alternating roles. Merge consecutive messages with the same role.
       const last = sanitized[sanitized.length - 1];
       if (last && last.role === base.role && !last.tool_calls && !base.tool_calls) {
         last.content = `${last.content}\n\n${base.content}`;
@@ -56,6 +85,11 @@ export class MistralProvider implements AIProvider {
     // Must end with a user or tool message, not an empty or trailing assistant
     while (sanitized.length > 0 && sanitized[sanitized.length - 1].role === "assistant") {
       sanitized.pop();
+    }
+
+    // If conversation after system starts with assistant, prepend a greeting user message
+    if (sanitized.length > 1 && sanitized[1].role === "assistant") {
+      sanitized.splice(1, 0, { role: "user", content: "Hello" });
     }
 
     return sanitized;
