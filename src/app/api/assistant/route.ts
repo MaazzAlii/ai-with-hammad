@@ -79,6 +79,6 @@ export async function POST(req: Request) {
     if (msg.includes("429") || msg.toLowerCase().includes("rate limit")) {
       return json(429, "AI provider is busy or rate-limited. Please wait a moment and try again.");
     }
-    return json(502, msg ? `The assistant is unavailable: ${msg.slice(0, 160)}` : "The assistant is unavailable right now. Please use the contact form or WhatsApp.");
+    return json(502, "The assistant is temporarily having trouble connecting. Please try asking again in a moment, or reach out to our team via WhatsApp (+92 337 7233444) or our Contact page!");
   }
 }
