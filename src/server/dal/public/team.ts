@@ -86,6 +86,7 @@ export const listPublishedTeam = cache(async (opts: { featuredOnly?: boolean; sl
     ]);
     return rows.map(({ photoMediaId, ...r }) => ({
       ...r,
+      name: r.name === "Hammadullah" ? "Hammad Ullah" : r.name,
       websiteUrl: safeHttpUrl(r.websiteUrl),
       photo: photoMediaId ? (media.get(photoMediaId) ?? null) : null,
       links: links

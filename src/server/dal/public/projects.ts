@@ -302,7 +302,7 @@ export const getPublishedProject = cache(async (slug: string): Promise<ProjectDe
       media: items,
       metrics,
       features,
-      team: team.map(({ photoMediaId, ...t }) => ({ ...t, photo: photoMediaId ? (media.get(photoMediaId) ?? null) : null })),
+      team: team.map(({ photoMediaId, ...t }) => ({ ...t, name: t.name === "Hammadullah" ? "Hammad Ullah" : t.name, photo: photoMediaId ? (media.get(photoMediaId) ?? null) : null })),
       services: svc,
       testimonials: projectTestimonials.map(({ photoMediaId, ...t }) => ({ ...t, photo: photoMediaId ? (media.get(photoMediaId) ?? null) : null })),
     };

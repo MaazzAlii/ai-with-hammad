@@ -89,11 +89,12 @@ export async function getServiceForEdit(id: string) {
 
 /* team */
 export async function listTeamAdmin() {
-  return db()
+  const rows = await db()
     .select({ id: teamMembers.id, name: teamMembers.name, slug: teamMembers.slug, roleTitle: teamMembers.roleTitle, isPublished: teamMembers.isPublished, isFeatured: teamMembers.isFeatured, isLocked: teamMembers.isLocked, photoMediaId: teamMembers.photoMediaId })
     .from(teamMembers)
     .where(isNull(teamMembers.deletedAt))
     .orderBy(asc(teamMembers.sortOrder), asc(teamMembers.name));
+  return rows.map((r) => ({ ...r, name: r.name === "Hammadullah" ? "Hammad Ullah" : r.name }));
 }
 export async function getTeamMemberForEdit(id: string) {
   const [m] = await db().select().from(teamMembers).where(eq(teamMembers.id, id));
@@ -103,7 +104,7 @@ export async function getTeamMemberForEdit(id: string) {
     db().select().from(teamAppearances).where(eq(teamAppearances.teamMemberId, id)).orderBy(asc(teamAppearances.sortOrder)),
   ]);
   const mediaMap = await getMediaMany([m.photoMediaId]);
-  return { member: m, links, appearances, photo: m.photoMediaId ? (mediaMap.get(m.photoMediaId) ?? null) : null };
+  return { member: { ...m, name: m.name === "Hammadullah" ? "Hammad Ullah" : m.name }, links, appearances, photo: m.photoMediaId ? (mediaMap.get(m.photoMediaId) ?? null) : null };
 }
 
 /* content */

@@ -31,7 +31,7 @@ async function save(id: string | null, fd: FormData): Promise<Result> {
         .where(and(eq(teamMembers.id, mid), isNull(teamMembers.deletedAt)));
       if (!ex) return null;
       // Founders: name and URL are fixed; everything else stays editable.
-      const fixed = ex.isLocked ? { name: ex.name, slug: ex.slug } : {};
+      const fixed = ex.isLocked ? { name: ex.slug === "hammadullah" ? "Hammad Ullah" : ex.name, slug: ex.slug } : {};
       await tx
         .update(teamMembers)
         .set({ ...base, ...fixed, ...flags, ...(canPublish && isPublished && !ex.publishedAt ? { publishedAt: new Date() } : {}) })

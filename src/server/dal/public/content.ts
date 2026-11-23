@@ -124,7 +124,7 @@ export const listPublishedContent = cache(async (opts: { platform?: ContentPlatf
       ...authors.map((a) => a.photoMediaId),
     ]);
     const metricsById = new Map(metrics.map(({ contentItemId, ...m }) => [contentItemId, m]));
-    const authorsById = new Map(authors.map((a) => [a.id, { slug: a.slug, name: a.name, roleTitle: a.roleTitle, photo: a.photoMediaId ? (media.get(a.photoMediaId) ?? null) : null }]));
+    const authorsById = new Map(authors.map((a) => [a.id, { slug: a.slug, name: a.name === "Hammadullah" ? "Hammad Ullah" : a.name, roleTitle: a.roleTitle, photo: a.photoMediaId ? (media.get(a.photoMediaId) ?? null) : null }]));
     return rows.map(({ thumbnailMediaId, embedUrl, authorTeamMemberId, resourceMediaId, ...r }) => {
       const url = safeHttpUrl(r.url, { httpsOnly: true });
       const embed = parseEmbed(embedUrl) ?? parseEmbed(url);
