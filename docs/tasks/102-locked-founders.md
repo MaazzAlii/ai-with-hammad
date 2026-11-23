@@ -2,7 +2,7 @@
 
 ## Objective
 
-Hammadullah and Maaz Ali are seeded as founders whose names cannot be changed or deleted; everything else stays editable.
+Hammad Ullah and Maaz Ali are seeded as founders whose names cannot be changed or deleted; everything else stays editable.
 
 ## Why This Matters
 

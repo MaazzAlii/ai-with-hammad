@@ -240,7 +240,7 @@ describe("client portal isolation", () => {
 describe("locked founders", () => {
   it("are seeded, cannot be renamed or deleted, but other fields are editable", async () => {
     const rows = await sql`select slug, name, is_locked from team_members where is_locked order by sort_order`;
-    expect(rows.map((r) => r.name)).toEqual(["Hammadullah", "Maaz Ali"]);
+    expect(rows.map((r) => r.name)).toEqual(["Hammad Ullah", "Maaz Ali"]);
     await expect(sql`update team_members set name = 'Someone else' where slug = 'maaz-ali'`).rejects.toThrow(/locked/);
     await expect(sql`update team_members set deleted_at = now() where slug = 'maaz-ali'`).rejects.toThrow(/locked/);
     await expect(sql`delete from team_members where slug = 'hammadullah'`).rejects.toThrow(/locked/);

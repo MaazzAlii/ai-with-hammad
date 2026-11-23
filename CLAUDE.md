@@ -88,7 +88,7 @@ Use `MediaImage` for public images. Motion via tokens (`ease-spring`, `data-reve
 - Two account kinds in `profiles.kind`: `staff` (admin panel) and `client` (portal, linked to `clients` via
   `profiles.client_id`). `getCurrentStaff`/`has_permission` only accept `kind='staff'`. Portal pages use
   `requireClient()`, portal actions `authorizeClient()`, and every portal query filters by the caller's `client_id`.
-- The founders (Hammadullah, Maaz Ali) are `team_members.is_locked`: a DB trigger blocks renaming, re-slugging,
+- The founders (Hammad Ullah, Maaz Ali) are `team_members.is_locked`: a DB trigger blocks renaming, re-slugging,
   unlocking and deleting them. Everything else a visitor sees must stay editable from Admin (no hard-coded copy).
 - Only async functions may be exported from `"use server"` files (every export is a public endpoint;
   guarded by `tests/unit/server-actions-guard.test.ts`). Put read helpers in the DAL.

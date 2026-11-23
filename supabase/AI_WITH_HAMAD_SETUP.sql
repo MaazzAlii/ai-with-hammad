@@ -1724,7 +1724,7 @@ where not exists (select 1 from public.service_features sf where sf.service_id =
 insert into public.team_members (slug, name, role_title, is_published, published_at, is_featured, is_locked, sort_order)
 select v.slug, v.name, v.role_title, true, now(), true, true, v.sort_order
 from (values
-  ('hammadullah', 'Hammadullah', 'Co-founder · AI Engineer', 10),
+  ('hammadullah', 'Hammad Ullah', 'Co-founder · AI Engineer', 10),
   ('maaz-ali',    'Maaz Ali',    'Co-founder · AI Engineer', 20)
 ) as v(slug, name, role_title, sort_order)
 where not exists (select 1 from public.team_members m where m.slug = v.slug and m.deleted_at is null);

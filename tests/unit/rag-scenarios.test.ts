@@ -18,7 +18,7 @@ describe("RAG Assistant Scenarios & Robustness", () => {
     expect(results.length).toBeGreaterThan(0);
     const topChunk = results[0].chunk;
     const combinedText = `${topChunk.title} ${topChunk.content}`.toLowerCase();
-    expect(combinedText).toMatch(/hammadullah|maaz/);
+    expect(combinedText).toMatch(/hammad|ullah|maaz/);
   });
 
   it("retrieves Maaz Ali profile chunk when asked about Maaz Ali", async () => {
@@ -55,7 +55,7 @@ describe("RAG Assistant Scenarios & Robustness", () => {
     const prompt = await buildAgentSystemPrompt();
     expect(prompt).toContain("CUSTOMER SERVICE & CONFLICT DE-ESCALATION");
     expect(prompt).toContain("ALWAYS maintain absolute poise, empathy, and professional courtesy");
-    expect(prompt).toContain("Hammadullah and Maaz Ali");
+    expect(prompt).toContain("Hammad Ullah and Maaz Ali");
   });
 
   it("system prompt mandates native multilingual responses", async () => {

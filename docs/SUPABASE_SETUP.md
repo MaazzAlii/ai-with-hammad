@@ -15,7 +15,7 @@ templates and the three starter services carried over from the original site). I
 2. Re-running later is safe (use it to apply updates to buckets/policies/seed).
 3. Check: Table editor shows 35 tables in `public` (including `clients`, `message_threads`, `messages`,
    `testimonials`, `faqs`); Storage shows 10 buckets; `team_members` contains the two locked founders
-   (Hammadullah, Maaz Ali).
+   (Hammad Ullah, Maaz Ali).
 4. **Already ran an older version?** Just run the whole file again — it adds the client portal tables,
    new permissions, founders and FAQs without touching your existing data.
 

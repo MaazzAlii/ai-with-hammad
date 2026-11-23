@@ -55,7 +55,7 @@ blocked **in this sandbox only**. Two Lighthouse findings were fixed during the 
 | **FAQ** module (homepage + contact) | Admin → FAQs |
 | **WhatsApp**: floating button and contact card, number and prefilled message editable | Admin → Settings → General |
 | **Everything visitors see is editable**: agency name, logo (also used on the loading screen), contact details, phone, address, hours, tech stack, team photos, navigation, legal pages | Admin → Settings / Team / Media |
-| **Founders fixed**: Hammadullah and Maaz Ali are seeded and locked. Their names and slugs can't be changed or deleted (DB trigger); photos, bios and links are editable | Admin → Team |
+| **Founders fixed**: Hammad Ullah and Maaz Ali are seeded and locked. Their names and slugs can't be changed or deleted (DB trigger); photos, bios and links are editable | Admin → Team |
 | **Captcha** on contact, sponsorship, staff login, password reset and client login (built-in signed challenge, or Cloudflare Turnstile via env) | `src/server/captcha.ts` |
 | **Redesign**: animated AI-agent pipeline hero, aurora background, tech marquee, reveal-on-scroll, lazy rendering below the fold (`content-visibility`), branded navigation loader | `src/components/site/*` |
 | **Self-hosting**: Dockerfile, docker-compose + Caddy (HTTPS), `/api/health` | `docs/HOSTING_PLAN.md` |

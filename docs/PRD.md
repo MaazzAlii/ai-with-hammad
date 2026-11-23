@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| Owner | Maaz Ali, Hammadullah |
+| Owner | Maaz Ali, Hammad Ullah |
 | Status | Living document — v2 (Liquid Glass redesign + link-in-bio) |
 | Production | https://ai-with-hammad2.vercel.app (custom domain to follow) |
 | Repository | https://github.com/MaazzAlii/ai-with-hammad (push to `main` → Vercel deploys) |

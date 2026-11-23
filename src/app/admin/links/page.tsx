@@ -167,7 +167,7 @@ export default async function LinksAdminPage() {
           <AdminForm action={saveBioLink.bind(null, null)} submitLabel="Add link" compact>
             <FormSection
               title="Add link"
-              description="Brand links go in the main list. To add Hammadullah's or Maaz's profiles, pick Type “Social profile” and Belongs to that person — only links you add here are shown, and switching Published off hides one. Affiliate and sponsored links are labelled for visitors."
+              description="Brand links go in the main list. To add Hammad Ullah's or Maaz's profiles, pick Type “Social profile” and Belongs to that person — only links you add here are shown, and switching Published off hides one. Affiliate and sponsored links are labelled for visitors."
             >
               <LinkFields people={people} />
             </FormSection>

@@ -156,7 +156,7 @@ test.describe("founders", () => {
     await expect(pub.getByRole("heading", { level: 1 })).toHaveText("Maaz Ali");
     await expect(pub.getByText("AI engineer building automation systems.")).toBeVisible();
     await pub.goto("/team/hammadullah");
-    await expect(pub.getByRole("heading", { level: 1 })).toHaveText("Hammadullah");
+    await expect(pub.getByRole("heading", { level: 1 })).toHaveText("Hammad Ullah");
     await ctx.close();
   });
 });

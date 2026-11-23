@@ -51,7 +51,7 @@ describe("RAG Semantic Chunker", () => {
         "# Leadership",
         "Leadership team bios and background.",
         "## Founders",
-        "Hammadullah and Maaz Ali are the founding partners.",
+        "Hammad Ullah and Maaz Ali are the founding partners.",
       ].join("\n"),
     };
 

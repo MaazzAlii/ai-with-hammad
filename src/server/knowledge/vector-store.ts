@@ -221,6 +221,8 @@ export class LocalVectorStore implements IVectorStore {
         searchTerms.add("founder");
         searchTerms.add("founders");
         searchTerms.add("hammadullah");
+        searchTerms.add("hammad");
+        searchTerms.add("ullah");
         searchTerms.add("maaz");
       }
       if (["service", "services", "offer", "offerings", "skills", "capabilities"].includes(qt)) {
@@ -234,8 +236,10 @@ export class LocalVectorStore implements IVectorStore {
         searchTerms.add("contact");
         searchTerms.add("whatsapp");
       }
-      if (["hammad", "hamad"].includes(qt)) {
+      if (["hammad", "hamad", "ullah"].includes(qt)) {
         searchTerms.add("hammadullah");
+        searchTerms.add("hammad");
+        searchTerms.add("ullah");
       }
     }
 
